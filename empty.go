@@ -75,10 +75,8 @@ func IsValueZero(v reflect.Value) bool {
 		return v.Bool() == false
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return v.Int() == 0
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		return v.Uint() == 0
-	case reflect.Uintptr:
-		return v.Pointer() == 0
 	case reflect.Float32, reflect.Float64:
 		return v.Float() == 0
 	case reflect.Complex64, reflect.Complex128:
@@ -116,18 +114,8 @@ func IsStructZero(v reflect.Value) bool {
 
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
-		switch field.Kind() {
-		case reflect.Ptr:
-			field = field.Elem()
-			fallthrough
-		case reflect.Struct:
-			if !IsStructZero(field) {
-				return false
-			}
-		default:
-			if field.CanInterface() && !IsZero(field.Interface()) {
-				return false
-			}
+		if field.CanInterface() && !IsZero(field.Interface()) {
+			return false
 		}
 	}
 	return true
@@ -140,7 +128,8 @@ func IsArrayZero(v reflect.Value) bool {
 	}
 
 	for i := 0; i < v.Len(); i++ {
-		if !IsZero(v.Index(i).Interface()) {
+		elem := v.Index(i)
+		if elem.CanInterface() && !IsZero(elem.Interface()) {
 			return false
 		}
 	}
