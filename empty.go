@@ -1,4 +1,4 @@
-package utils
+package reflecthelper
 
 import (
 	"reflect"
@@ -18,47 +18,49 @@ func IsZero(k interface{}) bool {
 		return true
 	}
 
-	switch k.(type) {
-	case complex64:
-		return k.(complex64) == 0
-	case complex128:
-		return k.(complex128) == 0
-	case int:
-		return k.(int) == 0
-	case int8:
-		return k.(int8) == 0
-	case int16:
-		return k.(int16) == 0
-	case int32:
-		return k.(int32) == 0
-	case int64:
-		return k.(int64) == 0
-	case uint:
-		return k.(uint) == 0
-	case uint8:
-		return k.(uint8) == 0
-	case uint16:
-		return k.(uint16) == 0
-	case uint32:
-		return k.(uint32) == 0
-	case uint64:
-		return k.(uint64) == 0
-	case float32:
-		return k.(float32) == 0
-	case float64:
-		return k.(float64) == 0
+	switch val := k.(type) {
 	case bool:
-		return k.(bool) == false
+		return val == false
+	case int:
+		return val == 0
+	case int8:
+		return val == 0
+	case int16:
+		return val == 0
+	case int32:
+		return val == 0
+	case int64:
+		return val == 0
+	case uint:
+		return val == 0
+	case uint8:
+		return val == 0
+	case uint16:
+		return val == 0
+	case uint32:
+		return val == 0
+	case uint64:
+		return val == 0
+	case uintptr:
+		return val == 0
+	case float32:
+		return val == 0
+	case float64:
+		return val == 0
+	case complex64:
+		return val == 0
+	case complex128:
+		return val == 0
 	case string:
-		return k.(string) == ""
+		return val == ""
 	case *time.Time:
-		return k.(*time.Time) == nilTime || IsTimeZero(*k.(*time.Time))
+		return val == nilTime || IsTimeZero(*val)
 	case time.Time:
-		return IsTimeZero(k.(time.Time))
+		return IsTimeZero(val)
 	case Zeroable:
-		return k.(Zeroable) == nil || k.(Zeroable).IsZero()
+		return val == nil || val.IsZero()
 	case reflect.Value: // for go version less than 1.13 because reflect.Value has no method IsZero
-		return IsValueZero(k.(reflect.Value))
+		return IsValueZero(val)
 	}
 
 	return IsValueZero(reflect.ValueOf(k))
@@ -69,29 +71,36 @@ var zeroType = reflect.TypeOf((*Zeroable)(nil)).Elem()
 // IsValueZero check the reflect.Value if it is zero based on it's kind.
 func IsValueZero(v reflect.Value) bool {
 	switch v.Kind() {
+	case reflect.Bool:
+		return v.Bool() == false
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return v.Uint() == 0
+	case reflect.Uintptr:
+		return v.Pointer() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
 	case reflect.Complex64, reflect.Complex128:
 		return v.Complex() == 0
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Slice:
+	case reflect.Array:
+		return IsArrayZero(v)
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Slice, reflect.UnsafePointer:
 		return v.IsNil()
-	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int, reflect.Int64:
-		return v.Int() == 0
-	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint, reflect.Uint64:
-		return v.Uint() == 0
-	case reflect.String:
-		return v.Len() == 0
 	case reflect.Ptr:
 		if v.IsNil() {
 			return true
 		}
 		return IsValueZero(v.Elem())
+	case reflect.String:
+		return v.Len() == 0
 	case reflect.Struct:
 		return IsStructZero(v)
-	case reflect.Array:
-		return IsArrayZero(v)
 	}
 	return false
 }
 
+// IsStructZero checks if the struct is zero.
 func IsStructZero(v reflect.Value) bool {
 	if !v.IsValid() || v.NumField() == 0 {
 		return true
@@ -124,6 +133,7 @@ func IsStructZero(v reflect.Value) bool {
 	return true
 }
 
+// IsArrayZero checks if the array is empty.
 func IsArrayZero(v reflect.Value) bool {
 	if !v.IsValid() || v.Len() == 0 {
 		return true
@@ -138,11 +148,13 @@ func IsArrayZero(v reflect.Value) bool {
 	return true
 }
 
+// List of constants for the zero time.
 const (
 	ZeroTime0 = "0000-00-00 00:00:00"
 	ZeroTime1 = "0001-01-01 00:00:00"
 )
 
+// IsTimeZero checks if the time is zero.
 func IsTimeZero(t time.Time) bool {
 	return t.IsZero() || t.Format("2006-01-02 15:04:05") == ZeroTime0 ||
 		t.Format("2006-01-02 15:04:05") == ZeroTime1
