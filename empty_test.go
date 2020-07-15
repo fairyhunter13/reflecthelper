@@ -51,6 +51,7 @@ func TestZero(t *testing.T) {
 
 func TestIsValueZero(t *testing.T) {
 	var test chan int
+	var elemInt *int
 	type complexStruct struct {
 		Hello *string
 		Test  string
@@ -63,6 +64,7 @@ func TestIsValueZero(t *testing.T) {
 		}
 	}
 	var zeroReflectValues = []reflect.Value{
+		reflect.ValueOf(nil),
 		reflect.ValueOf(false),
 		reflect.ValueOf(int(0)),
 		reflect.ValueOf(int8(0)),
@@ -80,6 +82,7 @@ func TestIsValueZero(t *testing.T) {
 		reflect.ValueOf(complex64(0)),
 		reflect.ValueOf(complex128(0)),
 		reflect.ValueOf(""),
+		reflect.ValueOf([1]*int{elemInt}),
 		reflect.ValueOf([0]int{}),
 		reflect.ValueOf([5]int{}),
 		reflect.ValueOf(complexStruct{}),

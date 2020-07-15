@@ -94,6 +94,8 @@ func IsValueZero(v reflect.Value) bool {
 		return v.Len() == 0
 	case reflect.Struct:
 		return IsStructZero(v)
+	case reflect.Invalid:
+		return true
 	}
 	return false
 }
@@ -114,6 +116,9 @@ func IsStructZero(v reflect.Value) bool {
 
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
+		if !field.IsValid() {
+			continue
+		}
 		if field.CanInterface() && !IsZero(field.Interface()) {
 			return false
 		}
@@ -129,6 +134,9 @@ func IsArrayZero(v reflect.Value) bool {
 
 	for i := 0; i < v.Len(); i++ {
 		elem := v.Index(i)
+		if !elem.IsValid() {
+			continue
+		}
 		if elem.CanInterface() && !IsZero(elem.Interface()) {
 			return false
 		}

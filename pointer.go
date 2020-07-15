@@ -25,11 +25,11 @@ func GetInitElem(v reflect.Value) (res reflect.Value) {
 // GetChildElem gets the child elem if it is a pointer with an element of pointer.
 func GetChildElem(v reflect.Value) (res reflect.Value) {
 	res = v
-	kind := GetKind(v)
+	kind := GetKind(res)
 	for kind == reflect.Ptr {
 		res = GetInitElem(res)
 		kind = GetKind(res)
-		if !res.CanSet() {
+		if !res.IsValid() || !res.CanSet() {
 			return
 		}
 	}
