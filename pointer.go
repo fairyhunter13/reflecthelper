@@ -5,7 +5,7 @@ import "reflect"
 // GetInitElem gets the element of a pointer value.
 // It initialize the element of a pointer value if it is nil.
 func GetInitElem(v reflect.Value) (res reflect.Value) {
-	kind := v.Type().Kind()
+	kind := GetKind(v)
 	if kind != reflect.Ptr {
 		res = v
 		return
@@ -25,10 +25,10 @@ func GetInitElem(v reflect.Value) (res reflect.Value) {
 // GetChildElem gets the child elem if it is a pointer with an element of pointer.
 func GetChildElem(v reflect.Value) (res reflect.Value) {
 	res = v
-	kind := v.Type().Kind()
+	kind := GetKind(v)
 	for kind == reflect.Ptr {
 		res = GetInitElem(res)
-		kind = res.Type().Kind()
+		kind = GetKind(res)
 		if !res.CanSet() {
 			return
 		}
