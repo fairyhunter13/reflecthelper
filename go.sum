@@ -1,3 +1,5 @@
+github.com/Popog/deepcopy v0.0.0-20160519164043-14c73c14458b h1:OtYAM5G0quXKgIMPTbE3pEkhBEOFDFSjJ+jETINgXXw=
+github.com/Popog/deepcopy v0.0.0-20160519164043-14c73c14458b/go.mod h1:0rMzFh80h/r2qSUDZBoKDFTSX/4XUF62zMTutQ4TR6w=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
