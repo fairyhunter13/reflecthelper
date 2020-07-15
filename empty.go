@@ -70,7 +70,7 @@ var zeroType = reflect.TypeOf((*Zeroable)(nil)).Elem()
 
 // IsValueZero check the reflect.Value if it is zero based on it's kind.
 func IsValueZero(v reflect.Value) bool {
-	switch v.Kind() {
+	switch v.Type().Kind() {
 	case reflect.Bool:
 		return v.Bool() == false
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
