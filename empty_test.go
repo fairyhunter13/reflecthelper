@@ -256,3 +256,38 @@ func TestIsInterfaceReflectZero(t *testing.T) {
 		})
 	}
 }
+
+func TestSetReflectZero(t *testing.T) {
+	var test *int
+	type args struct {
+		val reflect.Value
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "nil reflect value",
+			args: args{
+				val: reflect.ValueOf(nil),
+			},
+		},
+		{
+			name: "nil pointer of pointer integer value",
+			args: args{
+				val: reflect.ValueOf(&test),
+			},
+		},
+		{
+			name: "elem of nil pointer integer value",
+			args: args{
+				val: reflect.ValueOf(&test).Elem(),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SetReflectZero(tt.args.val)
+		})
+	}
+}

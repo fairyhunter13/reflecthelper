@@ -172,3 +172,14 @@ func IsInterfaceReflectZero(val interface{}) (result bool) {
 
 	return IsReflectZero(reflect.ValueOf(val))
 }
+
+// SetReflectZero sets the val to the reflect.Zero of its type.
+func SetReflectZero(val reflect.Value) {
+	if !val.IsValid() {
+		return
+	}
+
+	if val.CanSet() {
+		val.Set(reflect.Zero(val.Type()))
+	}
+}
