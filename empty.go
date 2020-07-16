@@ -58,6 +58,10 @@ func IsZero(k interface{}) bool {
 	case time.Time:
 		return IsTimeZero(val)
 	case Zeroable:
+		refVal := reflect.ValueOf(val)
+		if GetKind(refVal) == reflect.Ptr {
+			return refVal.IsNil() || val == nil || val.IsZero()
+		}
 		return val == nil || val.IsZero()
 	case reflect.Value: // for go version less than 1.13 because reflect.Value has no method IsZero
 		return IsValueZero(val)

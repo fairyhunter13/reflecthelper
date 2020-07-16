@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fairyhunter13/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -40,6 +41,9 @@ func TestZero(t *testing.T) {
 		nilTime,
 		ZeroStruct{},
 		&ZeroStruct{},
+		decimal.Decimal{},
+		&decimal.Decimal{},
+		(*decimal.Decimal)(nil),
 	}
 
 	for _, v := range zeroValues {
