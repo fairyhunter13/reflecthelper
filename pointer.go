@@ -44,6 +44,9 @@ func GetElem(val reflect.Value) (res reflect.Value) {
 	if GetKind(res) != reflect.Ptr {
 		return
 	}
+	if res.IsNil() {
+		return
+	}
 	res = reflect.Indirect(res)
 	return
 }
@@ -54,7 +57,7 @@ func GetChildElem(val reflect.Value) (res reflect.Value) {
 	kind := GetKind(res)
 	var tempRes reflect.Value
 	for kind == reflect.Ptr {
-		tempRes = GetElem(val)
+		tempRes = GetElem(res)
 		if res == tempRes {
 			return
 		}
