@@ -77,13 +77,13 @@ func TestGetInitElem(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotRes := GetInitElem(tt.args.v); !(gotRes.Type() == tt.wantRes.Type()) {
-				t.Errorf("GetInitElem() = %v, want %v", gotRes, tt.wantRes)
+				t.Errorf("GetInitElem() = %v, want %v", gotRes.Type(), tt.wantRes.Type())
 			}
 		})
 	}
 }
 
-func TestGetChildElem(t *testing.T) {
+func TestGetInitChildElem(t *testing.T) {
 	var strPtr1 *string
 	var strPtr2 **string
 	var intPtr2 **int
@@ -133,8 +133,30 @@ func TestGetChildElem(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := GetChildElem(tt.args.v); !(gotRes.Type() == tt.wantRes.Type()) {
-				t.Errorf("GetChildElem() = %v, want %v", gotRes, tt.wantRes)
+			if gotRes := GetInitChildElem(tt.args.v); !(gotRes.Type() == tt.wantRes.Type()) {
+				t.Errorf("GetInitChildElem() = %v, want %v", gotRes.Type(), tt.wantRes.Type())
+			}
+		})
+	}
+}
+
+func TestGetChildElem(t *testing.T) {
+	type args struct {
+		val reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes reflect.Value
+	}{
+		{
+			name: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotRes := GetChildElem(tt.args.val); !(gotRes.Type() == tt.wantRes.Type()) {
+				t.Errorf("GetChildElem() = %v, want %v", gotRes.Type(), tt.wantRes.Type())
 			}
 		})
 	}
