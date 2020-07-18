@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"math"
 	"reflect"
 	"time"
 )
@@ -82,9 +83,10 @@ func IsValueZero(v reflect.Value) bool {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		return v.Uint() == 0
 	case reflect.Float32, reflect.Float64:
-		return v.Float() == 0
+		return math.Float64bits(v.Float()) == 0
 	case reflect.Complex64, reflect.Complex128:
-		return v.Complex() == 0
+		complexNum := v.Complex()
+		return math.Float64bits(real(complexNum)) == 0 && math.Float64bits(imag(complexNum)) == 0
 	case reflect.Array:
 		return IsArrayZero(v)
 	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Slice, reflect.UnsafePointer:

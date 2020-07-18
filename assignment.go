@@ -15,25 +15,13 @@ func checkValid(val reflect.Value) (err error) {
 	return
 }
 
-func checkAssign(assigner reflect.Value, val reflect.Value) (err error) {
+func checkAssigner(assigner reflect.Value) (err error) {
 	err = checkValid(assigner)
-	if err != nil {
-		return
-	}
-	err = checkValid(val)
 	if err != nil {
 		return
 	}
 	if !assigner.CanSet() {
 		err = ErrAssignerCantSet
-		return
-	}
-	if !val.CanInterface() {
-		err = fmt.Errorf(
-			"The val can't extract the underlying value as interface, underlying val: %s kind: %s",
-			val.String(),
-			GetKind(val),
-		)
 	}
 	return
 }
@@ -41,10 +29,7 @@ func checkAssign(assigner reflect.Value, val reflect.Value) (err error) {
 // AssignReflect assigns the val of the reflect.Value to the assigner.
 // This function asserts that the assigner Kind is same as the val Kind.
 func AssignReflect(assigner reflect.Value, val reflect.Value) (err error) {
-	err = checkAssign(assigner, val)
-	if err != nil {
-		return
-	}
+	// TODO: implement this
 	return
 }
 
@@ -52,14 +37,14 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 	switch GetKind(assigner) {
 	case reflect.Bool:
 		var result bool
-		result, err = getBool(val)
+		result, err = ExtractBool(val)
 		if err != nil {
 			return
 		}
 		assigner.SetBool(result)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		var result int64
-		result, err = getInt(val)
+		result, err = ExtractInt(val)
 		if err != nil {
 			return
 		}
@@ -70,7 +55,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 		assigner.SetInt(result)
 	case reflect.String:
 		var result string
-		result, err = getString(val)
+		result, err = ExtractString(val)
 		if err != nil {
 			return
 		}

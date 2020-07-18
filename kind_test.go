@@ -80,6 +80,34 @@ func TestGetElemKind(t *testing.T) {
 			},
 			wantRes: reflect.Ptr,
 		},
+		{
+			name: "array of int type",
+			args: args{
+				val: reflect.ValueOf([3]int{}),
+			},
+			wantRes: reflect.Int,
+		},
+		{
+			name: "pointer array of int type",
+			args: args{
+				val: reflect.ValueOf(&[3]int{}),
+			},
+			wantRes: reflect.Array,
+		},
+		{
+			name: "slice of int type",
+			args: args{
+				val: reflect.ValueOf([]string{}),
+			},
+			wantRes: reflect.String,
+		},
+		{
+			name: "pointer slice of int type",
+			args: args{
+				val: reflect.ValueOf(&[]string{}),
+			},
+			wantRes: reflect.Slice,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

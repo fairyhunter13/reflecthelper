@@ -18,7 +18,8 @@ func GetElemKind(val reflect.Value) (res reflect.Kind) {
 	}
 
 	res = GetKind(val)
-	if res == reflect.Ptr {
+	switch res {
+	case reflect.Array, reflect.Chan, reflect.Map, reflect.Ptr, reflect.Slice:
 		res = val.Type().Elem().Kind()
 	}
 	return
