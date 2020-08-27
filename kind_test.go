@@ -47,6 +47,7 @@ func TestGetElemKind(t *testing.T) {
 	type args struct {
 		val reflect.Value
 	}
+	interfaceOfString := interface{}("hello")
 	tests := []struct {
 		name    string
 		args    args
@@ -107,6 +108,13 @@ func TestGetElemKind(t *testing.T) {
 				val: reflect.ValueOf(&[]string{}),
 			},
 			wantRes: reflect.Slice,
+		},
+		{
+			name: "interface of interface type",
+			args: args{
+				val: reflect.ValueOf(interface{}(interfaceOfString)),
+			},
+			wantRes: reflect.String,
 		},
 	}
 	for _, tt := range tests {

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGetChildIndirect(t *testing.T) {
+func TestGetChildElem(t *testing.T) {
 	var test **string
 	var k *string
 	var y *int
@@ -64,14 +64,14 @@ func TestGetChildIndirect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := GetChildIndirect(tt.args.val); !(gotRes.Type() == tt.wantRes.Type()) {
-				t.Errorf("GetChildIndirect() = %v, want %v", gotRes.Type(), tt.wantRes.Type())
+			if gotRes := GetChildElem(tt.args.val); !(gotRes.Type() == tt.wantRes.Type()) {
+				t.Errorf("GetChildElem() = %v, want %v", gotRes.Type(), tt.wantRes.Type())
 			}
 		})
 	}
 }
 
-func TestGetIndirect(t *testing.T) {
+func TestGetElem(t *testing.T) {
 	var k *string
 	var y **string
 	var test *int
@@ -137,8 +137,42 @@ func TestGetIndirect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := GetIndirect(tt.args.val); !(gotRes.Type() == tt.wantRes.Type()) {
-				t.Errorf("GetIndirect() = %v, want %v", gotRes.Type(), tt.wantRes.Type())
+			if gotRes := GetElem(tt.args.val); !(gotRes.Type() == tt.wantRes.Type()) {
+				t.Errorf("GetElem() = %v, want %v", gotRes.Type(), tt.wantRes.Type())
+			}
+		})
+	}
+}
+
+func TestIsValueElemable(t *testing.T) {
+	number := 1
+	type args struct {
+		val reflect.Value
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "value is not elemable",
+			args: args{
+				val: reflect.ValueOf(1),
+			},
+			want: false,
+		},
+		{
+			name: "value is elemable",
+			args: args{
+				val: reflect.ValueOf(&number),
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsValueElemable(tt.args.val); got != tt.want {
+				t.Errorf("IsValueElemable() = %v, want %v", got, tt.want)
 			}
 		})
 	}
