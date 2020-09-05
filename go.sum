@@ -6,6 +6,8 @@ github.com/fairyhunter13/decimal v1.2.0-imp-4 h1:Givim5MfWNoJTWBGj+NNUA/4Wqs41Ea
 github.com/fairyhunter13/decimal v1.2.0-imp-4/go.mod h1:pqb4RNxJI5R5ilHfmg9FTkpRMxi95Sa1K6tACdWfv9M=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/reiver/go-cast v0.0.0-20170210005224-b977979c1903 h1:ftOiDC4+zrIGRqeCCC8W/1vmUuA9N5BDqHfiLSyEdUQ=
+github.com/reiver/go-cast v0.0.0-20170210005224-b977979c1903/go.mod h1:uRL5CxaBNFKow2DYLvnHhVB5K0jqr6Vz5TLADLg5pTo=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd0=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=

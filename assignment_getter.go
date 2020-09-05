@@ -12,6 +12,8 @@ const (
 	DefaultFloatPrecision = -1
 	// DefaultBitSize is the default bit size used for the conversion in this package.
 	DefaultBitSize = 64
+	// DefaultComplexBitSize is the default bit size for the complex128 type.
+	DefaultComplexBitSize = 128
 	// DefaultBaseSystem is the default base system used for decimal in this package.
 	DefaultBaseSystem = 10
 )
