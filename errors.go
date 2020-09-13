@@ -53,3 +53,13 @@ func getErrOverflowedLength(assigner reflect.Value, val reflect.Value) (err erro
 	)
 	return
 }
+
+func getErrUnimplementedExtract(val reflect.Value) (err error) {
+	err = fmt.Errorf(
+		"Error unimplemented extraction for val of reflect.Value,kind: %s type: %s val: %s",
+		GetKind(val),
+		val.Type(),
+		val,
+	)
+	return
+}

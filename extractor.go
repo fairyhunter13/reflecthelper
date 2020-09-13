@@ -204,3 +204,19 @@ func ExtractString(val reflect.Value) (result string, err error) {
 	}
 	return
 }
+
+// TryExtract tries to extract the real value from the val of reflect.Value.
+func TryExtract(val reflect.Value) (result interface{}, err error) {
+	// TODO: Implement extraction tries in here using the Kind of reflect.Value.
+	switch GetKind(val) {
+	case reflect.Bool:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+	case reflect.Float32, reflect.Float64:
+	case reflect.Complex64, reflect.Complex128:
+	case reflect.String:
+	default:
+		err = getErrUnimplementedExtract(val)
+	}
+	return
+}

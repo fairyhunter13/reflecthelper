@@ -91,20 +91,16 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 	case reflect.Array, reflect.Slice:
 		switch GetKind(val) {
 		case reflect.Array, reflect.Slice:
-			if assignerKind == reflect.Array {
+			isSlice := assignerKind == reflect.Slice
+			if !isSlice {
 				err = checkOverLength(assigner, val)
 				if err != nil {
 					return
 				}
 			}
-			err = iterateAndAssign(assigner, val)
+			err = iterateAndAssign(assigner, val, isSlice)
 		case reflect.String:
-			switch GetElemKind(assigner) {
-			case reflect.Uint8:
-				reflect.Copy(assigner, val)
-			default:
-				err = getErrUnimplementedAssign(assigner, val)
-			}
+			err = iterateAndAssignString(assigner, val)
 		default:
 			err = getErrUnimplementedAssign(assigner, val)
 		}
@@ -152,15 +148,32 @@ func recoverTryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 	return
 }
 
-func iterateAndAssign(assigner reflect.Value, val reflect.Value) (err error) {
-	isSlice := GetKind(assigner) == reflect.Slice
-
+func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (err error) {
 	if isSlice {
 		assigner.Set(reflect.MakeSlice(assigner.Type(), 0, val.Len()))
+
+		assigner.Set(reflect.AppendSlice())
+		// TODO: Implement assignment in slice manually
 	} else {
 		typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
 		assigner.Set(reflect.New(typeArr).Elem())
+
+		// TODO: Implement assignment in array manually
 	}
 
+	return
+}
+
+type test rune
+
+func iterateAndAssignString(assigner reflect.Value, val reflect.Value) (err error) {
+	switch GetElemKind(assigner) {
+	case reflect.Uint8:
+		reflect.Copy(assigner, val)
+	case reflect.Int32:
+		// TODO: Implement this manually
+	default:
+		err = getErrUnimplementedAssign(assigner, val)
+	}
 	return
 }
