@@ -152,7 +152,7 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (
 	if isSlice {
 		assigner.Set(reflect.MakeSlice(assigner.Type(), 0, val.Len()))
 
-		assigner.Set(reflect.AppendSlice())
+		// assigner.Set(reflect.AppendSlice())
 		// TODO: Implement assignment in slice manually
 	} else {
 		typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
@@ -163,8 +163,6 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (
 
 	return
 }
-
-type test rune
 
 func iterateAndAssignString(assigner reflect.Value, val reflect.Value) (err error) {
 	switch GetElemKind(assigner) {

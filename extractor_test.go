@@ -597,3 +597,77 @@ func TestExtractString(t *testing.T) {
 		})
 	}
 }
+
+func TestTryExtract(t *testing.T) {
+	type args struct {
+		val reflect.Value
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult interface{}
+		wantErr    bool
+	}{
+		{
+			name: "unimplemented value",
+			args: args{
+				val: reflect.ValueOf([]int{0, 1, 2, 3}),
+			},
+			wantErr: true,
+		},
+		{
+			name: "bool value",
+			args: args{
+				val: reflect.ValueOf(true),
+			},
+			wantResult: true,
+		},
+		{
+			name: "int value",
+			args: args{
+				val: reflect.ValueOf(-5),
+			},
+			wantResult: -5,
+		},
+		{
+			name: "uint value",
+			args: args{
+				val: reflect.ValueOf(uint(5)),
+			},
+			wantResult: 5,
+		},
+		{
+			name: "float value",
+			args: args{
+				val: reflect.ValueOf(3.15),
+			},
+			wantResult: 3.15,
+		},
+		{
+			name: "complex value",
+			args: args{
+				val: reflect.ValueOf(complex(1, 0)),
+			},
+			wantResult: complex(1, 0),
+		},
+		{
+			name: "string value",
+			args: args{
+				val: reflect.ValueOf("hello"),
+			},
+			wantResult: "hello",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResult, err := TryExtract(tt.args.val)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TryExtract() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotResult, tt.wantResult) {
+				t.Errorf("TryExtract() = %v, want %v", gotResult, tt.wantResult)
+			}
+		})
+	}
+}
