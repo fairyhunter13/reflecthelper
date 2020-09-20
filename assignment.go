@@ -5,18 +5,8 @@ import (
 	"reflect"
 )
 
-func checkValid(val reflect.Value) (err error) {
-	if !val.IsValid() {
-		err = fmt.Errorf(
-			"The val of reflect.Value is invalid, underlying val: %s",
-			val.String(),
-		)
-	}
-	return
-}
-
 func checkAssigner(assigner reflect.Value) (err error) {
-	err = checkValid(assigner)
+	err = getErrIsValid(assigner)
 	if err != nil {
 		return
 	}
@@ -29,12 +19,32 @@ func checkAssigner(assigner reflect.Value) (err error) {
 // AssignReflect assigns the val of the reflect.Value to the assigner.
 // This function asserts that the assigner Kind is same as the val Kind.
 func AssignReflect(assigner reflect.Value, val reflect.Value) (err error) {
-	// TODO: check if the assigner is valid or not
-	// TODO: add try assign in here
+	assigner = GetChildElem(assigner)
+	val = GetChildElem(val)
+	err = checkAssigner(assigner)
+	if err != nil {
+		return
+	}
+	err = getErrIsValid(val)
+	if err != nil {
+		return
+	}
+	err = tryAssign(assigner, val)
 	return
 }
 
 func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			switch val := rec.(type) {
+			case error:
+				err = val
+			default:
+				err = fmt.Errorf("%v", val)
+			}
+		}
+	}()
+
 	assignerKind := GetKind(assigner)
 	switch assignerKind {
 	case reflect.Bool:
@@ -133,27 +143,17 @@ func checkOverLength(assigner reflect.Value, val reflect.Value) (err error) {
 	return
 }
 
-func recoverTryAssign(assigner reflect.Value, val reflect.Value) (err error) {
-	defer func() {
-		if rec := recover(); rec != nil {
-			switch val := rec.(type) {
-			case error:
-				err = val
-			default:
-				err = fmt.Errorf("%v", val)
-			}
-		}
-	}()
-	err = tryAssign(assigner, val)
-	return
-}
-
 func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (err error) {
 	if isSlice {
 		assigner.Set(reflect.MakeSlice(assigner.Type(), 0, val.Len()))
-
-		// assigner.Set(reflect.AppendSlice())
-		// TODO: Implement assignment in slice manually
+		elemVal := reflect.New(GetElemType(assigner)).Elem()
+		for index := 0; index < val.Len(); index++ {
+			err = AssignReflect(elemVal, val.Index(index))
+			if err != nil {
+				return
+			}
+			assigner.Set(reflect.AppendSlice(assigner, elemVal))
+		}
 	} else {
 		typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
 		assigner.Set(reflect.New(typeArr).Elem())

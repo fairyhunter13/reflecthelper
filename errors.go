@@ -63,3 +63,13 @@ func getErrUnimplementedExtract(val reflect.Value) (err error) {
 	)
 	return
 }
+
+func getErrIsValid(val reflect.Value) (err error) {
+	if !val.IsValid() {
+		err = fmt.Errorf(
+			"The val of reflect.Value is invalid, underlying val: %s",
+			val.String(),
+		)
+	}
+	return
+}

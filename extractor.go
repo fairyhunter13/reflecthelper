@@ -8,7 +8,7 @@ import (
 )
 
 func checkExtractValid(val reflect.Value) (err error) {
-	err = checkValid(val)
+	err = getErrIsValid(val)
 	if err != nil {
 		return
 	}
