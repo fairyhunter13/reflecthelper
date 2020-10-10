@@ -145,22 +145,27 @@ func checkOverLength(assigner reflect.Value, val reflect.Value) (err error) {
 
 func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (err error) {
 	if isSlice {
-		assigner.Set(reflect.MakeSlice(assigner.Type(), 0, val.Len()))
-		elemVal := reflect.New(GetElemType(assigner)).Elem()
+		emptySlice := reflect.MakeSlice(assigner.Type(), 0, val.Len())
 		for index := 0; index < val.Len(); index++ {
+			elemVal := reflect.New(GetElemType(assigner)).Elem()
 			err = AssignReflect(elemVal, val.Index(index))
 			if err != nil {
 				return
 			}
-			assigner.Set(reflect.AppendSlice(assigner, elemVal))
+			emptySlice.Set(reflect.AppendSlice(emptySlice, elemVal))
 		}
+		assigner.Set(emptySlice)
 	} else {
 		typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
-		assigner.Set(reflect.New(typeArr).Elem())
-
-		// TODO: Implement assignment in array manually
+		emptyArray := reflect.New(typeArr).Elem()
+		for index := 0; index < val.Len(); index++ {
+			err = AssignReflect(emptyArray.Index(index), val.Index(index))
+			if err != nil {
+				return
+			}
+		}
+		assigner.Set(emptyArray)
 	}
-
 	return
 }
 
