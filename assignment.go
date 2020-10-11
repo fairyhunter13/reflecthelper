@@ -174,6 +174,8 @@ func iterateAndAssignString(assigner reflect.Value, val reflect.Value) (err erro
 	case reflect.Uint8:
 		reflect.Copy(assigner, val)
 	case reflect.Int32:
+		valStr := val.String()
+		runeSlice := []rune(valStr)
 		// TODO: Implement this manually
 	default:
 		err = getErrUnimplementedAssign(assigner, val)

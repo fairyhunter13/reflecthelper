@@ -32,6 +32,5 @@ func GetChildElem(val reflect.Value) (res reflect.Value) {
 
 // IsValueElemable checks whether the val of reflect.Value could call Elem method.
 func IsValueElemable(val reflect.Value) bool {
-	kind := GetKind(val)
-	return kind == reflect.Ptr || kind == reflect.Interface
+	return IsKindValueElemable(GetKind(val))
 }

@@ -26,3 +26,17 @@ func GetElemKind(val reflect.Value) (res reflect.Kind) {
 	}
 	return
 }
+
+// IsKindValueElemable checks the kind of reflect.Value that can call Elem method.
+func IsKindValueElemable(kind reflect.Kind) bool {
+	return kind == reflect.Ptr || kind == reflect.Interface
+}
+
+// IsKindTypeElemable checks the kind of reflect.Type that can call Elem method.
+func IsKindTypeElemable(kind reflect.Kind) bool {
+	return kind == reflect.Array ||
+		kind == reflect.Chan ||
+		kind == reflect.Map ||
+		kind == reflect.Ptr ||
+		kind == reflect.Slice
+}

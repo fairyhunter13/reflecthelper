@@ -43,7 +43,7 @@ func TestGetElemType(t *testing.T) {
 	}
 }
 
-func TestIsTypeElemable(t *testing.T) {
+func TestIsTypeValueElemable(t *testing.T) {
 	number := 76
 	type args struct {
 		val reflect.Value
@@ -77,7 +77,7 @@ func TestIsTypeElemable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsTypeElemable(tt.args.val); got != tt.want {
+			if got := IsTypeValueElemable(tt.args.val); got != tt.want {
 				t.Errorf("IsTypeElemable() = %v, want %v", got, tt.want)
 			}
 		})
