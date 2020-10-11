@@ -7,6 +7,7 @@ func GetKind(val reflect.Value) (res reflect.Kind) {
 	if !val.IsValid() {
 		return
 	}
+
 	res = val.Type().Kind()
 	return
 }
@@ -17,13 +18,28 @@ func GetElemKind(val reflect.Value) (res reflect.Kind) {
 		return
 	}
 
-	res = GetKind(val)
-	switch res {
-	case reflect.Array, reflect.Chan, reflect.Map, reflect.Ptr, reflect.Slice:
+	tempRes := GetKind(val)
+	if IsKindTypeElemable(tempRes) {
 		res = val.Type().Elem().Kind()
-	case reflect.Interface:
+	} else if IsKindValueElemable(tempRes) {
 		res = val.Elem().Kind()
 	}
+	return
+}
+
+// GetChildElemKind returns the child elems' (root child) kind of the val of reflect.Value.
+func GetChildElemKind(val reflect.Value) (res reflect.Kind) {
+	if !val.IsValid() {
+		return
+	}
+
+	tempRes := GetKind(val)
+	if IsKindTypeElemable(tempRes) {
+		elemType := val.Type().Elem()
+		res = elemType.Kind()
+		// TODO: Continue this
+	}
+	// TODO: Continue this
 	return
 }
 

@@ -19,12 +19,14 @@ func TestGetElemType(t *testing.T) {
 			args: args{
 				val: reflect.ValueOf(nil),
 			},
+			wantTyp: nil,
 		},
 		{
 			name: "invalid elem type",
 			args: args{
 				val: reflect.ValueOf("hello"),
 			},
+			wantTyp: nil,
 		},
 		{
 			name: "array of uint8",
@@ -79,6 +81,80 @@ func TestIsTypeValueElemable(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsTypeValueElemable(tt.args.val); got != tt.want {
 				t.Errorf("IsTypeElemable() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsTypeElemable(t *testing.T) {
+	type args struct {
+		typ reflect.Type
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes bool
+	}{
+		{
+			name: "nil type",
+			args: args{
+				typ: nil,
+			},
+			wantRes: false,
+		},
+		{
+			name: "slice type",
+			args: args{
+				typ: TypeByteSlice,
+			},
+			wantRes: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotRes := IsTypeElemable(tt.args.typ); gotRes != tt.wantRes {
+				t.Errorf("IsTypeElemable() = %v, want %v", gotRes, tt.wantRes)
+			}
+		})
+	}
+}
+
+func TestGetChildElemType(t *testing.T) {
+	var testInt *int
+	type args struct {
+		val reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantTyp reflect.Type
+	}{
+		{
+			name: "nil type",
+			args: args{
+				val: reflect.ValueOf(nil),
+			},
+			wantTyp: nil,
+		},
+		{
+			name: "normal int type",
+			args: args{
+				val: reflect.ValueOf(5),
+			},
+			wantTyp: nil,
+		},
+		{
+			name: "pointer int type",
+			args: args{
+				val: reflect.ValueOf(testInt),
+			},
+			wantTyp: reflect.ValueOf(testInt).Type().Elem(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotTyp := GetChildElemType(tt.args.val); !reflect.DeepEqual(gotTyp, tt.wantTyp) {
+				t.Errorf("GetChildElemType() = %v, want %v", gotTyp, tt.wantTyp)
 			}
 		})
 	}

@@ -1,6 +1,8 @@
 package reflecthelper
 
-import "reflect"
+import (
+	"reflect"
+)
 
 // List of reflect.Type used in this package
 var (
@@ -19,6 +21,7 @@ func IsTypeElemable(typ reflect.Type) (res bool) {
 		return
 	}
 
+	res = IsKindTypeElemable(typ.Kind())
 	return
 }
 
@@ -28,19 +31,24 @@ func GetElemType(val reflect.Value) (typ reflect.Type) {
 		return
 	}
 
-	switch GetKind(val) {
-	case reflect.Array, reflect.Chan, reflect.Map, reflect.Ptr, reflect.Slice:
+	if IsTypeValueElemable(val) {
 		typ = val.Type().Elem()
 	}
 	return
 }
 
-// GetChildElemType returns the child of elem type of the val of reflect.Value.
+// GetChildElemType returns the child elems' (root child) type of the val of reflect.Value.
 func GetChildElemType(val reflect.Value) (typ reflect.Type) {
 	if !val.IsValid() {
 		return
 	}
 
-	// TODO: Add logic in here
+	tempType := val.Type()
+	if IsTypeElemable(tempType) {
+		for IsTypeElemable(tempType) {
+			tempType = tempType.Elem()
+		}
+		typ = tempType
+	}
 	return
 }

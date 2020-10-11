@@ -65,7 +65,7 @@ func TestGetElemKind(t *testing.T) {
 			args: args{
 				val: reflect.ValueOf(int(5)),
 			},
-			wantRes: reflect.Int,
+			wantRes: reflect.Invalid,
 		},
 		{
 			name: "normal pointer kind",
@@ -114,7 +114,7 @@ func TestGetElemKind(t *testing.T) {
 			args: args{
 				val: reflect.ValueOf(interface{}(interfaceOfString)),
 			},
-			wantRes: reflect.String,
+			wantRes: reflect.Invalid,
 		},
 	}
 	for _, tt := range tests {

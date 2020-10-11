@@ -20,7 +20,7 @@ func GetInitElem(val reflect.Value) (res reflect.Value) {
 	return
 }
 
-// GetInitChildElem gets the child elem if it is a pointer with an element of pointer.
+// GetInitChildElem gets the child elem (root child) if it is a pointer with an element of pointer.
 // It also initializes the child elem if it is CanSet and IsNil.
 func GetInitChildElem(val reflect.Value) (res reflect.Value) {
 	res = val
