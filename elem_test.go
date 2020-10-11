@@ -155,6 +155,13 @@ func TestIsValueElemable(t *testing.T) {
 		want bool
 	}{
 		{
+			name: "nil value is not elemable",
+			args: args{
+				val: reflect.ValueOf(nil),
+			},
+			want: false,
+		},
+		{
 			name: "value is not elemable",
 			args: args{
 				val: reflect.ValueOf(1),
