@@ -125,3 +125,55 @@ func TestGetElemKind(t *testing.T) {
 		})
 	}
 }
+
+func TestGetChildElemKind(t *testing.T) {
+	var testIntPtr **int
+	test := 5
+	testPtr := &test
+	testIntPtr = &testPtr
+	var testNilPtr *int
+	type args struct {
+		val reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes reflect.Kind
+	}{
+		{
+			name: "invalid kind for child elem kind",
+			args: args{
+				val: reflect.ValueOf(nil),
+			},
+			wantRes: reflect.Invalid,
+		},
+		{
+			name: "invalid kind for non child elem kind",
+			args: args{
+				val: reflect.ValueOf(5),
+			},
+			wantRes: reflect.Invalid,
+		},
+		{
+			name: "test multiple pointer",
+			args: args{
+				val: reflect.ValueOf(testIntPtr),
+			},
+			wantRes: reflect.Int,
+		},
+		{
+			name: "test nil ptr",
+			args: args{
+				val: reflect.ValueOf(testNilPtr),
+			},
+			wantRes: reflect.Int,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotRes := GetChildElemKind(tt.args.val); !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("GetChildElemKind() = %v, want %v", gotRes, tt.wantRes)
+			}
+		})
+	}
+}

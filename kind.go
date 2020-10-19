@@ -36,10 +36,21 @@ func GetChildElemKind(val reflect.Value) (res reflect.Kind) {
 	tempRes := GetKind(val)
 	if IsKindTypeElemable(tempRes) {
 		elemType := val.Type().Elem()
-		res = elemType.Kind()
-		// TODO: Continue this
+		tempRes = elemType.Kind()
+		for IsKindTypeElemable(tempRes) {
+			elemType = elemType.Elem()
+			tempRes = elemType.Kind()
+		}
+		res = tempRes
+	} else if IsKindValueElemable(tempRes) {
+		childVal := val.Elem()
+		tempRes = childVal.Kind()
+		for IsKindValueElemable(tempRes) {
+			childVal = childVal.Elem()
+			tempRes = childVal.Kind()
+		}
+		res = tempRes
 	}
-	// TODO: Continue this
 	return
 }
 
