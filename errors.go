@@ -32,6 +32,17 @@ func getErrCanInterface(val reflect.Value) (err error) {
 	return
 }
 
+func getErrUnassignable(assigner reflect.Value, val reflect.Value) (err error) {
+	err = fmt.Errorf(
+		"Error unassignable for kind: %s with val of reflect.Value, kind: %s type: %s val: %s",
+		GetKind(assigner),
+		GetKind(val),
+		val.Type(),
+		val,
+	)
+	return
+}
+
 func getErrUnimplementedAssign(assigner reflect.Value, val reflect.Value) (err error) {
 	err = fmt.Errorf(
 		"Error unimplemented assignment for kind: %s with val of reflect.Value, kind: %s type: %s val: %s",

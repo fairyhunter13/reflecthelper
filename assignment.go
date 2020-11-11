@@ -46,6 +46,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 	}()
 
 	assignerKind := GetKind(assigner)
+	valKind := GetKind(val)
 	switch assignerKind {
 	case reflect.Bool:
 		var result bool
@@ -99,8 +100,8 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 		}
 		assigner.SetComplex(result)
 	case reflect.Array, reflect.Slice:
-		switch GetKind(val) {
-		case reflect.Array, reflect.Slice:
+		switch valKind {
+		case reflect.Array, reflect.Slice, reflect.String:
 			isSlice := assignerKind == reflect.Slice
 			if !isSlice {
 				err = checkOverLength(assigner, val)
@@ -108,18 +109,23 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 					return
 				}
 			}
-			err = iterateAndAssign(assigner, val, isSlice)
-		case reflect.String:
-			err = iterateAndAssignString(assigner, val)
+
+			if valKind != reflect.String {
+				err = iterateAndAssign(assigner, val, isSlice)
+			} else {
+				err = iterateAndAssignString(assigner, val, isSlice)
+			}
 		default:
 			err = getErrUnimplementedAssign(assigner, val)
 		}
-	case reflect.Chan:
-		// TODO: Implement assigner for channel type
-	case reflect.Func:
-		// TODO: Implement assigner for func
-	case reflect.Map:
-		// TODO: Implement assigner for map
+	case reflect.Chan, reflect.Func, reflect.Map:
+		assignerType := assigner.Type()
+		valType := val.Type()
+		if !valType.AssignableTo(assignerType) {
+			err = getErrUnassignable(assigner, val)
+			return
+		}
+		assigner.Set(val)
 	case reflect.String:
 		var result string
 		result, err = ExtractString(val)
@@ -128,8 +134,23 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 		}
 		assigner.SetString(result)
 	case reflect.Struct:
-		// TODO: Implement assigner for struct
-		// TODO: Implement time.Time struct type
+		assignerType := assigner.Type()
+		valType := val.Type()
+		switch assignerType {
+		case TypeTime:
+			// TODO: Add assignment conversion from in here
+			switch valKind {
+			case reflect.String:
+				// TODO: Add parse time in here
+			default:
+			}
+		default:
+			if !valType.AssignableTo(assignerType) {
+				err = getErrUnassignable(assigner, val)
+				return
+			}
+			assigner.Set(val)
+		}
 	default:
 		err = getErrUnimplementedAssign(assigner, val)
 	}
@@ -147,7 +168,7 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (
 	if isSlice {
 		emptySlice := reflect.MakeSlice(assigner.Type(), 0, val.Len())
 		for index := 0; index < val.Len(); index++ {
-			elemVal := reflect.New(GetElemType(assigner)).Elem()
+			elemVal := GetInitChildElem(reflect.New(GetElemType(assigner)).Elem())
 			err = AssignReflect(elemVal, val.Index(index))
 			if err != nil {
 				return
@@ -159,7 +180,8 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (
 		typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
 		emptyArray := reflect.New(typeArr).Elem()
 		for index := 0; index < val.Len(); index++ {
-			err = AssignReflect(emptyArray.Index(index), val.Index(index))
+			elemVal := GetInitChildElem(emptyArray.Index(index))
+			err = AssignReflect(elemVal, val.Index(index))
 			if err != nil {
 				return
 			}
@@ -169,14 +191,14 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (
 	return
 }
 
-func iterateAndAssignString(assigner reflect.Value, val reflect.Value) (err error) {
+func iterateAndAssignString(assigner reflect.Value, val reflect.Value, isSlice bool) (err error) {
 	switch GetElemKind(assigner) {
 	case reflect.Uint8:
-		reflect.Copy(assigner, val)
+		byteSliceVal := reflect.ValueOf([]byte(val.String()))
+		err = iterateAndAssign(assigner, byteSliceVal, isSlice)
 	case reflect.Int32:
-		// valStr := val.String()
-		// runeSlice := []rune(valStr)
-		// TODO: Implement this manually
+		runeSliceVal := reflect.ValueOf([]rune(val.String()))
+		err = iterateAndAssign(assigner, runeSliceVal, isSlice)
 	default:
 		err = getErrUnimplementedAssign(assigner, val)
 	}

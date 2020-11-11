@@ -2,12 +2,15 @@ package reflecthelper
 
 import (
 	"reflect"
+	"time"
 )
 
 // List of reflect.Type used in this package
 var (
 	TypeRuneSlice = reflect.TypeOf([]rune{})
 	TypeByteSlice = reflect.TypeOf([]byte{})
+	TypeTimePtr   = reflect.TypeOf(&time.Time{})
+	TypeTime      = reflect.TypeOf(time.Time{})
 )
 
 // IsTypeValueElemable checks if the type of the reflect.Value can call Elem
