@@ -130,7 +130,7 @@ func TestGetElemKind(t *testing.T) {
 		{
 			name: "elem ptr of slice interface",
 			args: args{
-				val: valSlice.Index(1),
+				val: valSlice.Index(1).Elem(),
 			},
 			wantRes: reflect.Int,
 		},
@@ -223,6 +223,55 @@ func TestGetChildElemKind(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotRes := GetChildElemKind(tt.args.val); !reflect.DeepEqual(gotRes, tt.wantRes) {
 				t.Errorf("GetChildElemKind() = %v, want %v", gotRes, tt.wantRes)
+			}
+		})
+	}
+}
+
+func TestGetChildElemPtrKind(t *testing.T) {
+	var k **int
+	var testSlice []int
+	type args struct {
+		val reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes reflect.Kind
+	}{
+		{
+			name: "invalid reflect kind",
+			args: args{
+				val: reflect.ValueOf(nil),
+			},
+			wantRes: reflect.Invalid,
+		},
+		{
+			name: "invalid slice kind",
+			args: args{
+				val: reflect.ValueOf([]int{}),
+			},
+			wantRes: reflect.Invalid,
+		},
+		{
+			name: "slice kind",
+			args: args{
+				val: reflect.ValueOf(&testSlice),
+			},
+			wantRes: reflect.Slice,
+		},
+		{
+			name: "int ptr kind",
+			args: args{
+				val: reflect.ValueOf(k),
+			},
+			wantRes: reflect.Int,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotRes := GetChildElemPtrKind(tt.args.val); !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("GetChildElemPtrKind() = %v, want %v", gotRes, tt.wantRes)
 			}
 		})
 	}

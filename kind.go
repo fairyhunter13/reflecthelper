@@ -41,7 +41,6 @@ func GetChildElemKind(val reflect.Value) (res reflect.Kind) {
 			elemType = elemType.Elem()
 			tempRes = elemType.Kind()
 		}
-		res = tempRes
 	} else if IsKindValueElemable(tempRes) {
 		childVal := val.Elem()
 		tempRes = childVal.Kind()
@@ -49,8 +48,30 @@ func GetChildElemKind(val reflect.Value) (res reflect.Kind) {
 			childVal = childVal.Elem()
 			tempRes = childVal.Kind()
 		}
-		res = tempRes
+	} else {
+		return
 	}
+	res = tempRes
+	return
+}
+
+// GetChildElemPtrKind gets the child elements' (root child) ptr kind of the val of reflect.Value.
+func GetChildElemPtrKind(val reflect.Value) (res reflect.Kind) {
+	if !val.IsValid() {
+		return
+	}
+
+	tempRes := GetKind(val)
+	if tempRes == reflect.Ptr {
+		valType := val.Type()
+		for tempRes == reflect.Ptr {
+			valType = valType.Elem()
+			tempRes = valType.Kind()
+		}
+	} else {
+		return
+	}
+	res = tempRes
 	return
 }
 
