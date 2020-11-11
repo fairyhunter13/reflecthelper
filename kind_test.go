@@ -42,6 +42,10 @@ func TestGetElemKind(t *testing.T) {
 	var valInt *int
 	test := 5
 	valInt = &test
+	testSlice := []interface{}{
+		0, valInt, nil,
+	}
+	valSlice := reflect.ValueOf(testSlice)
 
 	var valNilPtr **int
 	type args struct {
@@ -116,6 +120,27 @@ func TestGetElemKind(t *testing.T) {
 			},
 			wantRes: reflect.Invalid,
 		},
+		{
+			name: "elem of slice interface",
+			args: args{
+				val: valSlice.Index(0),
+			},
+			wantRes: reflect.Int,
+		},
+		{
+			name: "elem ptr of slice interface",
+			args: args{
+				val: valSlice.Index(1),
+			},
+			wantRes: reflect.Int,
+		},
+		{
+			name: "elem nil of slice interface",
+			args: args{
+				val: valSlice.Index(2),
+			},
+			wantRes: reflect.Invalid,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -131,6 +156,10 @@ func TestGetChildElemKind(t *testing.T) {
 	test := 5
 	testPtr := &test
 	testIntPtr = &testPtr
+	testSlice := []interface{}{
+		0, testIntPtr, nil,
+	}
+	valSlice := reflect.ValueOf(testSlice)
 	var testNilPtr *int
 	type args struct {
 		val reflect.Value
@@ -167,6 +196,27 @@ func TestGetChildElemKind(t *testing.T) {
 				val: reflect.ValueOf(testNilPtr),
 			},
 			wantRes: reflect.Int,
+		},
+		{
+			name: "elem of slice interface",
+			args: args{
+				val: valSlice.Index(0),
+			},
+			wantRes: reflect.Int,
+		},
+		{
+			name: "elem ptr of slice interface",
+			args: args{
+				val: valSlice.Index(1),
+			},
+			wantRes: reflect.Int,
+		},
+		{
+			name: "elem nil of slice interface",
+			args: args{
+				val: valSlice.Index(2),
+			},
+			wantRes: reflect.Invalid,
 		},
 	}
 	for _, tt := range tests {

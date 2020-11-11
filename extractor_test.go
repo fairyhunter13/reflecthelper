@@ -3,6 +3,8 @@ package reflecthelper
 import (
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type booler struct {
@@ -625,16 +627,16 @@ func TestTryExtract(t *testing.T) {
 		{
 			name: "int value",
 			args: args{
-				val: reflect.ValueOf(-5),
+				val: reflect.ValueOf(int(-5)),
 			},
-			wantResult: -5,
+			wantResult: int64(-5),
 		},
 		{
 			name: "uint value",
 			args: args{
 				val: reflect.ValueOf(uint(5)),
 			},
-			wantResult: 5,
+			wantResult: uint64(5),
 		},
 		{
 			name: "float value",
@@ -665,9 +667,7 @@ func TestTryExtract(t *testing.T) {
 				t.Errorf("TryExtract() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(gotResult, tt.wantResult) {
-				t.Errorf("TryExtract() = %v, want %v", gotResult, tt.wantResult)
-			}
+			assert.Equal(t, tt.wantResult, gotResult)
 		})
 	}
 }
