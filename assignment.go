@@ -3,6 +3,7 @@ package reflecthelper
 import (
 	"fmt"
 	"reflect"
+	"time"
 )
 
 func checkAssigner(assigner reflect.Value) (err error) {
@@ -118,14 +119,6 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 		default:
 			err = getErrUnimplementedAssign(assigner, val)
 		}
-	case reflect.Chan, reflect.Func, reflect.Map:
-		assignerType := assigner.Type()
-		valType := val.Type()
-		if !valType.AssignableTo(assignerType) {
-			err = getErrUnassignable(assigner, val)
-			return
-		}
-		assigner.Set(val)
 	case reflect.String:
 		var result string
 		result, err = ExtractString(val)
@@ -133,17 +126,32 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 			return
 		}
 		assigner.SetString(result)
-	case reflect.Struct:
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Struct:
 		assignerType := assigner.Type()
 		valType := val.Type()
 		switch assignerType {
 		case TypeTime:
-			// TODO: Add assignment conversion from in here
+			var timeStr string
 			switch valKind {
 			case reflect.String:
-				// TODO: Add parse time in here
+				timeStr = val.String()
 			default:
+				if valType == TypeTime {
+					assigner.Set(val)
+					return
+				}
+				timeStr, err = ExtractString(val)
+				if err != nil {
+					return
+				}
 			}
+
+			var timeStruct time.Time
+			timeStruct, err = ParseTime(timeStr)
+			if err != nil {
+				return
+			}
+			assigner.Set(reflect.ValueOf(timeStruct))
 		default:
 			if !valType.AssignableTo(assignerType) {
 				err = getErrUnassignable(assigner, val)
