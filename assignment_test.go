@@ -17,7 +17,7 @@ func TestAssignReflect(t *testing.T) {
 		name         string
 		args         args
 		wantErr      bool
-		wantAssigner reflect.Value
+		wantAssigner func() reflect.Value
 	}{
 		{
 			name: "invalid assigner and val",
@@ -29,7 +29,8 @@ func TestAssignReflect(t *testing.T) {
 					return reflect.ValueOf(nil)
 				},
 			},
-			wantErr: true,
+			wantErr:      true,
+			wantAssigner: nil,
 		},
 		{
 			name: "assigner can't set",
@@ -41,7 +42,8 @@ func TestAssignReflect(t *testing.T) {
 					return reflect.ValueOf(nil)
 				},
 			},
-			wantErr: true,
+			wantErr:      true,
+			wantAssigner: nil,
 		},
 		{
 			name: "invalid val",
@@ -54,7 +56,8 @@ func TestAssignReflect(t *testing.T) {
 					return reflect.ValueOf(nil)
 				},
 			},
-			wantErr: true,
+			wantErr:      true,
+			wantAssigner: nil,
 		},
 		{
 			name: "invalid bool",
@@ -67,7 +70,8 @@ func TestAssignReflect(t *testing.T) {
 					return reflect.ValueOf("hello")
 				},
 			},
-			wantErr: true,
+			wantErr:      true,
+			wantAssigner: nil,
 		},
 		{
 			name: "valid bool",
@@ -80,8 +84,10 @@ func TestAssignReflect(t *testing.T) {
 					return reflect.ValueOf("false")
 				},
 			},
-			wantErr:      false,
-			wantAssigner: reflect.ValueOf(false),
+			wantErr: false,
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(false)
+			},
 		},
 		{
 			name: "invalid int",
@@ -94,7 +100,8 @@ func TestAssignReflect(t *testing.T) {
 					return reflect.ValueOf("hello")
 				},
 			},
-			wantErr: true,
+			wantErr:      true,
+			wantAssigner: nil,
 		},
 		{
 			name: "overflow int8",
@@ -107,7 +114,68 @@ func TestAssignReflect(t *testing.T) {
 					return reflect.ValueOf(math.MaxInt8 + 1)
 				},
 			},
-			wantErr: true,
+			wantErr:      true,
+			wantAssigner: nil,
+		},
+		{
+			name: "set int8 succeeded",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := int8(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(10)
+				},
+			},
+			wantErr: false,
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(10)
+			},
+		},
+		{
+			name: "invalid uint value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := uint(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "overflow uint8 value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := uint8(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(math.MaxUint8 + 1)
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "valid uint8 value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := uint8(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("10")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(uint8(10))
+			},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -116,8 +184,8 @@ func TestAssignReflect(t *testing.T) {
 			if err := AssignReflect(assigner, tt.args.val()); (err != nil) != tt.wantErr {
 				t.Errorf("AssignReflect() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if tt.wantAssigner.IsValid() {
-				assert.EqualValues(t, tt.wantAssigner.Interface(), GetChildElem(assigner).Interface())
+			if tt.wantAssigner != nil && tt.wantAssigner().IsValid() {
+				assert.EqualValues(t, tt.wantAssigner().Interface(), GetChildElem(assigner).Interface())
 			}
 		})
 	}
