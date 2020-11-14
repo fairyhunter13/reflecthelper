@@ -279,7 +279,156 @@ func TestAssignReflect(t *testing.T) {
 			wantAssigner: nil,
 			wantErr:      true,
 		},
-		// TODO: Add more tests for slice and array
+		{
+			name: "over length for the assigner",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := [1]int{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{1, 2, 3})
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "not supported multi level array",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := [3][3]int{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{1, 2, 3})
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "not supported multi level slice",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := [][]int{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{1, 2, 3})
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "valid array assignment",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := [3]int{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{1, 2, 3})
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf([3]int{1, 2, 3})
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid slice assignment",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := []int{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf([3]int{1, 2, 3})
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf([]int{1, 2, 3})
+			},
+			wantErr: false,
+		},
+		{
+			name: "slice int unimplemented string assignment",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := []int{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "slice uint8 overlength string assignment",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := [2]uint8{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "slice uint8 valid string assignment",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := []uint8{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf([]uint8("hello"))
+			},
+			wantErr: false,
+		},
+		{
+			name: "array uint8 valid string assignment",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := [5]uint8{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf([5]uint8{byte('h'), byte('e'), byte('l'), byte('l'), byte('o')})
+			},
+			wantErr: false,
+		},
+		{
+			name: "slice int32 valid string assignment",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := []int32{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf([]int32("hello"))
+			},
+			wantErr: false,
+		},
 		{
 			name: "invalid string value",
 			args: args{

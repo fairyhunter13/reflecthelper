@@ -101,21 +101,18 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 		}
 		assigner.SetComplex(result)
 	case reflect.Array, reflect.Slice:
+		isSlice := assignerKind == reflect.Slice
 		switch valKind {
-		case reflect.Array, reflect.Slice, reflect.String:
-			isSlice := assignerKind == reflect.Slice
+		case reflect.Array, reflect.Slice:
 			if !isSlice {
 				err = checkOverLength(assigner, val)
 				if err != nil {
 					return
 				}
 			}
-
-			if valKind != reflect.String {
-				err = iterateAndAssign(assigner, val, isSlice)
-			} else {
-				err = iterateAndAssignString(assigner, val, isSlice)
-			}
+			err = iterateAndAssign(assigner, val, isSlice)
+		case reflect.String:
+			err = iterateAndAssignString(assigner, val, isSlice)
 		default:
 			err = getErrUnimplementedAssign(assigner, val)
 		}
@@ -181,7 +178,7 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (
 			if err != nil {
 				return
 			}
-			emptySlice.Set(reflect.AppendSlice(emptySlice, elemVal))
+			emptySlice = reflect.Append(emptySlice, elemVal)
 		}
 		assigner.Set(emptySlice)
 	} else {
@@ -200,15 +197,22 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (
 }
 
 func iterateAndAssignString(assigner reflect.Value, val reflect.Value, isSlice bool) (err error) {
+	var listVal reflect.Value
 	switch GetElemKind(assigner) {
 	case reflect.Uint8:
-		byteSliceVal := reflect.ValueOf([]byte(val.String()))
-		err = iterateAndAssign(assigner, byteSliceVal, isSlice)
+		listVal = reflect.ValueOf([]byte(val.String()))
 	case reflect.Int32:
-		runeSliceVal := reflect.ValueOf([]rune(val.String()))
-		err = iterateAndAssign(assigner, runeSliceVal, isSlice)
+		listVal = reflect.ValueOf([]rune(val.String()))
 	default:
 		err = getErrUnimplementedAssign(assigner, val)
+		return
 	}
+	if !isSlice {
+		err = checkOverLength(assigner, listVal)
+		if err != nil {
+			return
+		}
+	}
+	err = iterateAndAssign(assigner, listVal, isSlice)
 	return
 }
