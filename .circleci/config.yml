@@ -1,0 +1,33 @@
+version: 2.1
+executors:
+  completedocker:
+    docker:
+      - image: golang:1
+    working_directory: /go/src/github.com/fairyhunter13/reflecthelper
+jobs:
+  testandcoverage:
+    executor: completedocker
+    steps:
+      - checkout
+      - run:
+          name: "Getting dependencies for testing"
+          command: go get -v -t -d ./...
+      - run:
+          name: "Getting dependencies for coverage"
+          command: |
+            go get github.com/mattn/goveralls
+            go get github.com/stretchr/testify/assert
+      - run:
+          name: "Integration testing and generate coverage"
+          command: go test -v -cover -race -coverprofile=coverage.out ./...
+      - run:
+          name: "Uploading to coveralls.io"
+          command: goveralls -coverprofile=coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
+workflows:
+  version: 2
+  checking:
+    jobs:
+      - testandcoverage:
+          filters:
+            branches:
+              only: master

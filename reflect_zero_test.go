@@ -9,9 +9,6 @@ type structTest struct{}
 
 func (st structTest) Hello() {}
 func TestIsReflectZero(t *testing.T) {
-	type test interface {
-		Hello()
-	}
 	type args struct {
 		val reflect.Value
 	}

@@ -276,7 +276,7 @@ func TestAssignReflect(t *testing.T) {
 					return reflect.ValueOf(&hello)
 				},
 				val: func() reflect.Value {
-					return reflect.ValueOf(make(chan int, 0))
+					return reflect.ValueOf(make(chan int))
 				},
 			},
 			wantAssigner: nil,

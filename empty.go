@@ -21,7 +21,7 @@ func IsZero(k interface{}) bool {
 
 	switch val := k.(type) {
 	case bool:
-		return val == false
+		return !val
 	case int:
 		return val == 0
 	case int8:
@@ -77,7 +77,7 @@ var zeroType = reflect.TypeOf((*Zeroable)(nil)).Elem()
 func IsValueZero(v reflect.Value) bool {
 	switch GetKind(v) {
 	case reflect.Bool:
-		return v.Bool() == false
+		return !v.Bool()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return v.Int() == 0
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
