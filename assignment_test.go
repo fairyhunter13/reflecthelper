@@ -177,6 +177,139 @@ func TestAssignReflect(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "invalid float value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := float32(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "overflow float32 value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := float32(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(math.MaxFloat64)
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "valid float32 value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := float32(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(10)
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(float32(10))
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid complex64 value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := complex64(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "overflow complex64 value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := complex64(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(complex(math.MaxFloat64, 0))
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "valid complex64 value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := complex64(5)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(complex64(10))
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(complex64(10))
+			},
+			wantErr: false,
+		},
+		{
+			name: "unimplemented val kind",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := []int{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(make(chan int, 0))
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		// TODO: Add more tests for slice and array
+		{
+			name: "invalid string value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := "check"
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{0, 1, 2, 3})
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "valid string value",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := "check"
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf("hello")
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
