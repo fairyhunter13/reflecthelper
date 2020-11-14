@@ -36,6 +36,11 @@ func TestClone(t *testing.T) {
 		assert.NotEqual(t, s, b)
 		fmt.Println(s, b)
 	})
+	t.Run("Clone nil literal", func(t *testing.T) {
+		valClone := Clone(reflect.ValueOf(nil))
+
+		assert.Equal(t, reflect.Invalid, valClone.Kind())
+	})
 }
 
 func TestInitNew(t *testing.T) {
@@ -45,5 +50,10 @@ func TestInitNew(t *testing.T) {
 		valInit := InitNew(reflect.ValueOf(s))
 		b := valInit.Interface().(*str)
 		assert.Nil(t, b)
+	})
+	t.Run("Init nil value", func(t *testing.T) {
+		valInit := InitNew(reflect.ValueOf(nil))
+
+		assert.Equal(t, reflect.Invalid, valInit.Kind())
 	})
 }

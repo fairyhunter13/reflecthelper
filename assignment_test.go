@@ -4,11 +4,14 @@ import (
 	"math"
 	"reflect"
 	"testing"
+	"time"
+	"unsafe"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAssignReflect(t *testing.T) {
+	now := time.Now()
 	type args struct {
 		assigner func() reflect.Value
 		val      func() reflect.Value
@@ -458,6 +461,112 @@ func TestAssignReflect(t *testing.T) {
 				return reflect.ValueOf("hello")
 			},
 			wantErr: false,
+		},
+		{
+			name: "different chan type",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := make(chan *int)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(make(chan int))
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "same map type",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := make(map[string]int)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(map[string]int{"hello": 5})
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(map[string]int{"hello": 5})
+			},
+			wantErr: false,
+		},
+		{
+			name: "same time type",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := now
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(now.Add(time.Second))
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(now.Add(time.Second))
+			},
+			wantErr: false,
+		},
+		{
+			name: "time assignment invalid val slice type",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := now
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{1, 2, 3})
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "time assignment invalid string format",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := now
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "time assignment valid string format",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := now
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("2019-08-22T11:43:21+07:00")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				past, _ := time.Parse(time.RFC3339, "2019-08-22T11:43:21+07:00")
+				return reflect.ValueOf(past)
+			},
+			wantErr: false,
+		},
+		{
+			name: "unimplemented unsafe pointer",
+			args: args{
+				assigner: func() reflect.Value {
+					var x *int
+					hello := unsafe.Pointer(x)
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
 		},
 	}
 	for _, tt := range tests {

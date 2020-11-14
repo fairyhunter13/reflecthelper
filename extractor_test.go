@@ -16,6 +16,10 @@ func (b booler) Bool() (bool, error) {
 }
 
 func TestExtractBool(t *testing.T) {
+	type test struct {
+		hello string
+	}
+	fieldVal := reflect.ValueOf(test{"hello"}).FieldByIndex([]int{0})
 	var nilBool *bool
 	valBool := true
 	valBooler := booler{true}
@@ -28,6 +32,13 @@ func TestExtractBool(t *testing.T) {
 		wantResult bool
 		wantErr    bool
 	}{
+		{
+			name: "invalid interface value",
+			args: args{
+				val: fieldVal,
+			},
+			wantErr: true,
+		},
 		{
 			name: "invalid reflect value",
 			args: args{
