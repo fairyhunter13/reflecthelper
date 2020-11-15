@@ -72,8 +72,6 @@ func GetChildElemPtrKind(val reflect.Value) (res reflect.Kind) {
 	return
 }
 
-// TODO: Add GetChildElemPtrAndInterfaceKind
-
 // IsKindValueElemable checks the kind of reflect.Value that can call Elem method.
 func IsKindValueElemable(kind reflect.Kind) bool {
 	return kind == reflect.Ptr || kind == reflect.Interface
