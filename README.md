@@ -1,3 +1,11 @@
+بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+
+السَّلاَمُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ
+
+ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ
+ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ
+ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ
+
 # reflecthelper
 [![Coverage Status](https://coveralls.io/repos/github/fairyhunter13/reflecthelper/badge.svg?branch=master)](https://coveralls.io/github/fairyhunter13/reflecthelper?branch=master)
 [![CircleCI](https://circleci.com/gh/fairyhunter13/reflecthelper.svg?style=shield)](https://circleci.com/gh/fairyhunter13/reflecthelper)
