@@ -36,9 +36,9 @@ func GetChildElemKind(val reflect.Value) (res reflect.Kind) {
 	res = GetKind(val)
 	if res == reflect.Interface {
 		val = UnwrapInterfaceValue(val)
+		res = GetKind(val)
 	}
 
-	res = GetKind(val)
 	if !IsKindTypeElemable(res) {
 		return
 	}
