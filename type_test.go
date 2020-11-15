@@ -22,7 +22,7 @@ func TestGetElemType(t *testing.T) {
 			wantTyp: nil,
 		},
 		{
-			name: "invalid elem type",
+			name: "valid string type",
 			args: args{
 				val: reflect.ValueOf("hello"),
 			},
