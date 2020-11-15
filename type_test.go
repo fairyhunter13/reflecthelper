@@ -26,7 +26,7 @@ func TestGetElemType(t *testing.T) {
 			args: args{
 				val: reflect.ValueOf("hello"),
 			},
-			wantTyp: nil,
+			wantTyp: reflect.TypeOf("hello"),
 		},
 		{
 			name: "array of uint8",
@@ -141,7 +141,7 @@ func TestGetChildElemType(t *testing.T) {
 			args: args{
 				val: reflect.ValueOf(5),
 			},
-			wantTyp: nil,
+			wantTyp: reflect.TypeOf(10),
 		},
 		{
 			name: "pointer int type",

@@ -34,8 +34,9 @@ func GetElemType(val reflect.Value) (typ reflect.Type) {
 		return
 	}
 
+	typ = val.Type()
 	if IsTypeValueElemable(val) {
-		typ = val.Type().Elem()
+		typ = typ.Elem()
 	}
 	return
 }
@@ -46,12 +47,9 @@ func GetChildElemType(val reflect.Value) (typ reflect.Type) {
 		return
 	}
 
-	tempType := val.Type()
-	if IsTypeElemable(tempType) {
-		for IsTypeElemable(tempType) {
-			tempType = tempType.Elem()
-		}
-		typ = tempType
+	typ = val.Type()
+	for IsTypeElemable(typ) {
+		typ = typ.Elem()
 	}
 	return
 }

@@ -69,7 +69,7 @@ func TestGetElemKind(t *testing.T) {
 			args: args{
 				val: reflect.ValueOf(int(5)),
 			},
-			wantRes: reflect.Invalid,
+			wantRes: reflect.Int,
 		},
 		{
 			name: "normal pointer kind",
@@ -118,7 +118,7 @@ func TestGetElemKind(t *testing.T) {
 			args: args{
 				val: reflect.ValueOf(interface{}(interfaceOfString)),
 			},
-			wantRes: reflect.Invalid,
+			wantRes: reflect.String,
 		},
 		{
 			name: "elem of slice interface",
@@ -177,11 +177,11 @@ func TestGetChildElemKind(t *testing.T) {
 			wantRes: reflect.Invalid,
 		},
 		{
-			name: "invalid kind for non child elem kind",
+			name: "valid kind for int",
 			args: args{
 				val: reflect.ValueOf(5),
 			},
-			wantRes: reflect.Invalid,
+			wantRes: reflect.Int,
 		},
 		{
 			name: "test multiple pointer",
@@ -247,21 +247,21 @@ func TestGetChildElemPtrKind(t *testing.T) {
 			wantRes: reflect.Invalid,
 		},
 		{
-			name: "invalid slice kind",
+			name: "valid slice kind",
 			args: args{
 				val: reflect.ValueOf([]int{}),
 			},
-			wantRes: reflect.Invalid,
+			wantRes: reflect.Slice,
 		},
 		{
-			name: "slice kind",
+			name: "valid ptr slice kind",
 			args: args{
 				val: reflect.ValueOf(&testSlice),
 			},
 			wantRes: reflect.Slice,
 		},
 		{
-			name: "int ptr kind",
+			name: "valid int ptr kind",
 			args: args{
 				val: reflect.ValueOf(k),
 			},
