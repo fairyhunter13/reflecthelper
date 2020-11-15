@@ -34,24 +34,23 @@ func GetChildElemKind(val reflect.Value) (res reflect.Kind) {
 	}
 
 	tempRes := GetKind(val)
-	if IsKindTypeElemable(tempRes) {
-		elemType := val.Type().Elem()
-		tempRes = elemType.Kind()
-		for IsKindTypeElemable(tempRes) {
-			elemType = elemType.Elem()
-			tempRes = elemType.Kind()
-		}
-	} else if IsKindValueElemable(tempRes) {
-		childVal := val.Elem()
-		tempRes = childVal.Kind()
-		for IsKindValueElemable(tempRes) {
-			childVal = childVal.Elem()
-			tempRes = childVal.Kind()
-		}
-	} else {
+	if !IsKindTypeElemable(tempRes) || !IsKindValueElemable(tempRes) {
 		return
 	}
+
+	// TODO: Change this to the reflect.Interface
+	tempRes = getKindTypeElemable(val)
 	res = tempRes
+	return
+}
+
+func getKindTypeElemable(val reflect.Value) (res reflect.Kind) {
+	elemType := val.Type().Elem()
+	res = elemType.Kind()
+	for IsKindTypeElemable(res) {
+		elemType = elemType.Elem()
+		res = elemType.Kind()
+	}
 	return
 }
 
@@ -68,12 +67,12 @@ func GetChildElemPtrKind(val reflect.Value) (res reflect.Kind) {
 			valType = valType.Elem()
 			tempRes = valType.Kind()
 		}
-	} else {
-		return
+		res = tempRes
 	}
-	res = tempRes
 	return
 }
+
+// TODO: Add GetChildElemPtrAndInterfaceKind
 
 // IsKindValueElemable checks the kind of reflect.Value that can call Elem method.
 func IsKindValueElemable(kind reflect.Kind) bool {
