@@ -1,4 +1,4 @@
-module github.com/fairyhunter13/reflecthelper
+module github.com/fairyhunter13/reflecthelper/v2
 
 go 1.15
 
