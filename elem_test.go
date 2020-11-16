@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -180,6 +181,118 @@ func TestIsValueElemable(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsValueElemable(tt.args.val); got != tt.want {
 				t.Errorf("IsValueElemable() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetNilElem(t *testing.T) {
+	type args struct {
+		val func() reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes func() reflect.Value
+	}{
+		{
+			name: "slice not elemable",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{1, 2, 3})
+				},
+			},
+			wantRes: func() reflect.Value {
+				return reflect.ValueOf([]int{1, 2, 3})
+			},
+		},
+		{
+			name: "valid nil ptr",
+			args: args{
+				val: func() reflect.Value {
+					var hello *string
+					return reflect.ValueOf(hello)
+				},
+			},
+			wantRes: func() reflect.Value {
+				return reflect.ValueOf(nil)
+			},
+		},
+		{
+			name: "valid ptr string",
+			args: args{
+				val: func() reflect.Value {
+					test := "hello"
+					hello := &test
+					return reflect.ValueOf(hello)
+				},
+			},
+			wantRes: func() reflect.Value {
+				return reflect.ValueOf("hi")
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotRes := GetNilElem(tt.args.val()); !(gotRes.Kind() == tt.wantRes().Kind()) {
+				fmt.Println(gotRes)
+				t.Errorf("GetNilElem() = %v, want %v", gotRes, tt.wantRes())
+			}
+		})
+	}
+}
+
+func TestGetChildNilElem(t *testing.T) {
+	type args struct {
+		val func() reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes func() reflect.Value
+	}{
+		{
+			name: "slice not elemable",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{1, 2, 3})
+				},
+			},
+			wantRes: func() reflect.Value {
+				return reflect.ValueOf([]int{1, 2, 3})
+			},
+		},
+		{
+			name: "valid nil ptr",
+			args: args{
+				val: func() reflect.Value {
+					var hello *string
+					return reflect.ValueOf(hello)
+				},
+			},
+			wantRes: func() reflect.Value {
+				return reflect.ValueOf(nil)
+			},
+		},
+		{
+			name: "valid multi ptr string",
+			args: args{
+				val: func() reflect.Value {
+					test := "hello"
+					hello := &test
+					hi := &hello
+					return reflect.ValueOf(&hi)
+				},
+			},
+			wantRes: func() reflect.Value {
+				return reflect.ValueOf("hello")
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotRes := GetChildNilElem(tt.args.val()); !(gotRes.Kind() == tt.wantRes().Kind()) {
+				t.Errorf("GetChildNilElem() = %v, want %v", gotRes, tt.wantRes())
 			}
 		})
 	}
