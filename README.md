@@ -12,6 +12,12 @@
 
 ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ
 
+<br/>
+
+اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ ، وَعَلَى آلِ مُحَمَّدٍ ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ ، إِنَّكَ حَمِيدٌ مَجِيدٌ ، اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ ، وَعَلَى آلِ مُحَمَّدٍ ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ ، وَعَلَى آلِ إِبْرَاهِيمَ ، إِنَّكَ حَمِيدٌ مَجِيدٌ
+
+<br/>
+
 # reflecthelper
 [![Coverage Status](https://coveralls.io/repos/github/fairyhunter13/reflecthelper/badge.svg?branch=master)](https://coveralls.io/github/fairyhunter13/reflecthelper?branch=master)
 [![CircleCI](https://circleci.com/gh/fairyhunter13/reflecthelper.svg?style=shield)](https://circleci.com/gh/fairyhunter13/reflecthelper)
