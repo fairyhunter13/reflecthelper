@@ -159,3 +159,50 @@ func TestGetChildElemType(t *testing.T) {
 		})
 	}
 }
+
+func TestGetChildElemPtrType(t *testing.T) {
+	type args struct {
+		val func() reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantTyp reflect.Type
+	}{
+		{
+			name: "invalid reflect value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf(nil)
+				},
+			},
+			wantTyp: nil,
+		},
+		{
+			name: "valid slice type",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{1, 2, 3})
+				},
+			},
+			wantTyp: reflect.TypeOf([]int{}),
+		},
+		{
+			name: "valid ptr type",
+			args: args{
+				val: func() reflect.Value {
+					var x **int
+					return reflect.ValueOf(x)
+				},
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotTyp := GetChildElemPtrType(tt.args.val()); !reflect.DeepEqual(gotTyp, tt.wantTyp) {
+				t.Errorf("GetChildElemPtrType() = %v, want %v", gotTyp, tt.wantTyp)
+			}
+		})
+	}
+}

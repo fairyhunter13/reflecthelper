@@ -53,3 +53,18 @@ func GetChildElemType(val reflect.Value) (typ reflect.Type) {
 	}
 	return
 }
+
+// GetChildElemPtrType returns the child elem's (root child) ptr type of the val of reflect.Value.
+func GetChildElemPtrType(val reflect.Value) (typ reflect.Type) {
+	if !val.IsValid() {
+		return
+	}
+
+	typ = val.Type()
+	res := typ.Kind()
+	for res == reflect.Ptr {
+		typ = typ.Elem()
+		res = typ.Kind()
+	}
+	return
+}
