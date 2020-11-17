@@ -68,3 +68,9 @@ func GetChildElemPtrType(val reflect.Value) (typ reflect.Type) {
 	}
 	return
 }
+
+// GetChildElemValueType returns the child elem's (root child) type of the val reflect.Value and it only works on ptr kind.
+func GetChildElemValueType(val reflect.Value) (typ reflect.Type) {
+	typ = GetChildElemPtrType(UnwrapInterfaceValue(val))
+	return
+}
