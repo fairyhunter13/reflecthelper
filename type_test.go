@@ -253,3 +253,173 @@ func TestGetChildElemValueType(t *testing.T) {
 		})
 	}
 }
+
+func TestGetElemTypeOfType(t *testing.T) {
+	var k **int
+	var kdown *int
+	type args struct {
+		inputTyp func() reflect.Type
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantTyp reflect.Type
+	}{
+		{
+			name: "invalid nil type",
+			args: args{
+				inputTyp: func() reflect.Type { return reflect.TypeOf(nil) },
+			},
+			wantTyp: reflect.TypeOf(nil),
+		},
+		{
+			name: "valid slice int type",
+			args: args{
+				inputTyp: func() reflect.Type { return reflect.TypeOf(make([]int, 0)) },
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+		{
+			name: "valid ptr int type",
+			args: args{
+				inputTyp: func() reflect.Type {
+					var k *int
+					return reflect.TypeOf(k)
+				},
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+		{
+			name: "valid multi level ptr int type",
+			args: args{
+				inputTyp: func() reflect.Type {
+					return reflect.TypeOf(k)
+				},
+			},
+			wantTyp: reflect.TypeOf(kdown),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotTyp := GetElemTypeOfType(tt.args.inputTyp()); !reflect.DeepEqual(gotTyp, tt.wantTyp) {
+				t.Errorf("GetElemTypeOfType() = %v, want %v", gotTyp, tt.wantTyp)
+			}
+		})
+	}
+}
+
+func TestGetChildElemTypeOfType(t *testing.T) {
+	type args struct {
+		input func() reflect.Type
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantTyp reflect.Type
+	}{
+		{
+			name: "invalid nil type",
+			args: args{
+				input: func() reflect.Type { return reflect.TypeOf(nil) },
+			},
+			wantTyp: reflect.TypeOf(nil),
+		},
+		{
+			name: "valid ptr slice int type",
+			args: args{
+				input: func() reflect.Type {
+					var test []int
+					return reflect.TypeOf(&test)
+				},
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+		{
+			name: "valid slice int type",
+			args: args{
+				input: func() reflect.Type { return reflect.TypeOf(make([]int, 0)) },
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+		{
+			name: "valid ptr int type",
+			args: args{
+				input: func() reflect.Type {
+					var k *int
+					return reflect.TypeOf(k)
+				},
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+		{
+			name: "valid multi level ptr int type",
+			args: args{
+				input: func() reflect.Type {
+					var k ********int
+					return reflect.TypeOf(k)
+				},
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotTyp := GetChildElemTypeOfType(tt.args.input()); !reflect.DeepEqual(gotTyp, tt.wantTyp) {
+				t.Errorf("GetChildElemTypeOfType() = %v, want %v", gotTyp, tt.wantTyp)
+			}
+		})
+	}
+}
+
+func TestGetChildElemPtrTypeOfType(t *testing.T) {
+	type args struct {
+		input func() reflect.Type
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantTyp reflect.Type
+	}{
+		{
+			name: "invalid nil type",
+			args: args{
+				input: func() reflect.Type { return reflect.TypeOf(nil) },
+			},
+			wantTyp: reflect.TypeOf(nil),
+		},
+		{
+			name: "valid slice int type",
+			args: args{
+				input: func() reflect.Type { return reflect.TypeOf(make([]int, 0)) },
+			},
+			wantTyp: reflect.TypeOf(make([]int, 0)),
+		},
+		{
+			name: "valid ptr int type",
+			args: args{
+				input: func() reflect.Type {
+					var k *int
+					return reflect.TypeOf(k)
+				},
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+		{
+			name: "valid multi level ptr int type",
+			args: args{
+				input: func() reflect.Type {
+					var k ********int
+					return reflect.TypeOf(k)
+				},
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotTyp := GetChildElemPtrTypeOfType(tt.args.input()); !reflect.DeepEqual(gotTyp, tt.wantTyp) {
+				t.Errorf("GetChildElemPtrTypeOfType() = %v, want %v", gotTyp, tt.wantTyp)
+			}
+		})
+	}
+}
