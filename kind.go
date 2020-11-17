@@ -87,3 +87,64 @@ func IsKindTypeElemable(kind reflect.Kind) bool {
 		kind == reflect.Ptr ||
 		kind == reflect.Slice
 }
+
+// IsKindBool checks whether the kind is bool or not.
+func IsKindBool(kind reflect.Kind) bool {
+	return kind == reflect.Bool
+}
+
+// IsKindValueBytesSlice checks whether the val of reflect.Value is byte slice.
+func IsKindValueBytesSlice(val reflect.Value) bool {
+	if !val.IsValid() {
+		return false
+	}
+
+	if !IsKindSlice(GetKind(val)) {
+		return false
+	}
+
+	return GetElemKind(val) == reflect.Uint8
+}
+
+// IsKindSlice checks whether the kind is slice or not.
+func IsKindSlice(kind reflect.Kind) bool {
+	return kind == reflect.Slice
+}
+
+// IsKindComplex checks whether the kind is complex or not.
+func IsKindComplex(kind reflect.Kind) bool {
+	return kind == reflect.Complex128 || kind == reflect.Complex64
+}
+
+// IsKindFloat checks whether the kind is float or not.
+func IsKindFloat(kind reflect.Kind) bool {
+	return kind == reflect.Float32 || kind == reflect.Float64
+}
+
+// IsKindInt checks whether the kind is int or not.
+func IsKindInt(kind reflect.Kind) bool {
+	switch kind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return true
+	}
+	return false
+}
+
+// IsKindUnsafePointer checks whether the kind is unsafe ptr or not.
+func IsKindUnsafePointer(kind reflect.Kind) bool {
+	return kind == reflect.UnsafePointer
+}
+
+// IsKindString checks whether the kind is string or not.
+func IsKindString(kind reflect.Kind) bool {
+	return kind == reflect.String
+}
+
+// IsKindUint checks whether the kind is uint or not.
+func IsKindUint(kind reflect.Kind) bool {
+	switch kind {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return true
+	}
+	return false
+}
