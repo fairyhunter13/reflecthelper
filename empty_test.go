@@ -163,3 +163,52 @@ func TestIsValueNotZero(t *testing.T) {
 		})
 	}
 }
+
+func TestIsPtrValueZero(t *testing.T) {
+	type args struct {
+		val func() reflect.Value
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "nil ptr zero",
+			args: args{
+				val: func() reflect.Value {
+					var test *int
+					return reflect.ValueOf(test)
+				},
+			},
+			want: true,
+		},
+		{
+			name: "non nil ptr zero",
+			args: args{
+				val: func() reflect.Value {
+					test := 5
+					return reflect.ValueOf(&test)
+				},
+			},
+			want: false,
+		},
+		{
+			name: "non ptr int",
+			args: args{
+				val: func() reflect.Value {
+					test := 5
+					return reflect.ValueOf(test)
+				},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsPtrValueZero(tt.args.val()); got != tt.want {
+				t.Errorf("IsPtrValueZero() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

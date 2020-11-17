@@ -162,3 +162,12 @@ func IsTimeZero(t time.Time) bool {
 	return t.IsZero() || t.Format("2006-01-02 15:04:05") == ZeroTime0 ||
 		t.Format("2006-01-02 15:04:05") == ZeroTime1
 }
+
+// IsPtrValueZero overrides the default behavior for the reflect.Ptr case in the IsValueZero method.
+func IsPtrValueZero(val reflect.Value) bool {
+	if val.Kind() != reflect.Ptr {
+		return IsValueZero(val)
+	}
+
+	return val.IsNil()
+}

@@ -1,6 +1,8 @@
 package reflecthelper
 
-import "reflect"
+import (
+	"reflect"
+)
 
 // GetInitElem gets the element of a pointer value.
 // It initialize the element of a pointer value if it is nil.
@@ -33,4 +35,24 @@ func GetInitChildElem(val reflect.Value) (res reflect.Value) {
 		res = tempRes
 	}
 	return
+}
+
+// GetInitChildPtrElem is similar with GetInitChildElem but the function stops when the elem is ptr and the elem of ptr is non ptr.
+func GetInitChildPtrElem(val reflect.Value) (res reflect.Value) {
+	res = val
+
+	var tempRes reflect.Value
+	for IsKindValueElemableParentElem(res) {
+		tempRes = GetInitElem(res)
+		if res == tempRes {
+			return
+		}
+		res = tempRes
+	}
+	return
+}
+
+// IsKindValueElemableParentElem checks whether the res have elemable kind for parent and elem.
+func IsKindValueElemableParentElem(res reflect.Value) bool {
+	return IsKindValueElemable(GetKind(res)) && IsKindValueElemable(GetElemKind(res))
 }

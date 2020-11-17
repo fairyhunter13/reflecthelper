@@ -139,3 +139,84 @@ func TestGetInitChildElem(t *testing.T) {
 		})
 	}
 }
+
+func TestGetInitChildPtrElem(t *testing.T) {
+	type args struct {
+		val func() reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes func() reflect.Value
+	}{
+		{
+			name: "valid string value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantRes: func() reflect.Value {
+				return reflect.ValueOf("hello")
+			},
+		},
+		{
+			name: "valid int value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf(5)
+				},
+			},
+			wantRes: func() reflect.Value {
+				return reflect.ValueOf(5)
+			},
+		},
+		{
+			name: "valid multi level ptr unsettable int value",
+			args: args{
+				val: func() reflect.Value {
+					var test **int
+					return reflect.ValueOf(test)
+				},
+			},
+			wantRes: func() reflect.Value {
+				var test **int
+				return reflect.ValueOf(test)
+			},
+		},
+		{
+			name: "valid ptr int value",
+			args: args{
+				val: func() reflect.Value {
+					var test *int
+					return reflect.ValueOf(&test)
+				},
+			},
+			wantRes: func() reflect.Value {
+				var test *int
+				return reflect.ValueOf(test)
+			},
+		},
+		{
+			name: "valid multi level ptr int value",
+			args: args{
+				val: func() reflect.Value {
+					var test ****int
+					return reflect.ValueOf(&test)
+				},
+			},
+			wantRes: func() reflect.Value {
+				var test *int
+				return reflect.ValueOf(test)
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRes := GetInitChildPtrElem(tt.args.val())
+			if !(gotRes.Type() == tt.wantRes().Type()) {
+				t.Errorf("GetInitChildPtrElem() = %v, want %v", gotRes.Type(), tt.wantRes().Type())
+			}
+		})
+	}
+}
