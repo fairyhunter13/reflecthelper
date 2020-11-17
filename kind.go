@@ -79,6 +79,11 @@ func IsKindValueElemable(kind reflect.Kind) bool {
 	return kind == reflect.Ptr || kind == reflect.Interface
 }
 
+// IsKindValueElemableParentElem checks whether the res have elemable kind for parent and elem.
+func IsKindValueElemableParentElem(res reflect.Value) bool {
+	return IsKindValueElemable(GetKind(res)) && IsKindValueElemable(GetElemKind(res))
+}
+
 // IsKindTypeElemable checks the kind of reflect.Type that can call Elem method.
 func IsKindTypeElemable(kind reflect.Kind) bool {
 	return kind == reflect.Array ||

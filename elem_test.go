@@ -297,3 +297,50 @@ func TestGetChildNilElem(t *testing.T) {
 		})
 	}
 }
+
+func TestGetChildPtrElem(t *testing.T) {
+	type args struct {
+		val func() reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes func() reflect.Value
+	}{
+		{
+			name: "valid multi ptr string",
+			args: args{
+				val: func() reflect.Value {
+					var x **string
+					return reflect.ValueOf(x)
+				},
+			},
+			wantRes: func() reflect.Value {
+				var test **string
+				return reflect.ValueOf(test)
+			},
+		},
+		{
+			name: "valid multi ptr string",
+			args: args{
+				val: func() reflect.Value {
+					test := "hello"
+					hello := &test
+					hi := &hello
+					return reflect.ValueOf(&hi)
+				},
+			},
+			wantRes: func() reflect.Value {
+				var test *string
+				return reflect.ValueOf(test)
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotRes := GetChildPtrElem(tt.args.val()); !(gotRes.Type() == tt.wantRes().Type()) {
+				t.Errorf("GetChildPtrElem() = %v, want %v", gotRes.Type(), tt.wantRes().Type())
+			}
+		})
+	}
+}
