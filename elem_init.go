@@ -12,7 +12,7 @@ func GetInitElem(val reflect.Value) (res reflect.Value) {
 		return
 	}
 	if res.IsNil() {
-		if !res.CanSet() {
+		if !res.CanSet() || !IsTypeValueElemable(res) {
 			return
 		}
 		res.Set(reflect.New(res.Type().Elem()))
