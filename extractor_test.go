@@ -3,6 +3,7 @@ package reflecthelper
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -679,6 +680,32 @@ func TestTryExtract(t *testing.T) {
 				return
 			}
 			assert.Equal(t, tt.wantResult, gotResult)
+		})
+	}
+}
+
+func TestExtractTime(t *testing.T) {
+	type args struct {
+		val reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes *time.Time
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRes, err := ExtractTime(tt.args.val)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractTime() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("ExtractTime() = %v, want %v", gotRes, tt.wantRes)
+			}
 		})
 	}
 }

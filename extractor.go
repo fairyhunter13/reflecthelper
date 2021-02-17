@@ -3,6 +3,7 @@ package reflecthelper
 import (
 	"reflect"
 	"strconv"
+	"time"
 
 	"github.com/reiver/go-cast"
 )
@@ -223,5 +224,49 @@ func TryExtract(val reflect.Value) (result interface{}, err error) {
 	default:
 		err = getErrUnimplementedExtract(val)
 	}
+	return
+}
+
+// ExtractTime extracts the time from val of reflect.Value.
+func ExtractTime(val reflect.Value) (res *time.Time, err error) {
+	err = checkExtractValid(val)
+	if err != nil {
+		return
+	}
+
+	var timeStr string
+	switch GetKind(val) {
+	case reflect.String:
+		timeStr = val.String()
+	case reflect.Ptr, reflect.Interface:
+		res, err = ExtractTime(val.Elem())
+		return
+	case reflect.Struct:
+		if val.Type() == TypeTime {
+			timeVal, valid := val.Interface().(time.Time)
+			if !valid {
+				err = getErrIsNotValidTime(timeVal)
+				return
+			}
+
+			res = &timeVal
+			return
+		}
+
+		fallthrough
+	default:
+		timeStr, err = ExtractString(val)
+	}
+
+	if err != nil {
+		return
+	}
+
+	timeVal, err := ParseTime(timeStr)
+	if err != nil {
+		return
+	}
+
+	res = &timeVal
 	return
 }
