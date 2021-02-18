@@ -17,8 +17,7 @@ func checkExtractValid(val reflect.Value) (err error) {
 	return
 }
 
-// ExtractBool extract the underlying bool value from the val of reflect.Value.
-func ExtractBool(val reflect.Value) (result bool, err error) {
+func extractBool(val reflect.Value, option *Option) (result bool, err error) {
 	err = checkExtractValid(val)
 	if err != nil {
 		return
@@ -56,8 +55,7 @@ func ExtractBool(val reflect.Value) (result bool, err error) {
 	return
 }
 
-// ExtractInt gets the underlying int value from val of reflect.Value.
-func ExtractInt(val reflect.Value) (result int64, err error) {
+func extractInt(val reflect.Value, option *Option) (result int64, err error) {
 	err = checkExtractValid(val)
 	if err != nil {
 		return
@@ -98,17 +96,16 @@ func ExtractInt(val reflect.Value) (result int64, err error) {
 			return
 		}
 		var str string
-		str, err = ExtractString(val)
+		str, err = extractString(val, option)
 		if err != nil {
 			return
 		}
-		result, err = strconv.ParseInt(str, DefaultBaseSystem, DefaultBitSize)
+		result, err = strconv.ParseInt(str, option.BaseSystem, option.BitSize)
 	}
 	return
 }
 
-// ExtractUint extracts the underlying uint value from val of reflect.Value.
-func ExtractUint(val reflect.Value) (result uint64, err error) {
+func extractUint(val reflect.Value, option *Option) (result uint64, err error) {
 	err = checkExtractValid(val)
 	if err != nil {
 		return
@@ -154,17 +151,16 @@ func ExtractUint(val reflect.Value) (result uint64, err error) {
 			return
 		}
 		var str string
-		str, err = ExtractString(val)
+		str, err = extractString(val, option)
 		if err != nil {
 			return
 		}
-		result, err = strconv.ParseUint(str, DefaultBaseSystem, DefaultBitSize)
+		result, err = strconv.ParseUint(str, option.BaseSystem, option.BitSize)
 	}
 	return
 }
 
-// ExtractFloat extracts the underlying float value from val of reflect.Value.
-func ExtractFloat(val reflect.Value) (result float64, err error) {
+func extractFloat(val reflect.Value, option *Option) (result float64, err error) {
 	err = checkExtractValid(val)
 	if err != nil {
 		return
@@ -207,17 +203,16 @@ func ExtractFloat(val reflect.Value) (result float64, err error) {
 			return
 		}
 		var str string
-		str, err = ExtractString(val)
+		str, err = extractString(val, option)
 		if err != nil {
 			return
 		}
-		result, err = strconv.ParseFloat(str, DefaultBitSize)
+		result, err = strconv.ParseFloat(str, option.BitSize)
 	}
 	return
 }
 
-// ExtractComplex gets the underlying complex value from val of reflect.Value.
-func ExtractComplex(val reflect.Value) (result complex128, err error) {
+func extractComplex(val reflect.Value, option *Option) (result complex128, err error) {
 	err = checkExtractValid(val)
 	if err != nil {
 		return
@@ -256,17 +251,16 @@ func ExtractComplex(val reflect.Value) (result complex128, err error) {
 			return
 		}
 		var str string
-		str, err = ExtractString(val)
+		str, err = extractString(val, option)
 		if err != nil {
 			return
 		}
-		result, err = strconv.ParseComplex(str, DefaultComplexBitSize)
+		result, err = strconv.ParseComplex(str, option.ComplexBitSize)
 	}
 	return
 }
 
-// ExtractString gets the underlying string value from val of reflect.Value.
-func ExtractString(val reflect.Value) (result string, err error) {
+func extractString(val reflect.Value, option *Option) (result string, err error) {
 	err = checkExtractValid(val)
 	if err != nil {
 		return
@@ -290,12 +284,12 @@ func ExtractString(val reflect.Value) (result string, err error) {
 		result = strconv.FormatBool(boolVal)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		intVal := val.Int()
-		result = strconv.FormatInt(intVal, DefaultBaseSystem)
+		result = strconv.FormatInt(intVal, option.BaseSystem)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		uintVal := val.Uint()
-		result = strconv.FormatUint(uintVal, DefaultBaseSystem)
+		result = strconv.FormatUint(uintVal, option.BaseSystem)
 	case reflect.Float32, reflect.Float64:
-		result = getDefaultFloatStr(val.Float())
+		result = getDefaultFloatStr(val.Float(), option)
 	case reflect.String:
 		result = val.String()
 	default:
@@ -310,41 +304,17 @@ func ExtractString(val reflect.Value) (result string, err error) {
 	return
 }
 
-// TryExtract tries to extract the real value from the val of reflect.Value.
-func TryExtract(val reflect.Value) (result interface{}, err error) {
-	switch GetKind(val) {
-	case reflect.Bool:
-		result, err = ExtractBool(val)
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		result, err = ExtractInt(val)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		result, err = ExtractUint(val)
-	case reflect.Float32, reflect.Float64:
-		result, err = ExtractFloat(val)
-	case reflect.Complex64, reflect.Complex128:
-		result, err = ExtractComplex(val)
-	case reflect.String:
-		result, err = ExtractString(val)
-	default:
-		err = getErrUnimplementedExtract(val)
-	}
-	return
-}
-
-// ExtractTime extracts the time from val of reflect.Value.
-func ExtractTime(val reflect.Value) (res *time.Time, err error) {
+func extractTime(val reflect.Value, option *Option) (res *time.Time, err error) {
 	err = checkExtractValid(val)
 	if err != nil {
 		return
 	}
 
+	val = GetChildElem(val)
 	var timeStr string
 	switch GetKind(val) {
 	case reflect.String:
 		timeStr = val.String()
-	case reflect.Ptr, reflect.Interface:
-		res, err = ExtractTime(val.Elem())
-		return
 	case reflect.Struct:
 		if val.Type() == TypeTime {
 			timeVal := val.Interface().(time.Time)
@@ -354,7 +324,7 @@ func ExtractTime(val reflect.Value) (res *time.Time, err error) {
 
 		fallthrough
 	default:
-		timeStr, err = ExtractString(val)
+		timeStr, err = extractString(val, option)
 	}
 
 	if err != nil {
@@ -367,5 +337,38 @@ func ExtractTime(val reflect.Value) (res *time.Time, err error) {
 	}
 
 	res = &timeVal
+	return
+}
+
+func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) {
+	err = checkExtractValid(val)
+	if err != nil {
+		return
+	}
+
+	switch GetKind(val) {
+	case reflect.Bool:
+		result, err = extractBool(val, opt)
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		result, err = extractInt(val, opt)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		result, err = extractUint(val, opt)
+	case reflect.Float32, reflect.Float64:
+		result, err = extractFloat(val, opt)
+	case reflect.Complex64, reflect.Complex128:
+		result, err = extractComplex(val, opt)
+	case reflect.String:
+		result, err = extractString(val, opt)
+	case reflect.Struct, reflect.Ptr:
+		valType := val.Type()
+		if valType == TypeTime || valType == TypeTimePtr {
+			result, err = extractTime(val, opt)
+			break
+		}
+
+		fallthrough
+	default:
+		err = getErrUnimplementedExtract(val)
+	}
 	return
 }

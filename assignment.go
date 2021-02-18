@@ -17,9 +17,7 @@ func checkAssigner(assigner reflect.Value) (err error) {
 	return
 }
 
-// AssignReflect assigns the val of the reflect.Value to the assigner.
-// This function asserts that the assigner Kind is same as the val Kind.
-func AssignReflect(assigner reflect.Value, val reflect.Value) (err error) {
+func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
 	assigner = GetChildElem(assigner)
 	val = GetChildElem(val)
 	err = checkAssigner(assigner)
@@ -30,11 +28,11 @@ func AssignReflect(assigner reflect.Value, val reflect.Value) (err error) {
 	if err != nil {
 		return
 	}
-	err = tryAssign(assigner, val)
+	err = tryAssign(assigner, val, opt)
 	return
 }
 
-func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
+func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
 	defer func() {
 		if rec := recover(); rec != nil {
 			switch val := rec.(type) {
@@ -51,14 +49,14 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 	switch assignerKind {
 	case reflect.Bool:
 		var result bool
-		result, err = ExtractBool(val)
+		result, err = extractBool(val, opt)
 		if err != nil {
 			return
 		}
 		assigner.SetBool(result)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		var result int64
-		result, err = ExtractInt(val)
+		result, err = extractInt(val, opt)
 		if err != nil {
 			return
 		}
@@ -69,7 +67,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 		assigner.SetInt(result)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		var result uint64
-		result, err = ExtractUint(val)
+		result, err = extractUint(val, opt)
 		if err != nil {
 			return
 		}
@@ -80,7 +78,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 		assigner.SetUint(result)
 	case reflect.Float32, reflect.Float64:
 		var result float64
-		result, err = ExtractFloat(val)
+		result, err = extractFloat(val, opt)
 		if err != nil {
 			return
 		}
@@ -91,7 +89,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 		assigner.SetFloat(result)
 	case reflect.Complex64, reflect.Complex128:
 		var result complex128
-		result, err = ExtractComplex(val)
+		result, err = extractComplex(val, opt)
 		if err != nil {
 			return
 		}
@@ -118,7 +116,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 		}
 	case reflect.String:
 		var result string
-		result, err = ExtractString(val)
+		result, err = extractString(val, opt)
 		if err != nil {
 			return
 		}
@@ -137,7 +135,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value) (err error) {
 					assigner.Set(val)
 					return
 				}
-				timeStr, err = ExtractString(val)
+				timeStr, err = extractString(val, opt)
 				if err != nil {
 					return
 				}

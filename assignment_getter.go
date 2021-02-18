@@ -6,20 +6,8 @@ import (
 	"strconv"
 )
 
-const (
-	// DefaultFloatPrecision specifies the default precision used in this package.
-	// This is the default maximum precision.
-	DefaultFloatPrecision = -1
-	// DefaultBitSize is the default bit size used for the conversion in this package.
-	DefaultBitSize = 64
-	// DefaultComplexBitSize is the default bit size for the complex128 type.
-	DefaultComplexBitSize = 128
-	// DefaultBaseSystem is the default base system used for decimal in this package.
-	DefaultBaseSystem = 10
-)
-
-func getDefaultFloatStr(floatVal float64) (result string) {
-	result = strconv.FormatFloat(floatVal, 'g', DefaultFloatPrecision, DefaultBitSize)
+func getDefaultFloatStr(floatVal float64, opt *Option) (result string) {
+	result = strconv.FormatFloat(floatVal, opt.FloatFormat, opt.FloatPrecision, opt.BitSize)
 	return
 }
 

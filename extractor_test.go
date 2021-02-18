@@ -890,6 +890,7 @@ func TestExtractTime(t *testing.T) {
 }
 
 func TestTryExtract(t *testing.T) {
+	now := time.Now()
 	type args struct {
 		val reflect.Value
 	}
@@ -900,9 +901,23 @@ func TestTryExtract(t *testing.T) {
 		wantErr    bool
 	}{
 		{
+			name: "nil value",
+			args: args{
+				val: reflect.ValueOf(nil),
+			},
+			wantErr: true,
+		},
+		{
 			name: "unimplemented value",
 			args: args{
 				val: reflect.ValueOf([]int{0, 1, 2, 3}),
+			},
+			wantErr: true,
+		},
+		{
+			name: "unimplemented anonymous struct value",
+			args: args{
+				val: reflect.ValueOf(struct{}{}),
 			},
 			wantErr: true,
 		},
@@ -947,6 +962,20 @@ func TestTryExtract(t *testing.T) {
 				val: reflect.ValueOf("hello"),
 			},
 			wantResult: "hello",
+		},
+		{
+			name: "time.Time value",
+			args: args{
+				val: reflect.ValueOf(now),
+			},
+			wantResult: &now,
+		},
+		{
+			name: "ptr time.Time value",
+			args: args{
+				val: reflect.ValueOf(&now),
+			},
+			wantResult: &now,
 		},
 	}
 	for _, tt := range tests {
