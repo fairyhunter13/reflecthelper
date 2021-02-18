@@ -84,11 +84,3 @@ func getErrIsValid(val reflect.Value) (err error) {
 	}
 	return
 }
-
-func getErrIsNotValidTime(input interface{}) (err error) {
-	err = fmt.Errorf(
-		"The interface value is not a valid time.Time type, input: %+v",
-		input,
-	)
-	return
-}

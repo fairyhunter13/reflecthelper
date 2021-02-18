@@ -92,7 +92,7 @@ func TestExtractBool(t *testing.T) {
 			wantResult: true,
 		},
 		{
-			name: "elem value booler value",
+			name: "elem ptr booler value",
 			args: args{
 				val: reflect.ValueOf(ptrValBooler).Elem(),
 			},
@@ -261,12 +261,19 @@ type uinter struct {
 	val uint
 }
 
-func (u uinter) Uint() (uint, error) {
+func (u *uinter) Uint() (uint, error) {
+	return u.val, nil
+}
+
+type uinterVal struct {
+	val uint
+}
+
+func (u uinterVal) Uint() (uint, error) {
 	return u.val, nil
 }
 
 func TestExtractUint(t *testing.T) {
-	// TODO: Enhance this
 	uintPtr := uint(15)
 	type args struct {
 		val reflect.Value
@@ -341,9 +348,23 @@ func TestExtractUint(t *testing.T) {
 			wantResult: 15,
 		},
 		{
-			name: "uinter value",
+			name: "ptr uinter value",
 			args: args{
-				val: reflect.ValueOf(uinter{15}),
+				val: reflect.ValueOf(&uinter{15}),
+			},
+			wantResult: 15,
+		},
+		{
+			name: "elem ptr uinter value",
+			args: args{
+				val: reflect.ValueOf(&uinter{15}).Elem(),
+			},
+			wantResult: 15,
+		},
+		{
+			name: "uinterVal value",
+			args: args{
+				val: reflect.ValueOf(uinterVal{15}),
 			},
 			wantResult: 15,
 		},
@@ -373,12 +394,19 @@ type floater struct {
 	val float64
 }
 
-func (f floater) Float64() (float64, error) {
+func (f *floater) Float64() (float64, error) {
+	return f.val, nil
+}
+
+type floaterVal struct {
+	val float64
+}
+
+func (f floaterVal) Float64() (float64, error) {
 	return f.val, nil
 }
 
 func TestExtractFloat(t *testing.T) {
-	// TODO: Enhance this
 	floatPtr := 13.0
 	type args struct {
 		val reflect.Value
@@ -453,9 +481,23 @@ func TestExtractFloat(t *testing.T) {
 			wantResult: 13.0,
 		},
 		{
-			name: "floater value",
+			name: "ptr floater value",
 			args: args{
-				val: reflect.ValueOf(floater{11}),
+				val: reflect.ValueOf(&floater{11}),
+			},
+			wantResult: 11.0,
+		},
+		{
+			name: "elem ptr floater value",
+			args: args{
+				val: reflect.ValueOf(&floater{11}).Elem(),
+			},
+			wantResult: 11.0,
+		},
+		{
+			name: "floaterVal value",
+			args: args{
+				val: reflect.ValueOf(floaterVal{11}),
 			},
 			wantResult: 11.0,
 		},
@@ -478,12 +520,20 @@ type complex128er struct {
 	val complex128
 }
 
-func (c complex128er) Complex128() (complex128, error) {
+func (c *complex128er) Complex128() (complex128, error) {
+	return c.val, nil
+}
+
+type complex128Val struct {
+	val complex128
+}
+
+func (c complex128Val) Complex128() (complex128, error) {
 	return c.val, nil
 }
 
 func TestExtractComplex(t *testing.T) {
-	// TODO: Enhance this
+	testComplex := complex(15, 0)
 	type args struct {
 		val reflect.Value
 	}
@@ -543,9 +593,30 @@ func TestExtractComplex(t *testing.T) {
 			wantResult: complex(15, 0),
 		},
 		{
-			name: "complex128er value",
+			name: "ptr complex value",
 			args: args{
-				val: reflect.ValueOf(complex128er{complex(17, 0)}),
+				val: reflect.ValueOf(&testComplex),
+			},
+			wantResult: complex(15, 0),
+		},
+		{
+			name: "ptr complex128er value",
+			args: args{
+				val: reflect.ValueOf(&complex128er{complex(17, 0)}),
+			},
+			wantResult: complex(17, 0),
+		},
+		{
+			name: "elem ptr complex128er value",
+			args: args{
+				val: reflect.ValueOf(&complex128er{complex(17, 0)}).Elem(),
+			},
+			wantResult: complex(17, 0),
+		},
+		{
+			name: "complex128Val value",
+			args: args{
+				val: reflect.ValueOf(complex128Val{complex(17, 0)}),
 			},
 			wantResult: complex(17, 0),
 		},
@@ -564,8 +635,23 @@ func TestExtractComplex(t *testing.T) {
 	}
 }
 
+type stringer struct {
+	val string
+}
+
+func (s *stringer) String() string {
+	return s.val
+}
+
+type stringVal struct {
+	val string
+}
+
+func (s stringVal) String() string {
+	return s.val
+}
+
 func TestExtractString(t *testing.T) {
-	// TODO: Enhance this
 	intVal := 5
 	type args struct {
 		val reflect.Value
@@ -642,6 +728,30 @@ func TestExtractString(t *testing.T) {
 			name: "byte slice to string",
 			args: args{
 				val: reflect.ValueOf([]byte("hello")),
+			},
+			wantResult: "hello",
+			wantErr:    false,
+		},
+		{
+			name: "ptr stringer value",
+			args: args{
+				val: reflect.ValueOf(&stringer{"hello"}),
+			},
+			wantResult: "hello",
+			wantErr:    false,
+		},
+		{
+			name: "elem ptr stringer value",
+			args: args{
+				val: reflect.ValueOf(&stringer{"hello"}).Elem(),
+			},
+			wantResult: "hello",
+			wantErr:    false,
+		},
+		{
+			name: "stringVal value",
+			args: args{
+				val: reflect.ValueOf(stringVal{"hello"}),
 			},
 			wantResult: "hello",
 			wantErr:    false,
