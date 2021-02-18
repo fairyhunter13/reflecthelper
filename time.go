@@ -32,3 +32,5 @@ func ParseTime(timeTxt string) (result time.Time, err error) {
 	}
 	return
 }
+
+// TODO: Add option for time layout

@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// TODO: Add FuncOption in here
+
 // ExtractBool extract the underlying bool value from the val of reflect.Value.
 func ExtractBool(val reflect.Value) (res bool, err error) {
 	res, err = extractBool(val, NewDefaultOption())
