@@ -23,12 +23,29 @@ func ExtractBool(val reflect.Value) (result bool, err error) {
 	if err != nil {
 		return
 	}
+
+	originKind := GetKind(val)
+	tempVal := GetElem(val)
+	for IsValueElemable(val) && tempVal != val {
+		result, err = cast.Bool(val.Interface())
+		if err == nil {
+			return
+		}
+		val = tempVal
+		tempVal = GetElem(val)
+	}
+	err = nil
+
 	switch GetKind(val) {
 	case reflect.Bool:
 		result = val.Bool()
-	case reflect.Ptr, reflect.Interface:
-		result, err = ExtractBool(val.Elem())
 	default:
+		if val.CanAddr() && !IsKindPtr(originKind) {
+			result, err = cast.Bool(val.Addr().Interface())
+			if err == nil {
+				return
+			}
+		}
 		result, err = cast.Bool(val.Interface())
 		if err == nil {
 			return
@@ -45,6 +62,19 @@ func ExtractInt(val reflect.Value) (result int64, err error) {
 	if err != nil {
 		return
 	}
+
+	originKind := GetKind(val)
+	tempVal := GetElem(val)
+	for IsValueElemable(val) && tempVal != val {
+		result, err = cast.Int64(val.Interface())
+		if err == nil {
+			return
+		}
+		val = tempVal
+		tempVal = GetElem(val)
+	}
+	err = nil
+
 	switch GetKind(val) {
 	case reflect.Bool:
 		if val.Bool() {
@@ -56,9 +86,13 @@ func ExtractInt(val reflect.Value) (result int64, err error) {
 		result = val.Int()
 	case reflect.Uint8, reflect.Uint16, reflect.Uint32:
 		result = int64(val.Uint())
-	case reflect.Ptr, reflect.Interface:
-		result, err = ExtractInt(val.Elem())
 	default:
+		if val.CanAddr() && !IsKindPtr(originKind) {
+			result, err = cast.Int64(val.Addr().Interface())
+			if err == nil {
+				return
+			}
+		}
 		result, err = cast.Int64(val.Interface())
 		if err == nil {
 			return
@@ -79,6 +113,19 @@ func ExtractUint(val reflect.Value) (result uint64, err error) {
 	if err != nil {
 		return
 	}
+
+	originKind := GetKind(val)
+	tempVal := GetElem(val)
+	for IsValueElemable(val) && tempVal != val {
+		result, err = cast.Uint64(val.Interface())
+		if err == nil {
+			return
+		}
+		val = tempVal
+		tempVal = GetElem(val)
+	}
+	err = nil
+
 	switch GetKind(val) {
 	case reflect.Bool:
 		if val.Bool() {
@@ -95,9 +142,13 @@ func ExtractUint(val reflect.Value) (result uint64, err error) {
 		result = uint64(valInt)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		result = val.Uint()
-	case reflect.Ptr, reflect.Interface:
-		result, err = ExtractUint(val.Elem())
 	default:
+		if val.CanAddr() && !IsKindPtr(originKind) {
+			result, err = cast.Uint64(val.Addr().Interface())
+			if err == nil {
+				return
+			}
+		}
 		result, err = cast.Uint64(val.Interface())
 		if err == nil {
 			return
@@ -118,6 +169,19 @@ func ExtractFloat(val reflect.Value) (result float64, err error) {
 	if err != nil {
 		return
 	}
+
+	originKind := GetKind(val)
+	tempVal := GetElem(val)
+	for IsValueElemable(val) && tempVal != val {
+		result, err = cast.Float64(val.Interface())
+		if err == nil {
+			return
+		}
+		val = tempVal
+		tempVal = GetElem(val)
+	}
+	err = nil
+
 	switch GetKind(val) {
 	case reflect.Bool:
 		if val.Bool() {
@@ -131,9 +195,13 @@ func ExtractFloat(val reflect.Value) (result float64, err error) {
 		result = float64(val.Uint())
 	case reflect.Float32, reflect.Float64:
 		result = val.Float()
-	case reflect.Ptr, reflect.Interface:
-		result, err = ExtractFloat(val.Elem())
 	default:
+		if val.CanAddr() && !IsKindPtr(originKind) {
+			result, err = cast.Float64(val.Addr().Interface())
+			if err == nil {
+				return
+			}
+		}
 		result, err = cast.Float64(val.Interface())
 		if err == nil {
 			return
@@ -154,6 +222,19 @@ func ExtractComplex(val reflect.Value) (result complex128, err error) {
 	if err != nil {
 		return
 	}
+
+	originKind := GetKind(val)
+	tempVal := GetElem(val)
+	for IsValueElemable(val) && tempVal != val {
+		result, err = cast.Complex128(val.Interface())
+		if err == nil {
+			return
+		}
+		val = tempVal
+		tempVal = GetElem(val)
+	}
+	err = nil
+
 	switch GetKind(val) {
 	case reflect.Int8, reflect.Int16:
 		result = complex(float64(val.Int()), 0)
@@ -164,6 +245,12 @@ func ExtractComplex(val reflect.Value) (result complex128, err error) {
 	case reflect.Complex64, reflect.Complex128:
 		result = val.Complex()
 	default:
+		if val.CanAddr() && !IsKindPtr(originKind) {
+			result, err = cast.Complex128(val.Addr().Interface())
+			if err == nil {
+				return
+			}
+		}
 		result, err = cast.Complex128(val.Interface())
 		if err == nil {
 			return
@@ -184,6 +271,19 @@ func ExtractString(val reflect.Value) (result string, err error) {
 	if err != nil {
 		return
 	}
+
+	originKind := GetKind(val)
+	tempVal := GetElem(val)
+	for IsValueElemable(val) && tempVal != val {
+		result, err = cast.String(val.Interface())
+		if err == nil {
+			return
+		}
+		val = tempVal
+		tempVal = GetElem(val)
+	}
+	err = nil
+
 	switch GetKind(val) {
 	case reflect.Bool:
 		boolVal := val.Bool()
@@ -196,11 +296,15 @@ func ExtractString(val reflect.Value) (result string, err error) {
 		result = strconv.FormatUint(uintVal, DefaultBaseSystem)
 	case reflect.Float32, reflect.Float64:
 		result = getDefaultFloatStr(val.Float())
-	case reflect.Ptr, reflect.Interface:
-		result, err = ExtractString(val.Elem())
 	case reflect.String:
 		result = val.String()
 	default:
+		if val.CanAddr() && !IsKindPtr(originKind) {
+			result, err = cast.String(val.Addr().Interface())
+			if err == nil {
+				return
+			}
+		}
 		result, err = cast.String(val.Interface())
 	}
 	return
@@ -243,12 +347,7 @@ func ExtractTime(val reflect.Value) (res *time.Time, err error) {
 		return
 	case reflect.Struct:
 		if val.Type() == TypeTime {
-			timeVal, valid := val.Interface().(time.Time)
-			if !valid {
-				err = getErrIsNotValidTime(timeVal)
-				return
-			}
-
+			timeVal := val.Interface().(time.Time)
 			res = &timeVal
 			return
 		}

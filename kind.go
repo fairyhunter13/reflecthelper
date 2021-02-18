@@ -153,3 +153,8 @@ func IsKindUint(kind reflect.Kind) bool {
 	}
 	return false
 }
+
+// IsKindPtr checks whether the input kind is reflect.Ptr.
+func IsKindPtr(kind reflect.Kind) bool {
+	return kind == reflect.Ptr
+}

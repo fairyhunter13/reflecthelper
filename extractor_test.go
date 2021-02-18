@@ -12,7 +12,15 @@ type booler struct {
 	val bool
 }
 
-func (b booler) Bool() (bool, error) {
+func (b *booler) Bool() (bool, error) {
+	return b.val, nil
+}
+
+type boolerVal struct {
+	val bool
+}
+
+func (b boolerVal) Bool() (bool, error) {
 	return b.val, nil
 }
 
@@ -24,6 +32,7 @@ func TestExtractBool(t *testing.T) {
 	var nilBool *bool
 	valBool := true
 	valBooler := booler{true}
+	ptrValBooler := &valBooler
 	type args struct {
 		val reflect.Value
 	}
@@ -83,9 +92,23 @@ func TestExtractBool(t *testing.T) {
 			wantResult: true,
 		},
 		{
-			name: "booler value",
+			name: "elem value booler value",
 			args: args{
-				val: reflect.ValueOf(valBooler),
+				val: reflect.ValueOf(ptrValBooler).Elem(),
+			},
+			wantResult: true,
+		},
+		{
+			name: "ptr booler value",
+			args: args{
+				val: reflect.ValueOf(ptrValBooler),
+			},
+			wantResult: true,
+		},
+		{
+			name: "boolerVal value",
+			args: args{
+				val: reflect.ValueOf(boolerVal{true}),
 			},
 			wantResult: true,
 		},
@@ -108,7 +131,15 @@ type int64er struct {
 	val int64
 }
 
-func (i int64er) Int64() (int64, error) {
+func (i *int64er) Int64() (int64, error) {
+	return i.val, nil
+}
+
+type int64Val struct {
+	val int64
+}
+
+func (i int64Val) Int64() (int64, error) {
 	return i.val, nil
 }
 
@@ -191,9 +222,23 @@ func TestExtractInt(t *testing.T) {
 			wantResult: 20,
 		},
 		{
-			name: "int64er value",
+			name: "ptr int64er value",
 			args: args{
-				val: reflect.ValueOf(int64er{15}),
+				val: reflect.ValueOf(&int64er{15}),
+			},
+			wantResult: 15,
+		},
+		{
+			name: "elem ptr int64er value",
+			args: args{
+				val: reflect.ValueOf(&int64er{15}).Elem(),
+			},
+			wantResult: 15,
+		},
+		{
+			name: "int64Val value",
+			args: args{
+				val: reflect.ValueOf(int64Val{15}),
 			},
 			wantResult: 15,
 		},
@@ -221,6 +266,7 @@ func (u uinter) Uint() (uint, error) {
 }
 
 func TestExtractUint(t *testing.T) {
+	// TODO: Enhance this
 	uintPtr := uint(15)
 	type args struct {
 		val reflect.Value
@@ -332,6 +378,7 @@ func (f floater) Float64() (float64, error) {
 }
 
 func TestExtractFloat(t *testing.T) {
+	// TODO: Enhance this
 	floatPtr := 13.0
 	type args struct {
 		val reflect.Value
@@ -436,6 +483,7 @@ func (c complex128er) Complex128() (complex128, error) {
 }
 
 func TestExtractComplex(t *testing.T) {
+	// TODO: Enhance this
 	type args struct {
 		val reflect.Value
 	}
@@ -517,6 +565,7 @@ func TestExtractComplex(t *testing.T) {
 }
 
 func TestExtractString(t *testing.T) {
+	// TODO: Enhance this
 	intVal := 5
 	type args struct {
 		val reflect.Value
@@ -612,6 +661,124 @@ func TestExtractString(t *testing.T) {
 	}
 }
 
+type hello struct{ test string }
+
+func (h *hello) String() string {
+	return h.test
+}
+
+func TestExtractTime(t *testing.T) {
+	type args struct {
+		val func() reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantRes func() *time.Time
+		wantErr bool
+	}{
+		{
+			name: "invalid reflect value",
+			args: args{
+				val: func() reflect.Value { return reflect.ValueOf(nil) },
+			},
+			wantRes: func() *time.Time {
+				return nil
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid string value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf("test")
+				},
+			},
+			wantRes: func() *time.Time {
+				return nil
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid slice value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf([]int{0, 1, 2, 3})
+				},
+			},
+			wantRes: func() *time.Time {
+				return nil
+			},
+			wantErr: true,
+		},
+		{
+			name: "ptr time type value",
+			args: args{
+				val: func() reflect.Value {
+					timeVal, _ := time.Parse(time.RFC3339, "2006-01-02T15:04:05+07:00")
+					return reflect.ValueOf(&timeVal)
+				},
+			},
+			wantRes: func() *time.Time {
+				timeVal, _ := time.Parse(time.RFC3339, "2006-01-02T15:04:05+07:00")
+				return &timeVal
+			},
+			wantErr: false,
+		},
+		{
+			name: "time type value",
+			args: args{
+				val: func() reflect.Value {
+					timeVal, _ := time.Parse(time.RFC3339, "2006-01-02T15:04:05+07:00")
+					return reflect.ValueOf(timeVal)
+				},
+			},
+			wantRes: func() *time.Time {
+				timeVal, _ := time.Parse(time.RFC3339, "2006-01-02T15:04:05+07:00")
+				return &timeVal
+			},
+			wantErr: false,
+		},
+		{
+			name: "hello type value",
+			args: args{
+				val: func() reflect.Value {
+					hi := &hello{test: "2006-01-02T15:04:05+07:00"}
+					return reflect.ValueOf(hi)
+				},
+			},
+			wantRes: func() *time.Time {
+				timeVal, _ := time.Parse(time.RFC3339, "2006-01-02T15:04:05+07:00")
+				return &timeVal
+			},
+			wantErr: false,
+		},
+		{
+			name: "string value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf("2006-01-02T15:04:05+07:00")
+				},
+			},
+			wantRes: func() *time.Time {
+				timeVal, _ := time.Parse(time.RFC3339, "2006-01-02T15:04:05+07:00")
+				return &timeVal
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRes, err := ExtractTime(tt.args.val())
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractTime() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.EqualValues(t, tt.wantRes(), gotRes)
+		})
+	}
+}
+
 func TestTryExtract(t *testing.T) {
 	type args struct {
 		val reflect.Value
@@ -680,32 +847,6 @@ func TestTryExtract(t *testing.T) {
 				return
 			}
 			assert.Equal(t, tt.wantResult, gotResult)
-		})
-	}
-}
-
-func TestExtractTime(t *testing.T) {
-	type args struct {
-		val reflect.Value
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantRes *time.Time
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := ExtractTime(tt.args.val)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ExtractTime() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("ExtractTime() = %v, want %v", gotRes, tt.wantRes)
-			}
 		})
 	}
 }
