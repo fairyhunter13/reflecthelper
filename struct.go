@@ -34,6 +34,11 @@ func CastStruct(val reflect.Value) (res ReflectStruct, err error) {
 		return
 	}
 
-	// TODO: Add logic in here
+	switch GetKind(val) {
+	case reflect.Struct:
+		res = ReflectStruct{val}
+	default:
+		err = getErrUnimplementedCasting(val, reflect.Struct)
+	}
 	return
 }
