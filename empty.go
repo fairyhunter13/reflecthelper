@@ -87,9 +87,9 @@ func IsValueZero(v reflect.Value) bool {
 	case reflect.Complex64, reflect.Complex128:
 		complexNum := v.Complex()
 		return math.Float64bits(real(complexNum)) == 0 && math.Float64bits(imag(complexNum)) == 0
-	case reflect.Array:
+	case reflect.Array, reflect.Slice:
 		return IsArrayZero(v)
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Slice, reflect.UnsafePointer:
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.UnsafePointer:
 		return v.IsNil()
 	case reflect.Ptr:
 		if v.IsNil() {

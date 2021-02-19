@@ -67,6 +67,10 @@ func TestIsValueZero(t *testing.T) {
 			Failed  *bool
 		}
 	}
+	type privateVar struct {
+		hello string
+		Test  string
+	}
 	var zeroReflectValues = []reflect.Value{
 		reflect.ValueOf(nil),
 		reflect.ValueOf(false),
@@ -100,6 +104,9 @@ func TestIsValueZero(t *testing.T) {
 		reflect.ValueOf(nilTime),
 		reflect.ValueOf(ZeroStruct{}),
 		reflect.ValueOf(&ZeroStruct{}),
+		reflect.ValueOf(privateVar{hello: "string"}),
+		reflect.ValueOf([]interface{}{nil, nil, nil}),
+		reflect.ValueOf([3]interface{}{nil, nil, nil}),
 	}
 
 	for _, v := range zeroReflectValues {
