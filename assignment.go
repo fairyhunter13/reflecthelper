@@ -1,7 +1,6 @@
 package reflecthelper
 
 import (
-	"fmt"
 	"reflect"
 	"time"
 )
@@ -33,16 +32,7 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 }
 
 func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
-	defer func() {
-		if rec := recover(); rec != nil {
-			switch val := rec.(type) {
-			case error:
-				err = val
-			default:
-				err = fmt.Errorf("%v", val)
-			}
-		}
-	}()
+	defer RecoverFn(&err)
 
 	assignerKind := GetKind(assigner)
 	valKind := GetKind(val)
