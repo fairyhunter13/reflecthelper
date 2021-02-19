@@ -44,7 +44,7 @@ func GetChildElem(val reflect.Value) (res reflect.Value) {
 func GetChildPtrElem(val reflect.Value) (res reflect.Value) {
 	res = val
 	var tempRes reflect.Value
-	for IsKindValueElemableParentElem(res) {
+	for IsValueElemableParentElem(res) {
 		tempRes = GetElem(res)
 		if res == tempRes {
 			return
@@ -61,9 +61,4 @@ func GetChildNilElem(val reflect.Value) (res reflect.Value) {
 		res = GetNilElem(res)
 	}
 	return
-}
-
-// IsValueElemable checks whether the val of reflect.Value could call Elem method.
-func IsValueElemable(val reflect.Value) bool {
-	return IsKindValueElemable(GetKind(val))
 }

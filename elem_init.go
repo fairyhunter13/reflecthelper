@@ -41,7 +41,7 @@ func GetInitChildElem(val reflect.Value) (res reflect.Value) {
 func GetInitChildPtrElem(val reflect.Value) (res reflect.Value) {
 	res = val
 	var tempRes reflect.Value
-	for IsKindValueElemableParentElem(res) {
+	for IsValueElemableParentElem(res) {
 		tempRes = GetInitElem(res)
 		if res == tempRes {
 			return
