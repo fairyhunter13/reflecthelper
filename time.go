@@ -22,9 +22,9 @@ var (
 	}
 )
 
-// ParseTime parses the timeTxt string to the time.Time using various formats.
-func ParseTime(timeTxt string) (result time.Time, err error) {
-	for _, layout := range listLayouts {
+func parseTime(timeTxt string, option *Option) (result time.Time, err error) {
+	layouts := append(option.TimeLayouts, listLayouts...)
+	for _, layout := range layouts {
 		result, err = time.Parse(layout, timeTxt)
 		if err == nil {
 			break
@@ -32,5 +32,3 @@ func ParseTime(timeTxt string) (result time.Time, err error) {
 	}
 	return
 }
-
-// TODO: Add option for time layout

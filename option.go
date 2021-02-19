@@ -48,6 +48,20 @@ func NewDefaultOption() *Option {
 	return new(Option).Default()
 }
 
+// NewOption initialize the new empty option.
+func NewOption() *Option {
+	return new(Option)
+}
+
+// Assign assigns the functional options to the Option.
+func (o *Option) Assign(fnOpts ...FuncOption) *Option {
+	for _, fnOpt := range fnOpts {
+		fnOpt(o)
+	}
+	o.Default()
+	return o
+}
+
 func (o *Option) isValidFloatFormat() bool {
 	switch o.FloatFormat {
 	case 'b', 'e', 'E', 'f', 'g', 'G', 'x', 'X':
@@ -86,6 +100,9 @@ func (o *Option) Default() *Option {
 	}
 	if !o.isValidFloatFormat() {
 		o.FloatFormat = DefaultFloatFormat
+	}
+	if o.TimeLayouts == nil {
+		o.TimeLayouts = make([]string, 0)
 	}
 	return o
 }
