@@ -8,17 +8,20 @@ import (
 	"github.com/reiver/go-cast"
 )
 
-func checkExtractValid(val reflect.Value) (err error) {
-	err = getErrIsValid(val)
-	if err != nil {
-		return
+func checkExtractValid(val reflect.Value, opt *Option) (err error) {
+	if !opt.hasCheckExtractValid {
+		defer opt.toggleOnCheckExtractValid()
+		err = getErrIsValid(val)
+		if err != nil {
+			return
+		}
+		err = getErrCanInterface(val)
 	}
-	err = getErrCanInterface(val)
 	return
 }
 
 func extractBool(val reflect.Value, option *Option) (result bool, err error) {
-	err = checkExtractValid(val)
+	err = checkExtractValid(val, option)
 	if err != nil {
 		return
 	}
@@ -56,7 +59,7 @@ func extractBool(val reflect.Value, option *Option) (result bool, err error) {
 }
 
 func extractInt(val reflect.Value, option *Option) (result int64, err error) {
-	err = checkExtractValid(val)
+	err = checkExtractValid(val, option)
 	if err != nil {
 		return
 	}
@@ -106,7 +109,7 @@ func extractInt(val reflect.Value, option *Option) (result int64, err error) {
 }
 
 func extractUint(val reflect.Value, option *Option) (result uint64, err error) {
-	err = checkExtractValid(val)
+	err = checkExtractValid(val, option)
 	if err != nil {
 		return
 	}
@@ -161,7 +164,7 @@ func extractUint(val reflect.Value, option *Option) (result uint64, err error) {
 }
 
 func extractFloat(val reflect.Value, option *Option) (result float64, err error) {
-	err = checkExtractValid(val)
+	err = checkExtractValid(val, option)
 	if err != nil {
 		return
 	}
@@ -213,7 +216,7 @@ func extractFloat(val reflect.Value, option *Option) (result float64, err error)
 }
 
 func extractComplex(val reflect.Value, option *Option) (result complex128, err error) {
-	err = checkExtractValid(val)
+	err = checkExtractValid(val, option)
 	if err != nil {
 		return
 	}
@@ -261,7 +264,7 @@ func extractComplex(val reflect.Value, option *Option) (result complex128, err e
 }
 
 func extractString(val reflect.Value, option *Option) (result string, err error) {
-	err = checkExtractValid(val)
+	err = checkExtractValid(val, option)
 	if err != nil {
 		return
 	}
@@ -305,7 +308,7 @@ func extractString(val reflect.Value, option *Option) (result string, err error)
 }
 
 func extractTime(val reflect.Value, option *Option) (res *time.Time, err error) {
-	err = checkExtractValid(val)
+	err = checkExtractValid(val, option)
 	if err != nil {
 		return
 	}
@@ -341,7 +344,7 @@ func extractTime(val reflect.Value, option *Option) (res *time.Time, err error) 
 }
 
 func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) {
-	err = checkExtractValid(val)
+	err = checkExtractValid(val, opt)
 	if err != nil {
 		return
 	}

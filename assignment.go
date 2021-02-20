@@ -23,7 +23,8 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 	if err != nil {
 		return
 	}
-	err = checkExtractValid(val)
+	opt.ResetCheck()
+	err = checkExtractValid(val, opt)
 	if err != nil {
 		return
 	}

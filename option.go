@@ -2,12 +2,13 @@ package reflecthelper
 
 // Option is a collection of argument options used in this package.
 type Option struct {
-	FloatPrecision int
-	FloatFormat    byte
-	BitSize        int
-	ComplexBitSize int
-	BaseSystem     int
-	TimeLayouts    []string
+	FloatPrecision       int
+	FloatFormat          byte
+	BitSize              int
+	ComplexBitSize       int
+	BaseSystem           int
+	TimeLayouts          []string
+	hasCheckExtractValid bool
 }
 
 // FuncOption is a function option to set the Option for function arguments.
@@ -105,4 +106,13 @@ func (o *Option) Default() *Option {
 		o.TimeLayouts = make([]string, 0)
 	}
 	return o
+}
+
+// ResetCheck resets all variables regarding checking.
+func (o *Option) ResetCheck() {
+	o.hasCheckExtractValid = false
+}
+
+func (o *Option) toggleOnCheckExtractValid() {
+	o.hasCheckExtractValid = true
 }
