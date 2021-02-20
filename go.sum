@@ -2,8 +2,8 @@ github.com/Popog/deepcopy v0.0.0-20160519164043-14c73c14458b h1:OtYAM5G0quXKgIMP
 github.com/Popog/deepcopy v0.0.0-20160519164043-14c73c14458b/go.mod h1:0rMzFh80h/r2qSUDZBoKDFTSX/4XUF62zMTutQ4TR6w=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/fairyhunter13/decimal v1.2.0-imp-5 h1:/dyrhMIGUp6qjb2vKjlD0vQGnMHVd2EsOdpTVmAZhOg=
-github.com/fairyhunter13/decimal v1.2.0-imp-5/go.mod h1:pqb4RNxJI5R5ilHfmg9FTkpRMxi95Sa1K6tACdWfv9M=
+github.com/fairyhunter13/decimal v1.2.0-imp-6 h1:6W9X0bC3A9Z8iaW8Wqew18dySWnQ6xbHni62bR/7CV0=
+github.com/fairyhunter13/decimal v1.2.0-imp-6/go.mod h1:pqb4RNxJI5R5ilHfmg9FTkpRMxi95Sa1K6tACdWfv9M=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/reiver/go-cast v0.0.0-20170210005224-b977979c1903 h1:ftOiDC4+zrIGRqeCCC8W/1vmUuA9N5BDqHfiLSyEdUQ=
