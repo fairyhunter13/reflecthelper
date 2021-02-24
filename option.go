@@ -105,6 +105,7 @@ func (o *Option) Default() *Option {
 	if o.TimeLayouts == nil {
 		o.TimeLayouts = make([]string, 0)
 	}
+	o.ResetCheck()
 	return o
 }
 
