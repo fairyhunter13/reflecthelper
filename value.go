@@ -7,18 +7,18 @@ import (
 // IterateStructFunc is function to iterate each field of structInput.
 type IterateStructFunc func(structInput reflect.Value, field reflect.Value)
 
-// ReflectStruct is a custom struct for representing reflect.Struct.
-type ReflectStruct struct {
+// Value is a custom struct for representing reflect.Value.
+type Value struct {
 	reflect.Value
 	kind reflect.Kind
 }
 
-func (s *ReflectStruct) isStruct() bool {
+func (s *Value) isStruct() bool {
 	return IsKindStruct(s.kind)
 }
 
-// Iterate iterates all the field in this struct.
-func (s *ReflectStruct) Iterate(fns ...IterateStructFunc) *ReflectStruct {
+// IterateStruct iterates all the field in this struct.
+func (s *Value) IterateStruct(fns ...IterateStructFunc) *Value {
 	if !s.isStruct() {
 		return s
 	}
@@ -27,8 +27,8 @@ func (s *ReflectStruct) Iterate(fns ...IterateStructFunc) *ReflectStruct {
 	return s
 }
 
-// IteratePanic iterates all the field in this struct by returning err when the iteration function panics.
-func (s *ReflectStruct) IteratePanic(fns ...IterateStructFunc) (err error) {
+// IterateStructPanic iterates all the field in this struct by returning err when the iteration function panics.
+func (s *Value) IterateStructPanic(fns ...IterateStructFunc) (err error) {
 	defer RecoverFn(&err)
 	if !s.isStruct() {
 		return
@@ -39,12 +39,12 @@ func (s *ReflectStruct) IteratePanic(fns ...IterateStructFunc) (err error) {
 }
 
 // CastStruct casts the val of reflect.Value to the ReflectStruct.
-func CastStruct(val reflect.Value) (res ReflectStruct) {
+func CastStruct(val reflect.Value) (res Value) {
 	val = GetChildElem(val)
 
 	kind := GetKind(val)
 	if IsKindStruct(kind) {
-		res = ReflectStruct{
+		res = Value{
 			Value: val,
 			kind:  kind,
 		}
