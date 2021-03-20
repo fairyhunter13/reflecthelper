@@ -14,6 +14,12 @@ type IterateStructErrorFunc func(structInput reflect.Value, field reflect.Value)
 type Value struct {
 	reflect.Value
 	kind reflect.Kind
+	err  error
+}
+
+// Error returns the error contained within the Value.
+func (s *Value) Error() error {
+	return s.err
 }
 
 func (s *Value) isStruct() bool {
@@ -21,7 +27,6 @@ func (s *Value) isStruct() bool {
 }
 
 func (s *Value) iterateStruct(fns ...IterateStructFunc) {
-
 	for index := 0; index < s.NumField(); index++ {
 		// TODO: Add logic in here.
 	}
@@ -38,14 +43,14 @@ func (s *Value) IterateStruct(fns ...IterateStructFunc) *Value {
 }
 
 // IterateStructPanic iterates all the field in this struct by returning err when the iteration function panics.
-func (s *Value) IterateStructPanic(fns ...IterateStructFunc) (err error) {
-	defer RecoverFn(&err)
+func (s *Value) IterateStructPanic(fns ...IterateStructFunc) *Value {
+	defer RecoverFn(&s.err)
 	if !s.isStruct() {
-		return
+		return s
 	}
 
 	s.iterateStruct(fns...)
-	return
+	return s
 }
 
 func (s *Value) iterateStructError(fns ...IterateStructErrorFunc) (err error) {
@@ -55,13 +60,13 @@ func (s *Value) iterateStructError(fns ...IterateStructErrorFunc) (err error) {
 	return
 }
 
-func (s *Value) IterateStructError(fns ...IterateStructErrorFunc) (err error) {
+func (s *Value) IterateStructError(fns ...IterateStructErrorFunc) *Value {
 	if !s.isStruct() {
-		return
+		return s
 	}
 
-	err = s.iterateStructError(fns...)
-	return
+	s.err = s.iterateStructError(fns...)
+	return s
 }
 
 // CastStruct casts the val of reflect.Value to the ReflectStruct.
