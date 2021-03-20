@@ -7,6 +7,9 @@ import (
 // IterateStructFunc is function to iterate each field of structInput.
 type IterateStructFunc func(structInput reflect.Value, field reflect.Value)
 
+// IterateStructErrorFunc is function to iterate each field of structInput and returning error if needed.
+type IterateStructErrorFunc func(structInput reflect.Value, field reflect.Value) error
+
 // Value is a custom struct for representing reflect.Value.
 type Value struct {
 	reflect.Value
@@ -17,13 +20,20 @@ func (s *Value) isStruct() bool {
 	return IsKindStruct(s.kind)
 }
 
+func (s *Value) iterateStruct(fns ...IterateStructFunc) {
+
+	for index := 0; index < s.NumField(); index++ {
+		// TODO: Add logic in here.
+	}
+}
+
 // IterateStruct iterates all the field in this struct.
 func (s *Value) IterateStruct(fns ...IterateStructFunc) *Value {
 	if !s.isStruct() {
 		return s
 	}
 
-	// TODO: Add logic in here.
+	s.iterateStruct(fns...)
 	return s
 }
 
@@ -34,7 +44,23 @@ func (s *Value) IterateStructPanic(fns ...IterateStructFunc) (err error) {
 		return
 	}
 
-	// TODO: Add logic in here.
+	s.iterateStruct(fns...)
+	return
+}
+
+func (s *Value) iterateStructError(fns ...IterateStructErrorFunc) (err error) {
+	for index := 0; index < s.NumField(); index++ {
+		// TODO: Add logic in here.
+	}
+	return
+}
+
+func (s *Value) IterateStructError(fns ...IterateStructErrorFunc) (err error) {
+	if !s.isStruct() {
+		return
+	}
+
+	err = s.iterateStructError(fns...)
 	return
 }
 
