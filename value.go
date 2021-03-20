@@ -28,7 +28,9 @@ func (s *Value) isStruct() bool {
 
 func (s *Value) iterateStruct(fns ...IterateStructFunc) {
 	for index := 0; index < s.NumField(); index++ {
-		// TODO: Add logic in here.
+		for _, fn := range fns {
+			fn(s.Value, s.Field(index))
+		}
 	}
 }
 
@@ -44,18 +46,25 @@ func (s *Value) IterateStruct(fns ...IterateStructFunc) *Value {
 
 // IterateStructPanic iterates all the field in this struct by returning err when the iteration function panics.
 func (s *Value) IterateStructPanic(fns ...IterateStructFunc) *Value {
-	defer RecoverFn(&s.err)
 	if !s.isStruct() {
 		return s
 	}
 
-	s.iterateStruct(fns...)
+	func() {
+		defer RecoverFn(&s.err)
+		s.iterateStruct(fns...)
+	}()
 	return s
 }
 
 func (s *Value) iterateStructError(fns ...IterateStructErrorFunc) (err error) {
 	for index := 0; index < s.NumField(); index++ {
-		// TODO: Add logic in here.
+		for _, fn := range fns {
+			err = fn(s.Value, s.Field(index))
+			if err != nil {
+				return
+			}
+		}
 	}
 	return
 }

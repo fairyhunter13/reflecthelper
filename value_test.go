@@ -56,3 +56,10 @@ func TestCastStruct(t *testing.T) {
 		})
 	}
 }
+
+func TestValue_IterateStruct(t *testing.T) {
+	t.Run("kind is not struct", func(t *testing.T) {
+		// TODO: Adding tests in here
+	})
+
+}
