@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -59,7 +60,30 @@ func TestCastStruct(t *testing.T) {
 
 func TestValue_IterateStruct(t *testing.T) {
 	t.Run("kind is not struct", func(t *testing.T) {
-		// TODO: Adding tests in here
+		var hello int
+		val := CastStruct(reflect.ValueOf(hello))
+		val.IterateStruct()
 	})
+	t.Run("iterate example function", func(t *testing.T) {
+		type test struct {
+			Hello string
+		}
 
+		val := CastStruct(reflect.ValueOf(&test{"Hi!"}))
+		val.IterateStruct(func(val reflect.Value, field reflect.Value) {
+			fmt.Println(val.String())
+			fmt.Println(field.String())
+		})
+	})
+}
+
+func TestValue_IterateStructPanic(t *testing.T) {
+	t.Run("kind is not struct", func(t *testing.T) {
+		var hello int
+		val := CastStruct(reflect.ValueOf(hello))
+		val.IterateStructPanic()
+	})
+	t.Run("panic happens in the iteration", func(t *testing.T) {
+		// TODO: Add test in here
+	})
 }
