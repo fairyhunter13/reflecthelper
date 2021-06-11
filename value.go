@@ -4,11 +4,11 @@ import (
 	"reflect"
 )
 
-// IterateStructFunc is function to iterate each field of structInput.
-type IterateStructFunc func(structInput reflect.Value, field reflect.Value)
+// IterStructFn is function type to iterate each field of structInput.
+type IterStructFn func(structInput reflect.Value, field reflect.Value)
 
-// IterateStructErrorFunc is function to iterate each field of structInput and returning error if needed.
-type IterateStructErrorFunc func(structInput reflect.Value, field reflect.Value) error
+// IterStructErrFn is function type to iterate each field of structInput and returning error if needed.
+type IterStructErrFn func(structInput reflect.Value, field reflect.Value) error
 
 // Value is a custom struct for representing reflect.Value.
 type Value struct {
@@ -26,7 +26,7 @@ func (s *Value) isStruct() bool {
 	return IsKindStruct(s.kind)
 }
 
-func (s *Value) iterateStruct(fns ...IterateStructFunc) {
+func (s *Value) iterateStruct(fns ...IterStructFn) {
 	for index := 0; index < s.NumField(); index++ {
 		for _, fn := range fns {
 			if fn == nil {
@@ -37,7 +37,7 @@ func (s *Value) iterateStruct(fns ...IterateStructFunc) {
 	}
 }
 
-func (s *Value) iterateStructError(fns ...IterateStructErrorFunc) (err error) {
+func (s *Value) iterateStructError(fns ...IterStructErrFn) (err error) {
 	for index := 0; index < s.NumField(); index++ {
 		for _, fn := range fns {
 			if fn == nil {
@@ -53,7 +53,7 @@ func (s *Value) iterateStructError(fns ...IterateStructErrorFunc) (err error) {
 }
 
 // IterateStruct iterates all the field in this struct.
-func (s *Value) IterateStruct(fns ...IterateStructFunc) *Value {
+func (s *Value) IterateStruct(fns ...IterStructFn) *Value {
 	if !s.isStruct() {
 		return s
 	}
@@ -63,7 +63,7 @@ func (s *Value) IterateStruct(fns ...IterateStructFunc) *Value {
 }
 
 // IterateStructPanic iterates all the field in this struct by returning err when the iteration function panics.
-func (s *Value) IterateStructPanic(fns ...IterateStructFunc) *Value {
+func (s *Value) IterateStructPanic(fns ...IterStructFn) *Value {
 	if !s.isStruct() {
 		return s
 	}
@@ -75,18 +75,13 @@ func (s *Value) IterateStructPanic(fns ...IterateStructFunc) *Value {
 	return s
 }
 
-func (s *Value) IterateStructError(fns ...IterateStructErrorFunc) *Value {
+func (s *Value) IterateStructError(fns ...IterStructErrFn) *Value {
 	if !s.isStruct() {
 		return s
 	}
 
 	s.err = s.iterateStructError(fns...)
 	return s
-}
-
-func (s *Value) isArrayOrSlice() bool {
-	// TODO: Add logic in here
-	return false
 }
 
 // Cast casts the val of reflect.Value to the Value of this package.

@@ -121,6 +121,11 @@ func IsKindSlice(kind reflect.Kind) bool {
 	return kind == reflect.Slice
 }
 
+// IsKindArray checks whether the kind is array or not.
+func IsKindArray(kind reflect.Kind) bool {
+	return kind == reflect.Array
+}
+
 // IsKindComplex checks whether the kind is complex or not.
 func IsKindComplex(kind reflect.Kind) bool {
 	return kind == reflect.Complex128 || kind == reflect.Complex64
