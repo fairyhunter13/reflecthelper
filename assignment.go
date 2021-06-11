@@ -23,8 +23,7 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 	if err != nil {
 		return
 	}
-	opt.ResetCheck()
-	err = checkExtractValid(val, opt)
+	err = checkExtractValid(val, opt.resetCheck())
 	if err != nil {
 		return
 	}
@@ -99,9 +98,9 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 					return
 				}
 			}
-			err = iterateAndAssign(assigner, val, isSlice)
+			err = iterateAndAssign(assigner, val, isSlice, opt)
 		case reflect.String:
-			err = iterateAndAssignString(assigner, val, isSlice)
+			err = iterateAndAssignString(assigner, val, isSlice, opt)
 		default:
 			err = getErrUnimplementedAssign(assigner, val)
 		}
@@ -133,7 +132,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			}
 
 			var timeStruct time.Time
-			timeStruct, err = ParseTime(timeStr, WithTimeLayouts(opt.TimeLayouts...))
+			timeStruct, err = parseTime(timeStr, opt)
 			if err != nil {
 				return
 			}
@@ -158,12 +157,12 @@ func checkOverLength(assigner reflect.Value, val reflect.Value) (err error) {
 	return
 }
 
-func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (err error) {
+func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, opt *Option) (err error) {
 	if isSlice {
 		emptySlice := reflect.MakeSlice(assigner.Type(), 0, val.Len())
 		for index := 0; index < val.Len(); index++ {
 			elemVal := GetInitChildElem(reflect.New(GetElemType(assigner)).Elem())
-			err = AssignReflect(elemVal, val.Index(index))
+			err = assignReflect(elemVal, val.Index(index), opt)
 			if err != nil {
 				return
 			}
@@ -175,7 +174,7 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (
 		emptyArray := reflect.New(typeArr).Elem()
 		for index := 0; index < val.Len(); index++ {
 			elemVal := GetInitChildElem(emptyArray.Index(index))
-			err = AssignReflect(elemVal, val.Index(index))
+			err = assignReflect(elemVal, val.Index(index), opt)
 			if err != nil {
 				return
 			}
@@ -185,7 +184,7 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool) (
 	return
 }
 
-func iterateAndAssignString(assigner reflect.Value, val reflect.Value, isSlice bool) (err error) {
+func iterateAndAssignString(assigner reflect.Value, val reflect.Value, isSlice bool, opt *Option) (err error) {
 	var listVal reflect.Value
 	switch GetElemKind(assigner) {
 	case reflect.Uint8:
@@ -202,6 +201,6 @@ func iterateAndAssignString(assigner reflect.Value, val reflect.Value, isSlice b
 			return
 		}
 	}
-	err = iterateAndAssign(assigner, listVal, isSlice)
+	err = iterateAndAssign(assigner, listVal, isSlice, opt)
 	return
 }

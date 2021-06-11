@@ -59,8 +59,7 @@ func (o *Option) Assign(fnOpts ...FuncOption) *Option {
 	for _, fnOpt := range fnOpts {
 		fnOpt(o)
 	}
-	o.Default()
-	return o
+	return o.Default()
 }
 
 func (o *Option) isValidFloatFormat() bool {
@@ -105,15 +104,15 @@ func (o *Option) Default() *Option {
 	if o.TimeLayouts == nil {
 		o.TimeLayouts = make([]string, 0)
 	}
-	o.ResetCheck()
+	return o.resetCheck()
+}
+
+func (o *Option) resetCheck() *Option {
+	o.hasCheckExtractValid = false
 	return o
 }
 
-// ResetCheck resets all variables regarding checking.
-func (o *Option) ResetCheck() {
-	o.hasCheckExtractValid = false
-}
-
-func (o *Option) toggleOnCheckExtractValid() {
+func (o *Option) toggleOnCheckExtractValid() *Option {
 	o.hasCheckExtractValid = true
+	return o
 }
