@@ -84,6 +84,11 @@ func (s *Value) IterateStructError(fns ...IterateStructErrorFunc) *Value {
 	return s
 }
 
+func (s *Value) isArrayOrSlice() bool {
+	// TODO: Add logic in here
+	return false
+}
+
 // Cast casts the val of reflect.Value to the Value of this package.
 func Cast(val reflect.Value) (res Value) {
 	val = GetChildElem(val)
