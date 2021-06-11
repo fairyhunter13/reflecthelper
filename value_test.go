@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
@@ -12,7 +13,7 @@ type test struct {
 	Hello string
 }
 
-func TestCastStruct(t *testing.T) {
+func TestCast(t *testing.T) {
 	type args struct {
 		val reflect.Value
 	}
@@ -29,11 +30,11 @@ func TestCastStruct(t *testing.T) {
 			wantKind: reflect.Invalid,
 		},
 		{
-			name: "invalid slice value",
+			name: "valid slice value",
 			args: args{
 				val: reflect.ValueOf([]int{1, 2, 3}),
 			},
-			wantKind: reflect.Invalid,
+			wantKind: reflect.Slice,
 		},
 		{
 			name: "valid struct value",
@@ -70,7 +71,7 @@ func TestValue_IterateStruct(t *testing.T) {
 		}
 
 		val := Cast(reflect.ValueOf(&test{"Hi!"}))
-		val.IterateStruct(func(val reflect.Value, field reflect.Value) {
+		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) {
 			fmt.Println(val.String())
 			fmt.Println(field.String())
 		})
@@ -84,6 +85,46 @@ func TestValue_IterateStructPanic(t *testing.T) {
 		val.IterateStructPanic()
 	})
 	t.Run("panic happens in the iteration", func(t *testing.T) {
-		// TODO: Add test in here
+		type test struct {
+			Hello string
+		}
+
+		val := Cast(reflect.ValueOf(&test{"Hi!"}))
+		val.IterateStructPanic(nil, func(val reflect.Value, field reflect.Value) {
+			panic("random panic")
+		})
+		assert.NotNil(t, val.Error())
+	})
+}
+
+func TestValue_IterateStructError(t *testing.T) {
+	t.Run("kind is not struct", func(t *testing.T) {
+		var hello int
+		val := Cast(reflect.ValueOf(hello))
+		val.IterateStructError()
+	})
+	t.Run("error in the second iteration", func(t *testing.T) {
+		type test struct {
+			Hello string
+		}
+
+		val := Cast(reflect.ValueOf(&test{"Hi!"}))
+		val.IterateStructError(nil, func(val reflect.Value, field reflect.Value) (err error) {
+			err = errors.New("random error")
+			return
+		})
+		assert.NotNil(t, val.Error())
+	})
+	t.Run("success in the second iteration", func(t *testing.T) {
+		type test struct {
+			Hello string
+		}
+
+		val := Cast(reflect.ValueOf(&test{"Hi!"}))
+		val.IterateStructError(nil, func(val reflect.Value, field reflect.Value) (err error) {
+			fmt.Println("Success!!!")
+			return
+		})
+		assert.Nil(t, val.Error())
 	})
 }
