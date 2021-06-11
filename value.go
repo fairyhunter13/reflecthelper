@@ -27,6 +27,7 @@ func (s *Value) isStruct() bool {
 }
 
 func (s *Value) iterateStruct(fns ...IterStructFn) {
+	// TODO: Add concurrent mode?
 	for index := 0; index < s.NumField(); index++ {
 		for _, fn := range fns {
 			if fn == nil {
@@ -38,6 +39,7 @@ func (s *Value) iterateStruct(fns ...IterStructFn) {
 }
 
 func (s *Value) iterateStructError(fns ...IterStructErrFn) (err error) {
+	// TODO: Add concurrent mode?
 	for index := 0; index < s.NumField(); index++ {
 		for _, fn := range fns {
 			if fn == nil {

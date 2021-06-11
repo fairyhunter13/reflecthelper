@@ -158,6 +158,7 @@ func checkOverLength(assigner reflect.Value, val reflect.Value) (err error) {
 }
 
 func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, opt *Option) (err error) {
+	// TODO: Add concurrent mode?
 	if isSlice {
 		emptySlice := reflect.MakeSlice(assigner.Type(), 0, val.Len())
 		for index := 0; index < val.Len(); index++ {
