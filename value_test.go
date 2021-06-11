@@ -52,7 +52,7 @@ func TestCastStruct(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes := CastStruct(tt.args.val)
+			gotRes := Cast(tt.args.val)
 			assert.Equal(t, tt.wantKind, GetKind(gotRes.Value))
 		})
 	}
@@ -61,7 +61,7 @@ func TestCastStruct(t *testing.T) {
 func TestValue_IterateStruct(t *testing.T) {
 	t.Run("kind is not struct", func(t *testing.T) {
 		var hello int
-		val := CastStruct(reflect.ValueOf(hello))
+		val := Cast(reflect.ValueOf(hello))
 		val.IterateStruct()
 	})
 	t.Run("iterate example function", func(t *testing.T) {
@@ -69,7 +69,7 @@ func TestValue_IterateStruct(t *testing.T) {
 			Hello string
 		}
 
-		val := CastStruct(reflect.ValueOf(&test{"Hi!"}))
+		val := Cast(reflect.ValueOf(&test{"Hi!"}))
 		val.IterateStruct(func(val reflect.Value, field reflect.Value) {
 			fmt.Println(val.String())
 			fmt.Println(field.String())
@@ -80,7 +80,7 @@ func TestValue_IterateStruct(t *testing.T) {
 func TestValue_IterateStructPanic(t *testing.T) {
 	t.Run("kind is not struct", func(t *testing.T) {
 		var hello int
-		val := CastStruct(reflect.ValueOf(hello))
+		val := Cast(reflect.ValueOf(hello))
 		val.IterateStructPanic()
 	})
 	t.Run("panic happens in the iteration", func(t *testing.T) {

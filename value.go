@@ -29,9 +29,27 @@ func (s *Value) isStruct() bool {
 func (s *Value) iterateStruct(fns ...IterateStructFunc) {
 	for index := 0; index < s.NumField(); index++ {
 		for _, fn := range fns {
+			if fn == nil {
+				continue
+			}
 			fn(s.Value, s.Field(index))
 		}
 	}
+}
+
+func (s *Value) iterateStructError(fns ...IterateStructErrorFunc) (err error) {
+	for index := 0; index < s.NumField(); index++ {
+		for _, fn := range fns {
+			if fn == nil {
+				continue
+			}
+			err = fn(s.Value, s.Field(index))
+			if err != nil {
+				return
+			}
+		}
+	}
+	return
 }
 
 // IterateStruct iterates all the field in this struct.
@@ -57,18 +75,6 @@ func (s *Value) IterateStructPanic(fns ...IterateStructFunc) *Value {
 	return s
 }
 
-func (s *Value) iterateStructError(fns ...IterateStructErrorFunc) (err error) {
-	for index := 0; index < s.NumField(); index++ {
-		for _, fn := range fns {
-			err = fn(s.Value, s.Field(index))
-			if err != nil {
-				return
-			}
-		}
-	}
-	return
-}
-
 func (s *Value) IterateStructError(fns ...IterateStructErrorFunc) *Value {
 	if !s.isStruct() {
 		return s
@@ -78,16 +84,12 @@ func (s *Value) IterateStructError(fns ...IterateStructErrorFunc) *Value {
 	return s
 }
 
-// CastStruct casts the val of reflect.Value to the ReflectStruct.
-func CastStruct(val reflect.Value) (res Value) {
+// Cast casts the val of reflect.Value to the Value of this package.
+func Cast(val reflect.Value) (res Value) {
 	val = GetChildElem(val)
-
-	kind := GetKind(val)
-	if IsKindStruct(kind) {
-		res = Value{
-			Value: val,
-			kind:  kind,
-		}
+	res = Value{
+		Value: val,
+		kind:  GetKind(val),
 	}
 	return
 }
