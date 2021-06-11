@@ -84,13 +84,13 @@ func ExtractString(val reflect.Value, fnOpts ...FuncOption) (result string, err 
 }
 
 // GetTime is ExtractTime without error.
-func GetTime(val reflect.Value, fnOpts ...FuncOption) (result *time.Time) {
+func GetTime(val reflect.Value, fnOpts ...FuncOption) (result time.Time) {
 	result, _ = ExtractTime(val, fnOpts...)
 	return
 }
 
 // ExtractTime extracts the time from val of reflect.Value.
-func ExtractTime(val reflect.Value, fnOpts ...FuncOption) (result *time.Time, err error) {
+func ExtractTime(val reflect.Value, fnOpts ...FuncOption) (result time.Time, err error) {
 	opt := NewOption().Assign(fnOpts...)
 	result, err = extractTime(val, opt)
 	return

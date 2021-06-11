@@ -9,6 +9,8 @@ type Option struct {
 	BaseSystem           int
 	TimeLayouts          []string
 	hasCheckExtractValid bool
+
+	// TODO: Add concurrent mode in here?
 }
 
 // FuncOption is a function option to set the Option for function arguments.

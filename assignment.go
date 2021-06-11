@@ -116,27 +116,12 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		valType := val.Type()
 		switch assignerType {
 		case TypeTime:
-			var timeStr string
-			switch valKind {
-			case reflect.String:
-				timeStr = val.String()
-			default:
-				if valType == TypeTime {
-					assigner.Set(val)
-					return
-				}
-				timeStr, err = extractString(val, opt)
-				if err != nil {
-					return
-				}
-			}
-
-			var timeStruct time.Time
-			timeStruct, err = parseTime(timeStr, opt)
+			var timeRes time.Time
+			timeRes, err = extractTime(val, opt)
 			if err != nil {
 				return
 			}
-			assigner.Set(reflect.ValueOf(timeStruct))
+			assigner.Set(reflect.ValueOf(timeRes))
 		default:
 			if !valType.AssignableTo(assignerType) {
 				err = getErrUnassignable(assigner, val)

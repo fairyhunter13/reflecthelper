@@ -240,9 +240,9 @@ func TestGetTime(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotResult := GetTime(tt.args.val, tt.args.fnOpts...)
 			if tt.wantResult {
-				assert.NotNil(t, gotResult)
+				assert.NotEmpty(t, gotResult)
 			} else {
-				assert.Nil(t, gotResult)
+				assert.Empty(t, gotResult)
 			}
 		})
 	}

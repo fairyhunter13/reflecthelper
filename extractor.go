@@ -307,7 +307,7 @@ func extractString(val reflect.Value, option *Option) (result string, err error)
 	return
 }
 
-func extractTime(val reflect.Value, option *Option) (res *time.Time, err error) {
+func extractTime(val reflect.Value, option *Option) (result time.Time, err error) {
 	err = checkExtractValid(val, option)
 	if err != nil {
 		return
@@ -321,7 +321,7 @@ func extractTime(val reflect.Value, option *Option) (res *time.Time, err error) 
 	case reflect.Struct:
 		if val.Type() == TypeTime {
 			timeVal := val.Interface().(time.Time)
-			res = &timeVal
+			result = timeVal
 			return
 		}
 
@@ -339,7 +339,7 @@ func extractTime(val reflect.Value, option *Option) (res *time.Time, err error) 
 		return
 	}
 
-	res = &timeVal
+	result = timeVal
 	return
 }
 

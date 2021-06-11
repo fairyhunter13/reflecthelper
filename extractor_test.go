@@ -884,7 +884,11 @@ func TestExtractTime(t *testing.T) {
 				t.Errorf("ExtractTime() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			assert.EqualValues(t, tt.wantRes(), gotRes)
+			if tt.wantErr {
+				assert.Nil(t, tt.wantRes())
+			} else {
+				assert.EqualValues(t, *tt.wantRes(), gotRes)
+			}
 		})
 	}
 }
@@ -968,14 +972,14 @@ func TestTryExtract(t *testing.T) {
 			args: args{
 				val: reflect.ValueOf(now),
 			},
-			wantResult: &now,
+			wantResult: now,
 		},
 		{
 			name: "ptr time.Time value",
 			args: args{
 				val: reflect.ValueOf(&now),
 			},
-			wantResult: &now,
+			wantResult: now,
 		},
 	}
 	for _, tt := range tests {

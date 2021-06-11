@@ -28,3 +28,19 @@ func TestOption(t *testing.T) {
 		assert.Equal(t, byte('f'), opt.FloatFormat)
 	})
 }
+
+func TestNewDefaultOption(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		{
+			name: "new default option",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := NewDefaultOption()
+			assert.NotNil(t, got)
+		})
+	}
+}
