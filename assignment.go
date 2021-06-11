@@ -112,7 +112,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			return
 		}
 		assigner.SetString(result)
-	case reflect.Chan, reflect.Func, reflect.Map, reflect.Struct:
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Struct, reflect.Interface:
 		assignerType := assigner.Type()
 		valType := val.Type()
 		switch assignerType {
@@ -133,7 +133,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			}
 
 			var timeStruct time.Time
-			timeStruct, err = ParseTime(timeStr)
+			timeStruct, err = ParseTime(timeStr, WithTimeLayouts(opt.TimeLayouts...))
 			if err != nil {
 				return
 			}
