@@ -84,14 +84,3 @@ func getErrUnimplementedAssign(assigner reflect.Value, val reflect.Value) (err e
 	)
 	return
 }
-
-func getErrUnimplementedCasting(val reflect.Value, kind reflect.Kind) (err error) {
-	err = fmt.Errorf(
-		"Error unimplemented casting of val: %+v of kind: %d and type: %s for kind: %d",
-		val.Interface(),
-		GetKind(val),
-		val.Type(),
-		kind,
-	)
-	return
-}

@@ -8,8 +8,7 @@ import (
 
 func TestOption(t *testing.T) {
 	t.Run("init option", func(t *testing.T) {
-		opt := NewDefaultOption()
-		opt = NewOption()
+		opt := NewOption()
 		assert.Equal(t, byte(0), opt.FloatFormat)
 	})
 	t.Run("functional options", func(t *testing.T) {
