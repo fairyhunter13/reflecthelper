@@ -408,6 +408,27 @@ func TestAssignReflect(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "valid slice ptr int assignment",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := []*int{}
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf([3]int{1, 2, 3})
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				var (
+					num1 = int(1)
+					num2 = int(2)
+					num3 = int(3)
+				)
+				return reflect.ValueOf([]*int{&num1, &num2, &num3})
+			},
+			wantErr: false,
+		},
+		{
 			name: "slice int unimplemented string assignment",
 			args: args{
 				assigner: func() reflect.Value {

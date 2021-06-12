@@ -4,6 +4,10 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fairyhunter13/decimal v1.2.0-imp-6 h1:6W9X0bC3A9Z8iaW8Wqew18dySWnQ6xbHni62bR/7CV0=
 github.com/fairyhunter13/decimal v1.2.0-imp-6/go.mod h1:pqb4RNxJI5R5ilHfmg9FTkpRMxi95Sa1K6tACdWfv9M=
+github.com/fairyhunter13/task v1.0.1 h1:7eHRNav+Al+HG3tzhCrWesl/MoVtb9rWRjmSXNII/5A=
+github.com/fairyhunter13/task v1.0.1/go.mod h1:MGMIHJH7HXnjOhVRDV1fBVf44yMZpJp4FXhoMX5J4Cg=
+github.com/panjf2000/ants v1.3.0 h1:8pQ+8leaLc9lys2viEEr8md0U4RN6uOSUCE9bOYjQ9M=
+github.com/panjf2000/ants v1.3.0/go.mod h1:AaACblRPzq35m1g3enqYcxspbbiOJJYaxU2wMpm1cXY=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/reiver/go-cast v0.0.0-20170210005224-b977979c1903 h1:ftOiDC4+zrIGRqeCCC8W/1vmUuA9N5BDqHfiLSyEdUQ=

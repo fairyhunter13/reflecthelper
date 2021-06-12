@@ -3,6 +3,8 @@ package reflecthelper
 import (
 	"reflect"
 	"time"
+
+	"github.com/fairyhunter13/task"
 )
 
 func checkAssigner(assigner reflect.Value) (err error) {
@@ -46,7 +48,7 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 }
 
 func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
-	defer RecoverFnOpt(&err, opt)
+	defer recoverFnOpt(&err, opt)
 
 	assignerKind := GetKind(assigner)
 	valKind := GetKind(val)
@@ -157,30 +159,48 @@ func checkOverLength(assigner reflect.Value, val reflect.Value) (err error) {
 }
 
 func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, opt *Option) (err error) {
-	// TODO: Add concurrent mode (no toggle)?
+	tm := task.NewErrorManager(val.Len())
 	if isSlice {
 		emptySlice := reflect.MakeSlice(assigner.Type(), 0, val.Len())
+		elemType := GetElemType(assigner)
 		for index := 0; index < val.Len(); index++ {
-			elemVal := GetInitChildElem(reflect.New(GetElemType(assigner)).Elem())
-			err = assignReflect(elemVal, val.Index(index), opt)
-			if err != nil {
-				return
-			}
+			elemVal := reflect.New(elemType).Elem()
 			emptySlice = reflect.Append(emptySlice, elemVal)
 		}
-		assigner.Set(emptySlice)
-	} else {
-		typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
-		emptyArray := reflect.New(typeArr).Elem()
 		for index := 0; index < val.Len(); index++ {
-			elemVal := GetInitChildElem(emptyArray.Index(index))
-			err = assignReflect(elemVal, val.Index(index), opt)
-			if err != nil {
+			opt := opt.Clone()
+			index := index
+			tm.Run(func() (err error) {
+				err = assignReflect(emptySlice.Index(index), val.Index(index), opt)
 				return
-			}
+			})
 		}
-		assigner.Set(emptyArray)
+		err = tm.Error()
+		if err != nil {
+			return
+		}
+
+		assigner.Set(emptySlice)
+		return
 	}
+
+	typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
+	emptyArray := reflect.New(typeArr).Elem()
+	for index := 0; index < val.Len(); index++ {
+		opt := opt.Clone()
+		index := index
+		tm.Run(func() (err error) {
+			elemVal := emptyArray.Index(index)
+			err = assignReflect(elemVal, val.Index(index), opt)
+			return
+		})
+	}
+	err = tm.Error()
+	if err != nil {
+		return
+	}
+
+	assigner.Set(emptyArray)
 	return
 }
 

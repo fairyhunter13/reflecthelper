@@ -2,8 +2,8 @@ package reflecthelper
 
 import "fmt"
 
-// RecoverFnOpt is used to recover from panic using the opt.RecoverPanic toggle.
-func RecoverFnOpt(err *error, opt *Option) {
+// recoverFnOpt is used to recover from panic using the opt.RecoverPanic toggle.
+func recoverFnOpt(err *error, opt *Option) {
 	if err == nil || opt == nil || !opt.RecoverPanic {
 		return
 	}

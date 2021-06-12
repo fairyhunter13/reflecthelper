@@ -161,7 +161,7 @@ func (s *Value) IterateStruct(fns ...IterStructFn) *Value {
 		return s
 	}
 
-	defer RecoverFnOpt(&s.err, s.opt)
+	defer recoverFnOpt(&s.err, s.opt)
 	s.err = s.iterateStruct(fns...)
 	return s
 }
@@ -172,7 +172,7 @@ func (s *Value) IterateArraySlice(fns ...IterArraySliceFn) *Value {
 		return s
 	}
 
-	defer RecoverFnOpt(&s.err, s.opt)
+	defer recoverFnOpt(&s.err, s.opt)
 	s.err = s.iterateArraySlice(fns...)
 	return s
 }
@@ -183,7 +183,7 @@ func (s *Value) IterateMap(fns ...IterMapFn) *Value {
 		return s
 	}
 
-	defer RecoverFnOpt(&s.err, s.opt)
+	defer recoverFnOpt(&s.err, s.opt)
 	s.err = s.iterateMap(fns...)
 	return s
 }
@@ -194,7 +194,7 @@ func (s *Value) IterateChan(fns ...IterChanFn) *Value {
 		return s
 	}
 
-	defer RecoverFnOpt(&s.err, s.opt)
+	defer recoverFnOpt(&s.err, s.opt)
 	s.err = s.iterateChan(fns...)
 	return s
 }

@@ -2,17 +2,19 @@ package reflecthelper
 
 // Option is a collection of argument options used in this package.
 type Option struct {
-	FloatPrecision       int
-	FloatFormat          byte
-	BitSize              int
-	ComplexBitSize       int
-	BaseSystem           int
-	TimeLayouts          []string
-	hasCheckExtractValid bool
-	// TODO: Add concurrent mode in here?
+	FloatPrecision int
+	FloatFormat    byte
+	BitSize        int
+	ComplexBitSize int
+	BaseSystem     int
+	TimeLayouts    []string
+
+	// Toggle Flag
+	hasCheckExtractValid  bool
 	IgnoreError           bool
 	RecoverPanic          bool
 	BlockChannelIteration bool
+	ConcurrentMode        bool
 }
 
 // FuncOption is a function option to set the Option for function arguments.
@@ -71,6 +73,14 @@ func EnableBlockChannel() FuncOption {
 	}
 }
 
+// EnableConcurrency enables the concurrency mode in this package, especially in the iteration.
+// This enables to iterate array, slice, map, or struct elements in concurrent mode.
+func EnableConcurrency() FuncOption {
+	return func(o *Option) {
+		o.ConcurrentMode = true
+	}
+}
+
 // NewDefaultOption initialize the new default option.
 func NewDefaultOption() *Option {
 	return new(Option).Default()
@@ -87,6 +97,12 @@ func (o *Option) Assign(fnOpts ...FuncOption) *Option {
 		fnOpt(o)
 	}
 	return o.Default()
+}
+
+// Clone clones the current option to the new memory address.
+func (o *Option) Clone() *Option {
+	newOpt := *o
+	return &newOpt
 }
 
 func (o *Option) isValidFloatFormat() bool {
