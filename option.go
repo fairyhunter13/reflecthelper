@@ -9,8 +9,9 @@ type Option struct {
 	BaseSystem           int
 	TimeLayouts          []string
 	hasCheckExtractValid bool
-
 	// TODO: Add concurrent mode in here?
+	IgnoreError  bool
+	RecoverPanic bool
 }
 
 // FuncOption is a function option to set the Option for function arguments.
@@ -43,6 +44,21 @@ func WithBaseSystem(base int) FuncOption {
 func WithTimeLayouts(timeLayouts ...string) FuncOption {
 	return func(o *Option) {
 		o.TimeLayouts = timeLayouts
+	}
+}
+
+// EnableIgnoreError ignores error in the struct, slice, array, and map iteration.
+func EnableIgnoreError() FuncOption {
+	return func(o *Option) {
+		o.IgnoreError = true
+	}
+}
+
+// EnablePanicRecoverer enables the panic recoverer in all of the packages' functions.
+// The default behavior for this package is false.
+func EnablePanicRecoverer() FuncOption {
+	return func(o *Option) {
+		o.RecoverPanic = true
 	}
 }
 

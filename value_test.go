@@ -71,60 +71,56 @@ func TestValue_IterateStruct(t *testing.T) {
 		}
 
 		val := Cast(reflect.ValueOf(&test{"Hi!"}))
-		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) {
+		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
 			fmt.Println(val.String())
 			fmt.Println(field.String())
+			return
 		})
 	})
-}
-
-func TestValue_IterateStructPanic(t *testing.T) {
-	t.Run("kind is not struct", func(t *testing.T) {
-		var hello int
-		val := Cast(reflect.ValueOf(hello))
-		val.IterateStructPanic()
-	})
-	t.Run("panic happens in the iteration", func(t *testing.T) {
+	t.Run("error in the iteration", func(t *testing.T) {
 		type test struct {
 			Hello string
 		}
 
 		val := Cast(reflect.ValueOf(&test{"Hi!"}))
-		val.IterateStructPanic(nil, func(val reflect.Value, field reflect.Value) {
-			panic("random panic")
+		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
+			return errors.New("random error")
 		})
 		assert.NotNil(t, val.Error())
 	})
-}
-
-func TestValue_IterateStructError(t *testing.T) {
-	t.Run("kind is not struct", func(t *testing.T) {
-		var hello int
-		val := Cast(reflect.ValueOf(hello))
-		val.IterateStructError()
-	})
-	t.Run("error in the second iteration", func(t *testing.T) {
+	t.Run("error in the iteration ignored", func(t *testing.T) {
 		type test struct {
 			Hello string
 		}
 
-		val := Cast(reflect.ValueOf(&test{"Hi!"}))
-		val.IterateStructError(nil, func(val reflect.Value, field reflect.Value) (err error) {
-			err = errors.New("random error")
-			return
-		})
-		assert.NotNil(t, val.Error())
-	})
-	t.Run("success in the second iteration", func(t *testing.T) {
-		type test struct {
-			Hello string
-		}
-
-		val := Cast(reflect.ValueOf(&test{"Hi!"}))
-		val.IterateStructError(nil, func(val reflect.Value, field reflect.Value) (err error) {
-			fmt.Println("Success!!!")
-			return
+		val := Cast(reflect.ValueOf(&test{"Hi!"}), EnableIgnoreError())
+		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
+			return errors.New("random error")
 		})
 		assert.Nil(t, val.Error())
+	})
+	t.Run("panic with recoverer - error type", func(t *testing.T) {
+		type test struct {
+			Hello string
+		}
+		errTest := errors.New("test")
+
+		val := Cast(reflect.ValueOf(&test{"Hi!"}), EnablePanicRecoverer())
+		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
+			panic(errTest)
+		})
+		assert.NotNil(t, val.Error())
+		assert.Equal(t, errTest, val.Error())
+	})
+	t.Run("panic with recoverer - any type", func(t *testing.T) {
+		type test struct {
+			Hello string
+		}
+		val := Cast(reflect.ValueOf(&test{"Hi!"}), EnablePanicRecoverer())
+		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
+			panic("hello")
+		})
+		assert.NotNil(t, val.Error())
+		assert.Equal(t, "hello", val.Error().Error())
 	})
 }

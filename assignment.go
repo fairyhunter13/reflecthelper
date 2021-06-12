@@ -32,7 +32,7 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 }
 
 func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
-	defer RecoverFn(&err)
+	defer recoverFnOpt(&err, opt)
 
 	assignerKind := GetKind(assigner)
 	valKind := GetKind(val)
@@ -143,7 +143,7 @@ func checkOverLength(assigner reflect.Value, val reflect.Value) (err error) {
 }
 
 func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, opt *Option) (err error) {
-	// TODO: Add concurrent mode?
+	// TODO: Add concurrent mode (no toggle)?
 	if isSlice {
 		emptySlice := reflect.MakeSlice(assigner.Type(), 0, val.Len())
 		for index := 0; index < val.Len(); index++ {
