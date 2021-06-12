@@ -160,38 +160,19 @@ func checkOverLength(assigner reflect.Value, val reflect.Value) (err error) {
 
 func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, opt *Option) (err error) {
 	tm := task.NewErrorManager(val.Len())
+	var emptyList reflect.Value
 	if isSlice {
-		emptySlice := reflect.MakeSlice(assigner.Type(), 0, val.Len())
-		elemType := GetElemType(assigner)
-		for index := 0; index < val.Len(); index++ {
-			elemVal := reflect.New(elemType).Elem()
-			emptySlice = reflect.Append(emptySlice, elemVal)
-		}
-		for index := 0; index < val.Len(); index++ {
-			opt := opt.Clone()
-			index := index
-			tm.Run(func() (err error) {
-				err = assignReflect(emptySlice.Index(index), val.Index(index), opt)
-				return
-			})
-		}
-		err = tm.Error()
-		if err != nil {
-			return
-		}
-
-		assigner.Set(emptySlice)
-		return
+		emptyList = reflect.MakeSlice(assigner.Type(), val.Len(), val.Len())
+	} else {
+		typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
+		emptyList = reflect.New(typeArr).Elem()
 	}
 
-	typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
-	emptyArray := reflect.New(typeArr).Elem()
 	for index := 0; index < val.Len(); index++ {
 		opt := opt.Clone()
 		index := index
 		tm.Run(func() (err error) {
-			elemVal := emptyArray.Index(index)
-			err = assignReflect(elemVal, val.Index(index), opt)
+			err = assignReflect(emptyList.Index(index), val.Index(index), opt)
 			return
 		})
 	}
@@ -200,7 +181,7 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, o
 		return
 	}
 
-	assigner.Set(emptyArray)
+	assigner.Set(emptyList)
 	return
 }
 
