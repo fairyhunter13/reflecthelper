@@ -49,6 +49,57 @@ func TestAssignReflect(t *testing.T) {
 			wantAssigner: nil,
 		},
 		{
+			name: "nil assigner",
+			args: args{
+				assigner: func() reflect.Value {
+					var hello *int
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(5)
+				},
+			},
+			wantErr: false,
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(5)
+			},
+		},
+		{
+			name: "interface assigner",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := []interface{}{5, 4, 3}
+					assigner := reflect.ValueOf(&hello).Elem().Index(0)
+					return assigner
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(10)
+				},
+			},
+			wantErr: false,
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(10)
+			},
+		},
+		{
+			name: "ptr interface assigner",
+			args: args{
+				assigner: func() reflect.Value {
+					test := 5
+					hello := []interface{}{&test, 4, 3}
+					assigner := reflect.ValueOf(&hello).Elem().Index(0)
+					return assigner
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(10)
+				},
+			},
+			wantErr: false,
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(10)
+			},
+		},
+		{
 			name: "invalid val",
 			args: args{
 				assigner: func() reflect.Value {

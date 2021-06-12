@@ -17,17 +17,31 @@ func checkAssigner(assigner reflect.Value) (err error) {
 }
 
 func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
-	assigner = GetChildElem(assigner)
-	val = GetChildElem(val)
-	err = checkAssigner(assigner)
+	var oriAssigner reflect.Value
+	if assigner.CanSet() {
+		oriAssigner = assigner
+	} else {
+		oriAssigner = GetChildElem(assigner)
+	}
+	err = checkAssigner(oriAssigner)
 	if err != nil {
 		return
 	}
+
+	val = GetChildElem(val)
 	err = checkExtractValid(val, opt.resetCheck())
 	if err != nil {
 		return
 	}
+
+	cloneAssigner := InitNew(oriAssigner)
+	assigner = GetInitChildElem(cloneAssigner)
 	err = tryAssign(assigner, val, opt)
+	if err != nil {
+		return
+	}
+
+	oriAssigner.Set(cloneAssigner)
 	return
 }
 
