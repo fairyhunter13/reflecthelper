@@ -10,8 +10,9 @@ type Option struct {
 	TimeLayouts          []string
 	hasCheckExtractValid bool
 	// TODO: Add concurrent mode in here?
-	IgnoreError  bool
-	RecoverPanic bool
+	IgnoreError           bool
+	RecoverPanic          bool
+	BlockChannelIteration bool
 }
 
 // FuncOption is a function option to set the Option for function arguments.
@@ -59,6 +60,14 @@ func EnableIgnoreError() FuncOption {
 func EnablePanicRecoverer() FuncOption {
 	return func(o *Option) {
 		o.RecoverPanic = true
+	}
+}
+
+// EnableBlockChannel enables the blocking operation of receive from reflect.Value with kind reflect.Chan.
+// EnableBlockChannel will use the Recv() method instead of TryRecv().
+func EnableBlockChannel() FuncOption {
+	return func(o *Option) {
+		o.BlockChannelIteration = true
 	}
 }
 

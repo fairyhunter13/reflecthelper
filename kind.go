@@ -165,3 +165,13 @@ func IsKindPtr(kind reflect.Kind) bool {
 func IsKindStruct(kind reflect.Kind) bool {
 	return kind == reflect.Struct
 }
+
+// IsKindMap checks whether the input kind is reflect.Map.
+func IsKindMap(kind reflect.Kind) bool {
+	return kind == reflect.Map
+}
+
+// IsKindChan checks whether the input kind is reflect.Chan.
+func IsKindChan(kind reflect.Kind) bool {
+	return kind == reflect.Chan
+}

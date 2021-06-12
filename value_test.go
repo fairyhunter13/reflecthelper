@@ -46,7 +46,7 @@ func TestCast(t *testing.T) {
 		{
 			name: "valid ptr struct value",
 			args: args{
-				val: reflect.ValueOf(&test{"Hi!"}),
+				val: reflect.ValueOf(test{"Hi!"}),
 			},
 			wantKind: reflect.Struct,
 		},
@@ -63,26 +63,27 @@ func TestValue_IterateStruct(t *testing.T) {
 	t.Run("kind is not struct", func(t *testing.T) {
 		var hello int
 		val := Cast(reflect.ValueOf(hello))
-		val.IterateStruct()
+		assert.Nil(t, val.IterateStruct().Error())
 	})
 	t.Run("iterate example function", func(t *testing.T) {
 		type test struct {
 			Hello string
 		}
 
-		val := Cast(reflect.ValueOf(&test{"Hi!"}))
+		val := Cast(reflect.ValueOf(test{"Hi!"}))
 		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
 			fmt.Println(val.String())
 			fmt.Println(field.String())
 			return
 		})
+		assert.Nil(t, val.Error())
 	})
 	t.Run("error in the iteration", func(t *testing.T) {
 		type test struct {
 			Hello string
 		}
 
-		val := Cast(reflect.ValueOf(&test{"Hi!"}))
+		val := Cast(reflect.ValueOf(test{"Hi!"}))
 		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
 			return errors.New("random error")
 		})
@@ -93,7 +94,7 @@ func TestValue_IterateStruct(t *testing.T) {
 			Hello string
 		}
 
-		val := Cast(reflect.ValueOf(&test{"Hi!"}), EnableIgnoreError())
+		val := Cast(reflect.ValueOf(test{"Hi!"}), EnableIgnoreError())
 		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
 			return errors.New("random error")
 		})
@@ -105,7 +106,7 @@ func TestValue_IterateStruct(t *testing.T) {
 		}
 		errTest := errors.New("test")
 
-		val := Cast(reflect.ValueOf(&test{"Hi!"}), EnablePanicRecoverer())
+		val := Cast(reflect.ValueOf(test{"Hi!"}), EnablePanicRecoverer())
 		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
 			panic(errTest)
 		})
@@ -116,11 +117,144 @@ func TestValue_IterateStruct(t *testing.T) {
 		type test struct {
 			Hello string
 		}
-		val := Cast(reflect.ValueOf(&test{"Hi!"}), EnablePanicRecoverer())
+		val := Cast(reflect.ValueOf(test{"Hi!"}), EnablePanicRecoverer())
 		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
 			panic("hello")
 		})
 		assert.NotNil(t, val.Error())
 		assert.Equal(t, "hello", val.Error().Error())
+	})
+}
+
+func TestValue_iterateArraySlice(t *testing.T) {
+	t.Run("kind is not slice or array", func(t *testing.T) {
+		var hello int
+		val := Cast(reflect.ValueOf(hello))
+		assert.Nil(t, val.IterateArraySlice().Error())
+	})
+	t.Run("iterate example function", func(t *testing.T) {
+		var hello = []int{1, 2, 3, 4, 5}
+
+		val := Cast(reflect.ValueOf(hello))
+		val.IterateArraySlice(nil, func(parent reflect.Value, index int, elem reflect.Value) (err error) {
+			fmt.Println("index: ", index, "elem: ", elem.Interface())
+			return
+		})
+		assert.Nil(t, val.Error())
+
+		var helloArray = [5]int{1, 2, 3, 4, 5}
+
+		val = Cast(reflect.ValueOf(helloArray))
+		val.IterateArraySlice(nil, func(parent reflect.Value, index int, elem reflect.Value) (err error) {
+			fmt.Println("index: ", index, "elem: ", elem.Interface())
+			return
+		})
+		assert.Nil(t, val.Error())
+	})
+	t.Run("error in the iteration", func(t *testing.T) {
+		var hello = []int{1, 2, 3, 4, 5}
+
+		val := Cast(reflect.ValueOf(hello))
+		val.IterateArraySlice(nil, func(parent reflect.Value, index int, elem reflect.Value) (err error) {
+			err = errors.New("any error")
+			return
+		})
+		assert.NotNil(t, val.Error())
+		assert.Equal(t, "any error", val.Error().Error())
+	})
+	t.Run("error in the iteration ignored", func(t *testing.T) {
+		var hello = [5]int{1, 2, 3, 4, 5}
+		val := Cast(reflect.ValueOf(hello), EnableIgnoreError())
+		val.IterateArraySlice(nil, func(parent reflect.Value, index int, elem reflect.Value) (err error) {
+			err = errors.New("any error")
+			return
+		})
+		assert.Nil(t, val.Error())
+	})
+	t.Run("panic with recoverer", func(t *testing.T) {
+		var hello = [5]int{1, 2, 3, 4, 5}
+		val := Cast(reflect.ValueOf(hello), EnablePanicRecoverer())
+		val.IterateArraySlice(nil, func(parent reflect.Value, index int, elem reflect.Value) (err error) {
+			panic(errors.New("panic error"))
+		})
+		assert.NotNil(t, val.Error())
+		assert.Equal(t, "panic error", val.Error().Error())
+	})
+}
+
+func TestValue_IterateMap(t *testing.T) {
+	t.Run("kind is not map", func(t *testing.T) {
+		var hello int
+		val := Cast(reflect.ValueOf(hello))
+		assert.Nil(t, val.IterateMap().Error())
+	})
+	t.Run("iterate example function", func(t *testing.T) {
+		var test = map[string]string{
+			"hello": "hi",
+			"hi":    "hello",
+		}
+
+		val := Cast(reflect.ValueOf(test))
+		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
+			fmt.Println("key: ", key, "elem: ", elem.Interface())
+			return
+		})
+		assert.Nil(t, val.Error())
+	})
+	t.Run("error in the iteration", func(t *testing.T) {
+		var test = map[string]string{
+			"hello": "hi",
+			"hi":    "hello",
+		}
+
+		val := Cast(reflect.ValueOf(test))
+		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
+			err = errors.New("random error")
+			return
+		})
+		assert.NotNil(t, val.Error())
+		assert.Equal(t, "random error", val.Error().Error())
+	})
+	t.Run("error in the iteration ignored", func(t *testing.T) {
+		var test = map[string]string{
+			"hello": "hi",
+			"hi":    "hello",
+		}
+
+		val := Cast(reflect.ValueOf(test), EnableIgnoreError())
+		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
+			err = errors.New("random error")
+			return
+		})
+		assert.Nil(t, val.Error())
+	})
+	t.Run("panic with recoverer", func(t *testing.T) {
+		var test = map[string]string{
+			"hello": "hi",
+			"hi":    "hello",
+		}
+
+		val := Cast(reflect.ValueOf(test), EnablePanicRecoverer())
+		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
+			panic(errors.New("panic error"))
+		})
+		assert.NotNil(t, val.Error())
+		assert.Equal(t, "panic error", val.Error().Error())
+	})
+}
+
+func TestValue_IterateChan(t *testing.T) {
+	t.Run("kind is not map", func(t *testing.T) {
+		var hello int
+		val := Cast(reflect.ValueOf(hello))
+		assert.Nil(t, val.IterateChan().Error())
+	})
+	t.Run("iterate example function", func(t *testing.T) {
+	})
+	t.Run("error in the iteration", func(t *testing.T) {
+	})
+	t.Run("error in the iteration ignored", func(t *testing.T) {
+	})
+	t.Run("panic with recoverer", func(t *testing.T) {
 	})
 }

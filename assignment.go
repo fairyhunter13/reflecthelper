@@ -46,7 +46,7 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 }
 
 func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
-	defer recoverFnOpt(&err, opt)
+	defer RecoverFnOpt(&err, opt)
 
 	assignerKind := GetKind(assigner)
 	valKind := GetKind(val)
