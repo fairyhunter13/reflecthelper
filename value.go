@@ -51,7 +51,7 @@ func (s *Value) isChan() bool {
 	return IsKindChan(s.kind) && s.CanSet()
 }
 
-func (s *Value) iterateStruct(fns ...IterStructFn) (err error) {
+func (s *Value) iterateStruct(fns []IterStructFn) (err error) {
 	// TODO: Add concurrent mode (with toggle)?
 	for index := 0; index < s.NumField(); index++ {
 		for _, fn := range fns {
@@ -71,7 +71,7 @@ func (s *Value) iterateStruct(fns ...IterStructFn) (err error) {
 	return
 }
 
-func (s *Value) iterateArraySlice(fns ...IterArraySliceFn) (err error) {
+func (s *Value) iterateArraySlice(fns []IterArraySliceFn) (err error) {
 	// TODO: Add concurrent mode (with toggle)?
 	for index := 0; index < s.Len(); index++ {
 		for _, fn := range fns {
@@ -91,7 +91,7 @@ func (s *Value) iterateArraySlice(fns ...IterArraySliceFn) (err error) {
 	return
 }
 
-func (s *Value) iterateMap(fns ...IterMapFn) (err error) {
+func (s *Value) iterateMap(fns []IterMapFn) (err error) {
 	// TODO: Add concurrent mode (with toggle)?
 	iter := s.MapRange()
 	for iter.Next() {
@@ -112,7 +112,7 @@ func (s *Value) iterateMap(fns ...IterMapFn) (err error) {
 	return
 }
 
-func (s *Value) iterateChan(fns ...IterChanFn) (err error) {
+func (s *Value) iterateChan(fns []IterChanFn) (err error) {
 	// TODO: Add concurrent mode (with toggle)?
 	for {
 		var (
@@ -162,7 +162,7 @@ func (s *Value) IterateStruct(fns ...IterStructFn) *Value {
 	}
 
 	defer recoverFnOpt(&s.err, s.opt)
-	s.err = s.iterateStruct(fns...)
+	s.err = s.iterateStruct(fns)
 	return s
 }
 
@@ -173,7 +173,7 @@ func (s *Value) IterateArraySlice(fns ...IterArraySliceFn) *Value {
 	}
 
 	defer recoverFnOpt(&s.err, s.opt)
-	s.err = s.iterateArraySlice(fns...)
+	s.err = s.iterateArraySlice(fns)
 	return s
 }
 
@@ -184,7 +184,7 @@ func (s *Value) IterateMap(fns ...IterMapFn) *Value {
 	}
 
 	defer recoverFnOpt(&s.err, s.opt)
-	s.err = s.iterateMap(fns...)
+	s.err = s.iterateMap(fns)
 	return s
 }
 
@@ -195,7 +195,7 @@ func (s *Value) IterateChan(fns ...IterChanFn) *Value {
 	}
 
 	defer recoverFnOpt(&s.err, s.opt)
-	s.err = s.iterateChan(fns...)
+	s.err = s.iterateChan(fns)
 	return s
 }
 
