@@ -128,21 +128,17 @@ func IsKindArray(kind reflect.Kind) bool {
 
 // IsKindComplex checks whether the kind is complex or not.
 func IsKindComplex(kind reflect.Kind) bool {
-	return kind == reflect.Complex128 || kind == reflect.Complex64
+	return kind >= reflect.Complex64 && kind <= reflect.Complex128
 }
 
 // IsKindFloat checks whether the kind is float or not.
 func IsKindFloat(kind reflect.Kind) bool {
-	return kind == reflect.Float32 || kind == reflect.Float64
+	return kind >= reflect.Float32 && kind <= reflect.Float64
 }
 
 // IsKindInt checks whether the kind is int or not.
 func IsKindInt(kind reflect.Kind) bool {
-	switch kind {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return true
-	}
-	return false
+	return kind >= reflect.Int && kind <= reflect.Int64
 }
 
 // IsKindUnsafePointer checks whether the kind is unsafe ptr or not.
@@ -157,11 +153,7 @@ func IsKindString(kind reflect.Kind) bool {
 
 // IsKindUint checks whether the kind is uint or not.
 func IsKindUint(kind reflect.Kind) bool {
-	switch kind {
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return true
-	}
-	return false
+	return kind >= reflect.Uint && kind <= reflect.Uintptr
 }
 
 // IsKindPtr checks whether the input kind is reflect.Ptr.
