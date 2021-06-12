@@ -125,7 +125,7 @@ func (s *Value) iterateChan(fns ...IterChanFn) (err error) {
 			val, ok = s.TryRecv()
 		}
 		if !ok {
-			return
+			break
 		}
 		for _, fn := range fns {
 			if fn == nil {

@@ -250,11 +250,75 @@ func TestValue_IterateChan(t *testing.T) {
 		assert.Nil(t, val.IterateChan().Error())
 	})
 	t.Run("iterate example function", func(t *testing.T) {
+		chanInt := make(chan int, 10)
+		chanInt <- 1
+		chanInt <- 2
+		chanInt <- 3
+		close(chanInt)
+
+		// Iterate without blocking
+		val := Cast(reflect.ValueOf(&chanInt))
+		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
+			fmt.Println(recv.Interface())
+			return
+		})
+		assert.Nil(t, val.Error())
+
+		chanInt = make(chan int, 10)
+		chanInt <- 1
+		chanInt <- 2
+		chanInt <- 3
+		close(chanInt)
+
+		// Iterate with blocking
+		val = Cast(reflect.ValueOf(&chanInt), EnableBlockChannel())
+		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
+			fmt.Println(recv.Interface())
+			return
+		})
+		assert.Nil(t, val.Error())
 	})
 	t.Run("error in the iteration", func(t *testing.T) {
+		chanInt := make(chan int, 10)
+		chanInt <- 1
+		chanInt <- 2
+		chanInt <- 3
+		close(chanInt)
+
+		val := Cast(reflect.ValueOf(&chanInt))
+		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
+			err = errors.New("error in the channel")
+			return
+		})
+		assert.NotNil(t, val.Error())
+		assert.Equal(t, "error in the channel", val.Error().Error())
 	})
 	t.Run("error in the iteration ignored", func(t *testing.T) {
+		chanInt := make(chan int, 10)
+		chanInt <- 1
+		chanInt <- 2
+		chanInt <- 3
+		close(chanInt)
+
+		val := Cast(reflect.ValueOf(&chanInt), EnableIgnoreError())
+		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
+			err = errors.New("error in the channel")
+			return
+		})
+		assert.Nil(t, val.Error())
 	})
 	t.Run("panic with recoverer", func(t *testing.T) {
+		chanInt := make(chan int, 10)
+		chanInt <- 1
+		chanInt <- 2
+		chanInt <- 3
+		close(chanInt)
+
+		val := Cast(reflect.ValueOf(&chanInt), EnablePanicRecoverer())
+		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
+			panic(errors.New("error in the channel"))
+		})
+		assert.NotNil(t, val.Error())
+		assert.Equal(t, "error in the channel", val.Error().Error())
 	})
 }
