@@ -60,6 +60,11 @@ func TestCast(t *testing.T) {
 }
 
 func TestValue_IterateStruct(t *testing.T) {
+	t.Run("no casting", func(t *testing.T) {
+		var hello int
+		val := Value{Value: reflect.ValueOf(hello)}
+		assert.Nil(t, val.IterateStruct().Error())
+	})
 	t.Run("kind is not struct", func(t *testing.T) {
 		var hello int
 		val := Cast(reflect.ValueOf(hello))
@@ -208,11 +213,20 @@ func TestValue_IterateMap(t *testing.T) {
 		var test = map[string]string{
 			"hello": "hi",
 			"hi":    "hello",
+			"test":  "testing",
+			"try":   "trial",
 		}
 
 		val := Cast(reflect.ValueOf(test))
 		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
-			fmt.Println("key: ", key, "elem: ", elem.Interface())
+			fmt.Println("key: ", key, "val: ", elem.Interface())
+			return
+		})
+		assert.Nil(t, val.Error())
+
+		val = Cast(reflect.ValueOf(test), WithConcurrency(true))
+		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
+			fmt.Println("key: ", key, "val: ", elem.Interface())
 			return
 		})
 		assert.Nil(t, val.Error())
@@ -224,6 +238,15 @@ func TestValue_IterateMap(t *testing.T) {
 		}
 
 		val := Cast(reflect.ValueOf(test))
+		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
+			err = errors.New("random error")
+			return
+		})
+		assert.NotNil(t, val.Error())
+		assert.Equal(t, "random error", val.Error().Error())
+
+		// concurrent mode
+		val = Cast(reflect.ValueOf(test), WithConcurrency(true))
 		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
 			err = errors.New("random error")
 			return
@@ -290,6 +313,21 @@ func TestValue_IterateChan(t *testing.T) {
 		val = Cast(reflect.ValueOf(&chanInt), WithBlockChannel(true))
 		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
 			fmt.Println(recv.Interface())
+			return
+		})
+		assert.Nil(t, val.Error())
+
+		// concurrent mode
+		chanInt = make(chan int, 10)
+		chanInt <- 1
+		chanInt <- 2
+		chanInt <- 3
+		close(chanInt)
+
+		// Iterate without blocking
+		val = Cast(reflect.ValueOf(&chanInt), WithConcurrency(true))
+		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
+			fmt.Println(recv.Kind(), recv.Interface())
 			return
 		})
 		assert.Nil(t, val.Error())

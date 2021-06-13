@@ -129,56 +129,90 @@ func (s *Value) iterateArraySlice(fns []IterArraySliceFn) (err error) {
 	return
 }
 
+func (s *Value) iterateEachMap(fns []IterMapFn, key reflect.Value, val reflect.Value) (err error) {
+	for _, fn := range fns {
+		if fn == nil {
+			continue
+		}
+		err = fn(s.Value, key, val)
+		if s.opt.IgnoreError {
+			err = nil
+			continue
+		}
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 func (s *Value) iterateMap(fns []IterMapFn) (err error) {
-	// TODO: Add concurrent mode (with toggle)?
+	tm := task.NewErrorManager(task.WithBufferSize(s.Len()))
 	iter := s.MapRange()
 	for iter.Next() {
-		for _, fn := range fns {
-			if fn == nil {
-				continue
-			}
-			err = fn(s.Value, iter.Key(), iter.Value())
-			if s.opt.IgnoreError {
-				err = nil
-				continue
-			}
-			if err != nil {
+		key := iter.Key()
+		val := iter.Value()
+		if s.opt.ConcurrentMode {
+			tm.Run(func() (err error) {
+				err = s.iterateEachMap(fns, key, val)
 				return
-			}
+			})
+			continue
+		}
+		err = s.iterateEachMap(fns, key, val)
+		if err != nil {
+			return
+		}
+	}
+	err = tm.Error()
+	return
+}
+
+func (s *Value) iterateEachChan(fns []IterChanFn, recv reflect.Value) (err error) {
+	for _, fn := range fns {
+		if fn == nil {
+			continue
+		}
+		err = fn(s.Value, recv)
+		if s.opt.IgnoreError {
+			err = nil
+			continue
+		}
+		if err != nil {
+			return
 		}
 	}
 	return
 }
 
 func (s *Value) iterateChan(fns []IterChanFn) (err error) {
-	// TODO: Add concurrent mode (with toggle)?
+	tm := task.NewErrorManager(task.WithBufferSize(s.Len()))
 	for {
 		var (
-			val reflect.Value
-			ok  bool
+			recv reflect.Value
+			ok   bool
 		)
 		if s.opt.BlockChannelIteration {
-			val, ok = s.Recv()
+			recv, ok = s.Recv()
 		} else {
-			val, ok = s.TryRecv()
+			recv, ok = s.TryRecv()
 		}
 		if !ok {
 			break
 		}
-		for _, fn := range fns {
-			if fn == nil {
-				continue
-			}
-			err = fn(s.Value, val)
-			if s.opt.IgnoreError {
-				err = nil
-				continue
-			}
-			if err != nil {
+		if s.opt.ConcurrentMode {
+			tm.Run(func() (err error) {
+				err = s.iterateEachChan(fns, recv)
 				return
-			}
+			})
+			continue
+		}
+		err = s.iterateEachChan(fns, recv)
+		if err != nil {
+			return
 		}
 	}
+	err = tm.Error()
 	return
 }
 
