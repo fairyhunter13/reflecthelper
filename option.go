@@ -50,34 +50,37 @@ func WithTimeLayouts(timeLayouts ...string) FuncOption {
 	}
 }
 
-// EnableIgnoreError ignores error in the struct, slice, array, and map iteration.
-func EnableIgnoreError() FuncOption {
-	return func(o *Option) {
-		o.IgnoreError = true
-	}
-}
-
-// EnablePanicRecoverer enables the panic recoverer in all of the packages' functions.
+// WithIgnoreError toggles for ignoring error in the struct, slice, array, and map iteration.
 // The default behavior for this package is false.
-func EnablePanicRecoverer() FuncOption {
+func WithIgnoreError(input bool) FuncOption {
 	return func(o *Option) {
-		o.RecoverPanic = true
+		o.IgnoreError = input
 	}
 }
 
-// EnableBlockChannel enables the blocking operation of receive from reflect.Value with kind reflect.Chan.
-// EnableBlockChannel will use the Recv() method instead of TryRecv().
-func EnableBlockChannel() FuncOption {
+// WithPanicRecoverer toggles the panic recoverer in all of the packages' functions.
+// The default behavior for this package is false.
+func WithPanicRecoverer(input bool) FuncOption {
 	return func(o *Option) {
-		o.BlockChannelIteration = true
+		o.RecoverPanic = input
 	}
 }
 
-// EnableConcurrency enables the concurrency mode in this package, especially in the iteration.
-// This enables to iterate array, slice, map, or struct elements in concurrent mode.
-func EnableConcurrency() FuncOption {
+// WithBlockChannel toggles the blocking operation of receive from reflect.Value with kind reflect.Chan.
+// WithBlockChannel will use the Recv() method instead of TryRecv().
+// The default behavior for this package is false.
+func WithBlockChannel(input bool) FuncOption {
 	return func(o *Option) {
-		o.ConcurrentMode = true
+		o.BlockChannelIteration = input
+	}
+}
+
+// WithConcurrency toggles the concurrency mode in this package, especially in the iteration.
+// This toggles to iterate array, slice, map, or struct elements in concurrent mode.
+// The default behavior for this package is false.
+func WithConcurrency(input bool) FuncOption {
+	return func(o *Option) {
+		o.ConcurrentMode = input
 	}
 }
 

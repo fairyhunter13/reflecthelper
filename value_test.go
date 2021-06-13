@@ -68,12 +68,21 @@ func TestValue_IterateStruct(t *testing.T) {
 	t.Run("iterate example function", func(t *testing.T) {
 		type test struct {
 			Hello string
+			Test  int
+			One   uint64
 		}
 
-		val := Cast(reflect.ValueOf(test{"Hi!"}))
+		val := Cast(reflect.ValueOf(test{"Hi!", 0, 10}))
 		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
-			fmt.Println(val.String())
-			fmt.Println(field.String())
+			fmt.Println(field.Type(), field.Interface())
+			return
+		})
+		assert.Nil(t, val.Error())
+
+		// Concurrent Mode
+		val = Cast(reflect.ValueOf(test{"Hi!", 0, 10}), WithConcurrency(true))
+		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
+			fmt.Println(field.Type(), field.Interface())
 			return
 		})
 		assert.Nil(t, val.Error())
@@ -94,7 +103,7 @@ func TestValue_IterateStruct(t *testing.T) {
 			Hello string
 		}
 
-		val := Cast(reflect.ValueOf(test{"Hi!"}), EnableIgnoreError())
+		val := Cast(reflect.ValueOf(test{"Hi!"}), WithIgnoreError(true))
 		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
 			return errors.New("random error")
 		})
@@ -106,7 +115,7 @@ func TestValue_IterateStruct(t *testing.T) {
 		}
 		errTest := errors.New("test")
 
-		val := Cast(reflect.ValueOf(test{"Hi!"}), EnablePanicRecoverer())
+		val := Cast(reflect.ValueOf(test{"Hi!"}), WithPanicRecoverer(true))
 		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
 			panic(errTest)
 		})
@@ -117,7 +126,7 @@ func TestValue_IterateStruct(t *testing.T) {
 		type test struct {
 			Hello string
 		}
-		val := Cast(reflect.ValueOf(test{"Hi!"}), EnablePanicRecoverer())
+		val := Cast(reflect.ValueOf(test{"Hi!"}), WithPanicRecoverer(true))
 		val.IterateStruct(nil, func(val reflect.Value, field reflect.Value) (err error) {
 			panic("hello")
 		})
@@ -164,7 +173,7 @@ func TestValue_iterateArraySlice(t *testing.T) {
 	})
 	t.Run("error in the iteration ignored", func(t *testing.T) {
 		var hello = [5]int{1, 2, 3, 4, 5}
-		val := Cast(reflect.ValueOf(hello), EnableIgnoreError())
+		val := Cast(reflect.ValueOf(hello), WithIgnoreError(true))
 		val.IterateArraySlice(nil, func(parent reflect.Value, index int, elem reflect.Value) (err error) {
 			err = errors.New("any error")
 			return
@@ -173,7 +182,7 @@ func TestValue_iterateArraySlice(t *testing.T) {
 	})
 	t.Run("panic with recoverer", func(t *testing.T) {
 		var hello = [5]int{1, 2, 3, 4, 5}
-		val := Cast(reflect.ValueOf(hello), EnablePanicRecoverer())
+		val := Cast(reflect.ValueOf(hello), WithPanicRecoverer(true))
 		val.IterateArraySlice(nil, func(parent reflect.Value, index int, elem reflect.Value) (err error) {
 			panic(errors.New("panic error"))
 		})
@@ -221,7 +230,7 @@ func TestValue_IterateMap(t *testing.T) {
 			"hi":    "hello",
 		}
 
-		val := Cast(reflect.ValueOf(test), EnableIgnoreError())
+		val := Cast(reflect.ValueOf(test), WithIgnoreError(true))
 		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
 			err = errors.New("random error")
 			return
@@ -234,7 +243,7 @@ func TestValue_IterateMap(t *testing.T) {
 			"hi":    "hello",
 		}
 
-		val := Cast(reflect.ValueOf(test), EnablePanicRecoverer())
+		val := Cast(reflect.ValueOf(test), WithPanicRecoverer(true))
 		val.IterateMap(nil, func(parent reflect.Value, key reflect.Value, elem reflect.Value) (err error) {
 			panic(errors.New("panic error"))
 		})
@@ -271,7 +280,7 @@ func TestValue_IterateChan(t *testing.T) {
 		close(chanInt)
 
 		// Iterate with blocking
-		val = Cast(reflect.ValueOf(&chanInt), EnableBlockChannel())
+		val = Cast(reflect.ValueOf(&chanInt), WithBlockChannel(true))
 		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
 			fmt.Println(recv.Interface())
 			return
@@ -300,7 +309,7 @@ func TestValue_IterateChan(t *testing.T) {
 		chanInt <- 3
 		close(chanInt)
 
-		val := Cast(reflect.ValueOf(&chanInt), EnableIgnoreError())
+		val := Cast(reflect.ValueOf(&chanInt), WithIgnoreError(true))
 		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
 			err = errors.New("error in the channel")
 			return
@@ -314,7 +323,7 @@ func TestValue_IterateChan(t *testing.T) {
 		chanInt <- 3
 		close(chanInt)
 
-		val := Cast(reflect.ValueOf(&chanInt), EnablePanicRecoverer())
+		val := Cast(reflect.ValueOf(&chanInt), WithPanicRecoverer(true))
 		val.IterateChan(nil, func(chanInput, recv reflect.Value) (err error) {
 			panic(errors.New("error in the channel"))
 		})

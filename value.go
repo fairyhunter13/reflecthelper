@@ -2,6 +2,8 @@ package reflecthelper
 
 import (
 	"reflect"
+
+	"github.com/fairyhunter13/task"
 )
 
 type (
@@ -51,23 +53,41 @@ func (s *Value) isChan() bool {
 	return IsKindChan(s.kind) && s.CanSet()
 }
 
-func (s *Value) iterateStruct(fns []IterStructFn) (err error) {
-	// TODO: Add concurrent mode (with toggle)?
-	for index := 0; index < s.NumField(); index++ {
-		for _, fn := range fns {
-			if fn == nil {
-				continue
-			}
-			err = fn(s.Value, s.Field(index))
-			if s.opt.IgnoreError {
-				err = nil
-				continue
-			}
-			if err != nil {
-				return
-			}
+func (s *Value) iterateEachStruct(fns []IterStructFn, index int) (err error) {
+	for _, fn := range fns {
+		if fn == nil {
+			continue
+		}
+		err = fn(s.Value, s.Field(index))
+		if s.opt.IgnoreError {
+			err = nil
+			continue
+		}
+		if err != nil {
+			return
 		}
 	}
+	return
+}
+
+func (s *Value) iterateStruct(fns []IterStructFn) (err error) {
+	numField := s.NumField()
+	tm := task.NewErrorManager(numField)
+	for index := 0; index < numField; index++ {
+		index := index
+		if s.opt.ConcurrentMode {
+			tm.Run(func() (err error) {
+				err = s.iterateEachStruct(fns, index)
+				return
+			})
+			continue
+		}
+		err = s.iterateEachStruct(fns, index)
+		if err != nil {
+			return
+		}
+	}
+	err = tm.Error()
 	return
 }
 
