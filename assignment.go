@@ -159,7 +159,7 @@ func checkOverLength(assigner reflect.Value, val reflect.Value) (err error) {
 }
 
 func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, opt *Option) (err error) {
-	tm := task.NewErrorManager(val.Len())
+	tm := task.NewErrorManager(task.WithBufferSize(val.Len()))
 	var emptyList reflect.Value
 	if isSlice {
 		emptyList = reflect.MakeSlice(assigner.Type(), val.Len(), val.Len())

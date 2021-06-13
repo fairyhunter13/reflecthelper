@@ -91,23 +91,41 @@ func (s *Value) iterateStruct(fns []IterStructFn) (err error) {
 	return
 }
 
-func (s *Value) iterateArraySlice(fns []IterArraySliceFn) (err error) {
-	// TODO: Add concurrent mode (with toggle)?
-	for index := 0; index < s.Len(); index++ {
-		for _, fn := range fns {
-			if fn == nil {
-				continue
-			}
-			err = fn(s.Value, index, s.Index(index))
-			if s.opt.IgnoreError {
-				err = nil
-				continue
-			}
-			if err != nil {
-				return
-			}
+func (s *Value) iterateEachArraySlice(fns []IterArraySliceFn, index int) (err error) {
+	for _, fn := range fns {
+		if fn == nil {
+			continue
+		}
+		err = fn(s.Value, index, s.Index(index))
+		if s.opt.IgnoreError {
+			err = nil
+			continue
+		}
+		if err != nil {
+			return
 		}
 	}
+	return
+}
+
+func (s *Value) iterateArraySlice(fns []IterArraySliceFn) (err error) {
+	lenList := s.Len()
+	tm := task.NewErrorManager(task.WithBufferSize(lenList))
+	for index := 0; index < lenList; index++ {
+		index := index
+		if s.opt.ConcurrentMode {
+			tm.Run(func() (err error) {
+				err = s.iterateEachArraySlice(fns, index)
+				return
+			})
+			continue
+		}
+		err = s.iterateEachArraySlice(fns, index)
+		if err != nil {
+			return
+		}
+	}
+	err = tm.Error()
 	return
 }
 

@@ -159,6 +159,13 @@ func TestValue_iterateArraySlice(t *testing.T) {
 			return
 		})
 		assert.Nil(t, val.Error())
+
+		val = Cast(reflect.ValueOf(helloArray), WithConcurrency(true))
+		val.IterateArraySlice(nil, func(parent reflect.Value, index int, elem reflect.Value) (err error) {
+			fmt.Println("index: ", index, "elem: ", elem.Interface())
+			return
+		})
+		assert.Nil(t, val.Error())
 	})
 	t.Run("error in the iteration", func(t *testing.T) {
 		var hello = []int{1, 2, 3, 4, 5}
