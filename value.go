@@ -3,7 +3,7 @@ package reflecthelper
 import (
 	"reflect"
 
-	"github.com/fairyhunter13/task"
+	"github.com/fairyhunter13/task/v2"
 )
 
 type (
@@ -72,7 +72,7 @@ func (s *Value) iterateEachStruct(fns []IterStructFn, index int) (err error) {
 
 func (s *Value) iterateStruct(fns []IterStructFn) (err error) {
 	numField := s.NumField()
-	tm := task.NewErrorManager(numField)
+	tm := task.NewErrorManager(task.WithBufferSize(numField))
 	for index := 0; index < numField; index++ {
 		index := index
 		if s.opt.ConcurrentMode {

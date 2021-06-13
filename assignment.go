@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/fairyhunter13/task"
+	"github.com/fairyhunter13/task/v2"
 )
 
 func checkAssigner(assigner reflect.Value) (err error) {
