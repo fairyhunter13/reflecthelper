@@ -127,10 +127,10 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			return
 		}
 		assigner.SetString(result)
-	case reflect.Chan, reflect.Func, reflect.Map, reflect.Struct, reflect.Interface:
-		assignerType := assigner.Type()
-		valType := val.Type()
-		switch assignerType {
+	case reflect.Map:
+		// TODO: Add map decoding
+	case reflect.Chan, reflect.Func, reflect.Struct, reflect.Interface:
+		switch assigner.Type() {
 		case TypeTime:
 			var timeRes time.Time
 			timeRes, err = extractTime(val, opt)
@@ -139,15 +139,22 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			}
 			assigner.Set(reflect.ValueOf(timeRes))
 		default:
-			if !valType.AssignableTo(assignerType) {
-				err = getErrUnassignable(assigner, val)
-				return
-			}
-			assigner.Set(val)
+			err = assignDefault(assigner, val)
 		}
 	default:
 		err = getErrUnimplementedAssign(assigner, val)
 	}
+	return
+}
+
+func assignDefault(assigner reflect.Value, val reflect.Value) (err error) {
+	assignerType := assigner.Type()
+	valType := val.Type()
+	if !valType.AssignableTo(assignerType) {
+		err = getErrUnassignable(assigner, val)
+		return
+	}
+	assigner.Set(val)
 	return
 }
 
