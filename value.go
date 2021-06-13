@@ -171,8 +171,11 @@ func (s *Value) Error() error {
 
 // Assign assigns the function options to the s.opt.
 func (s *Value) Assign(fnOpts ...FuncOption) *Value {
-	s.init().opt.Assign(fnOpts...)
-	return s
+	if s.opt == nil {
+		s.opt = NewDefaultOption()
+	}
+	s.opt.Assign(fnOpts...)
+	return s.init()
 }
 
 // IterateStruct iterates the struct field using the IterStructFn.
