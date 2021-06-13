@@ -127,7 +127,12 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetString(result)
 	case reflect.Map:
-		// TODO: Add map decoding
+		switch valKind {
+		case reflect.Map, reflect.Struct, reflect.Array, reflect.Slice:
+			// TODO: Add map decoding
+		default:
+			err = assignDefault(assigner, val)
+		}
 	case reflect.Chan, reflect.Func, reflect.Struct, reflect.Interface:
 		switch assigner.Type() {
 		case TypeTime:

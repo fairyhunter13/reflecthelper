@@ -1,5 +1,7 @@
 package reflecthelper
 
+import "github.com/mitchellh/mapstructure"
+
 // Option is a collection of argument options used in this package.
 type Option struct {
 	// Affected by Default() method
@@ -10,6 +12,7 @@ type Option struct {
 	BaseSystem           int
 	TimeLayouts          []string
 	hasCheckExtractValid bool
+	DecoderConfig        *mapstructure.DecoderConfig
 
 	// Not affected by Default() method
 	IgnoreError           bool
@@ -85,6 +88,14 @@ func WithConcurrency(input bool) FuncOption {
 	}
 }
 
+// WithDecoderConfig assigns the mapstructure decoder config for map assignment.
+// DecoderConfig will be assigned Result (output) in the process of assignment.
+func WithDecoderConfig(cfg *mapstructure.DecoderConfig) FuncOption {
+	return func(o *Option) {
+		o.DecoderConfig = cfg
+	}
+}
+
 // NewDefaultOption initialize the new default option.
 func NewDefaultOption() *Option {
 	return new(Option).Default()
@@ -150,6 +161,9 @@ func (o *Option) Default() *Option {
 	}
 	if o.TimeLayouts == nil {
 		o.TimeLayouts = make([]string, 0)
+	}
+	if o.DecoderConfig == nil {
+		o.DecoderConfig = new(mapstructure.DecoderConfig)
 	}
 	return o.resetCheck()
 }
