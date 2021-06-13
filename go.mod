@@ -1,6 +1,6 @@
 module github.com/fairyhunter13/reflecthelper/v3
 
-go 1.15
+go 1.16
 
 require (
 	github.com/Popog/deepcopy v0.0.0-20160519164043-14c73c14458b

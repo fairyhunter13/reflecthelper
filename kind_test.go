@@ -299,8 +299,7 @@ func TestGetChildElemValueKind(t *testing.T) {
 			name: "valid interface value",
 			args: args{
 				val: func() reflect.Value {
-					var hello interface{}
-					hello = 5
+					var hello interface{} = 5
 					return reflect.ValueOf(hello)
 				},
 			},

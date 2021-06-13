@@ -108,12 +108,11 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		isSlice := assignerKind == reflect.Slice
 		switch valKind {
 		case reflect.Array, reflect.Slice:
-			if !isSlice {
-				err = checkOverLength(assigner, val)
-				if err != nil {
-					return
-				}
+			err = getErrOverflowedLength(assigner, val, isSlice)
+			if err != nil {
+				return
 			}
+
 			err = iterateAndAssign(assigner, val, isSlice, opt)
 		case reflect.String:
 			err = iterateAndAssignString(assigner, val, isSlice, opt)
@@ -148,20 +147,12 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 }
 
 func assignDefault(assigner reflect.Value, val reflect.Value) (err error) {
-	assignerType := assigner.Type()
-	valType := val.Type()
-	if !valType.AssignableTo(assignerType) {
-		err = getErrUnassignable(assigner, val)
+	err = getErrUnassignable(assigner, val)
+	if err != nil {
 		return
 	}
-	assigner.Set(val)
-	return
-}
 
-func checkOverLength(assigner reflect.Value, val reflect.Value) (err error) {
-	if assigner.Len() < val.Len() {
-		err = getErrOverflowedLength(assigner, val)
-	}
+	assigner.Set(val)
 	return
 }
 
@@ -203,12 +194,11 @@ func iterateAndAssignString(assigner reflect.Value, val reflect.Value, isSlice b
 		err = getErrUnimplementedAssign(assigner, val)
 		return
 	}
-	if !isSlice {
-		err = checkOverLength(assigner, listVal)
-		if err != nil {
-			return
-		}
+	err = getErrOverflowedLength(assigner, listVal, isSlice)
+	if err != nil {
+		return
 	}
+
 	err = iterateAndAssign(assigner, listVal, isSlice, opt)
 	return
 }
