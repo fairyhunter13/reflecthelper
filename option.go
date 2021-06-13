@@ -2,15 +2,16 @@ package reflecthelper
 
 // Option is a collection of argument options used in this package.
 type Option struct {
-	FloatPrecision int
-	FloatFormat    byte
-	BitSize        int
-	ComplexBitSize int
-	BaseSystem     int
-	TimeLayouts    []string
+	// Affected by Default() method
+	FloatPrecision       int
+	FloatFormat          byte
+	BitSize              int
+	ComplexBitSize       int
+	BaseSystem           int
+	TimeLayouts          []string
+	hasCheckExtractValid bool
 
-	// Toggle Flag
-	hasCheckExtractValid  bool
+	// Not affected by Default() method
 	IgnoreError           bool
 	RecoverPanic          bool
 	BlockChannelIteration bool
