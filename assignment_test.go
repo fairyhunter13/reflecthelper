@@ -49,7 +49,7 @@ func TestAssignReflect(t *testing.T) {
 			wantAssigner: nil,
 		},
 		{
-			name: "nil assigner",
+			name: "nil ptr assigner",
 			args: args{
 				assigner: func() reflect.Value {
 					var hello *int
@@ -635,6 +635,102 @@ func TestAssignReflect(t *testing.T) {
 				},
 				val: func() reflect.Value {
 					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "assign map from struct",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := make(map[string]interface{})
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					type test struct {
+						Hello string
+						Hi    int
+					}
+					return reflect.ValueOf(test{"hello", 5})
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(map[string]interface{}{
+					"Hello": "hello",
+					"Hi":    5,
+				})
+			},
+			wantErr: false,
+		},
+		{
+			name: "assign map from map with different type",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := make(map[string]interface{})
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(map[string]int{"hello": 5, "hi": 10})
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(map[string]interface{}{
+					"hello": 5,
+					"hi":    10,
+				})
+			},
+			wantErr: false,
+		},
+		{
+			name: "assign map from int - error",
+			args: args{
+				assigner: func() reflect.Value {
+					hello := make(map[string]interface{})
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(5)
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "assign struct from map",
+			args: args{
+				assigner: func() reflect.Value {
+					type test struct {
+						Hello string
+						Hi    int
+					}
+					return reflect.ValueOf(&test{})
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(map[string]interface{}{"hello": "hola!", "hi": 10})
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				type test struct {
+					Hello string
+					Hi    int
+				}
+				return reflect.ValueOf(test{"hola!", 10})
+			},
+			wantErr: false,
+		},
+		{
+			name: "assign struct from int - error",
+			args: args{
+				assigner: func() reflect.Value {
+					type test struct {
+						Hello string
+						Hi    int
+					}
+					return reflect.ValueOf(&test{})
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf(5)
 				},
 			},
 			wantAssigner: nil,

@@ -21,14 +21,14 @@ func getErrOverflow(val reflect.Value) (err error) {
 }
 
 func getErrUnassignable(assigner reflect.Value, val reflect.Value) (err error) {
-	assignerType := assigner.Type()
-	valType := val.Type()
+	assignerType := GetType(assigner)
+	valType := GetType(val)
 	if !valType.AssignableTo(assignerType) {
 		err = fmt.Errorf(
 			"error unassignable for kind: %s with val of reflect.Value, kind: %s type: %s val: %s",
 			GetKind(assigner),
 			GetKind(val),
-			val.Type(),
+			GetType(val),
 			val,
 		)
 	}
@@ -43,9 +43,9 @@ func getErrOverflowedLength(assigner reflect.Value, val reflect.Value, isSlice b
 	if assigner.Len() < val.Len() {
 		err = fmt.Errorf(
 			"error length of assigner is smaller than the length of val, assigner type:%s length:%d, val type:%s length:%d",
-			assigner.Type(),
+			GetType(assigner),
 			assigner.Len(),
-			val.Type(),
+			GetType(val),
 			val.Len(),
 		)
 	}
@@ -57,7 +57,7 @@ func getErrCanInterface(val reflect.Value) (err error) {
 		err = fmt.Errorf(
 			"can't get the interface from the val of reflect.Value, kind: %s type: %s val: %s",
 			GetKind(val),
-			val.Type(),
+			GetType(val),
 			val,
 		)
 	}
@@ -78,7 +78,7 @@ func getErrUnimplementedExtract(val reflect.Value) (err error) {
 	err = fmt.Errorf(
 		"error unimplemented extraction for val of reflect.Value,kind: %s type: %s val: %s",
 		GetKind(val),
-		val.Type(),
+		GetType(val),
 		val,
 	)
 	return
@@ -89,8 +89,46 @@ func getErrUnimplementedAssign(assigner reflect.Value, val reflect.Value) (err e
 		"error unimplemented assignment for kind: %s with val of reflect.Value, kind: %s type: %s val: %s",
 		GetKind(assigner),
 		GetKind(val),
-		val.Type(),
+		GetType(val),
 		val,
 	)
+	return
+}
+
+func getErrCanAddrInterface(assigner reflect.Value) (err error) {
+	if !assigner.CanAddr() {
+		err = fmt.Errorf(
+			"error can't get pointer address from assigner, kind: %s type: %s val: %s",
+			GetKind(assigner),
+			GetType(assigner),
+			assigner,
+		)
+		return
+	}
+	err = getErrCanInterface(assigner.Addr())
+	return
+}
+
+func checkAssigner(assigner reflect.Value) (err error) {
+	err = getErrIsValid(assigner)
+	if err != nil {
+		return
+	}
+
+	if !assigner.CanSet() {
+		err = ErrAssignerCantSet
+	}
+	return
+}
+
+func checkExtractValid(val reflect.Value, opt *Option) (err error) {
+	if !opt.hasCheckExtractValid {
+		defer opt.toggleOnCheckExtractValid()
+		err = getErrIsValid(val)
+		if err != nil {
+			return
+		}
+		err = getErrCanInterface(val)
+	}
 	return
 }

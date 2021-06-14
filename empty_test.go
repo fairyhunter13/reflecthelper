@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fairyhunter13/decimal"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -215,6 +215,58 @@ func TestIsPtrValueZero(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsPtrValueZero(tt.args.val()); got != tt.want {
 				t.Errorf("IsPtrValueZero() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsStructZero(t *testing.T) {
+	type args struct {
+		v reflect.Value
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "kind is not struct",
+			args: args{
+				v: reflect.ValueOf(5),
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsStructZero(tt.args.v); got != tt.want {
+				t.Errorf("IsStructZero() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsArrayZero(t *testing.T) {
+	type args struct {
+		v reflect.Value
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "kind is not array or slice",
+			args: args{
+				v: reflect.ValueOf(5),
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsArrayZero(tt.args.v); got != tt.want {
+				t.Errorf("IsArrayZero() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -28,6 +28,16 @@ func IsTypeElemable(typ reflect.Type) (res bool) {
 	return
 }
 
+// GetType is a wrapper for val.Type() to safely extract type if it is valid.
+func GetType(val reflect.Value) (typ reflect.Type) {
+	if !val.IsValid() {
+		return
+	}
+
+	typ = val.Type()
+	return
+}
+
 // GetElemType returns the elem type of a val of reflect.Value.
 func GetElemType(val reflect.Value) (typ reflect.Type) {
 	if !val.IsValid() {

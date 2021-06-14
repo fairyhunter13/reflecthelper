@@ -423,3 +423,36 @@ func TestGetChildElemPtrTypeOfType(t *testing.T) {
 		})
 	}
 }
+
+func TestGetType(t *testing.T) {
+	type args struct {
+		val reflect.Value
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantTyp reflect.Type
+	}{
+		{
+			name: "invalid type",
+			args: args{
+				val: reflect.ValueOf(nil),
+			},
+			wantTyp: nil,
+		},
+		{
+			name: "valid int type",
+			args: args{
+				val: reflect.ValueOf(5),
+			},
+			wantTyp: reflect.TypeOf(5),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotTyp := GetType(tt.args.val); !reflect.DeepEqual(gotTyp, tt.wantTyp) {
+				t.Errorf("GetType() = %v, want %v", gotTyp, tt.wantTyp)
+			}
+		})
+	}
+}

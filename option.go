@@ -1,6 +1,9 @@
 package reflecthelper
 
-import "github.com/mitchellh/mapstructure"
+import (
+	"github.com/Popog/deepcopy"
+	"github.com/mitchellh/mapstructure"
+)
 
 // Option is a collection of argument options used in this package.
 type Option struct {
@@ -11,7 +14,7 @@ type Option struct {
 	ComplexBitSize       int
 	BaseSystem           int
 	TimeLayouts          []string
-	hasCheckExtractValid bool
+	hasCheckExtractValid bool // private field
 	DecoderConfig        *mapstructure.DecoderConfig
 
 	// Not affected by Default() method
@@ -116,7 +119,8 @@ func (o *Option) Assign(fnOpts ...FuncOption) *Option {
 
 // Clone clones the current option to the new memory address.
 func (o *Option) Clone() *Option {
-	newOpt := *o
+	newOpt := deepcopy.DeepCopy(*o).(Option)
+	newOpt.hasCheckExtractValid = o.hasCheckExtractValid
 	return &newOpt
 }
 

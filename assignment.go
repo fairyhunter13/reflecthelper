@@ -5,18 +5,8 @@ import (
 	"time"
 
 	"github.com/fairyhunter13/task/v2"
+	"github.com/mitchellh/mapstructure"
 )
-
-func checkAssigner(assigner reflect.Value) (err error) {
-	err = getErrIsValid(assigner)
-	if err != nil {
-		return
-	}
-	if !assigner.CanSet() {
-		err = ErrAssignerCantSet
-	}
-	return
-}
 
 func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
 	var oriAssigner reflect.Value
@@ -25,6 +15,7 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 	} else {
 		oriAssigner = GetChildElem(assigner)
 	}
+
 	err = checkAssigner(oriAssigner)
 	if err != nil {
 		return
@@ -128,12 +119,20 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		assigner.SetString(result)
 	case reflect.Map:
 		switch valKind {
-		case reflect.Map, reflect.Struct, reflect.Array, reflect.Slice:
-			// TODO: Add map decoding
+		case reflect.Map:
+			if GetType(assigner) == GetType(val) {
+				err = assignDefault(assigner, val)
+				if err == nil {
+					return
+				}
+			}
+			fallthrough
+		case reflect.Struct, reflect.Array, reflect.Slice:
+			err = assignMap(assigner, val, opt)
 		default:
 			err = assignDefault(assigner, val)
 		}
-	case reflect.Chan, reflect.Func, reflect.Struct, reflect.Interface:
+	case reflect.Struct:
 		switch assigner.Type() {
 		case TypeTime:
 			var timeRes time.Time
@@ -142,12 +141,39 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 				return
 			}
 			assigner.Set(reflect.ValueOf(timeRes))
+			return
 		default:
-			err = assignDefault(assigner, val)
+			if !IsKindMap(valKind) && !IsKindStruct(valKind) {
+				break
+			}
+
+			err = assignMap(assigner, val, opt)
+			if err == nil {
+				return
+			}
 		}
+		fallthrough
+	case reflect.Chan, reflect.Func, reflect.Interface:
+		err = assignDefault(assigner, val)
 	default:
 		err = getErrUnimplementedAssign(assigner, val)
 	}
+	return
+}
+
+func assignMap(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
+	err = getErrCanAddrInterface(assigner)
+	if err != nil {
+		return
+	}
+
+	opt.DecoderConfig.Result = assigner.Addr().Interface()
+	decoder, err := mapstructure.NewDecoder(opt.DecoderConfig)
+	if err != nil {
+		return
+	}
+
+	err = decoder.Decode(val.Interface())
 	return
 }
 

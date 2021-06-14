@@ -108,7 +108,7 @@ func IsValueZero(v reflect.Value) bool {
 
 // IsStructZero checks if the struct is zero.
 func IsStructZero(v reflect.Value) bool {
-	if !v.IsValid() || v.NumField() == 0 {
+	if !v.IsValid() || !IsKindStruct(GetKind(v)) || v.NumField() == 0 {
 		return true
 	}
 
@@ -134,7 +134,7 @@ func IsStructZero(v reflect.Value) bool {
 
 // IsArrayZero checks if the array is empty.
 func IsArrayZero(v reflect.Value) bool {
-	if !v.IsValid() || v.Len() == 0 {
+	if !v.IsValid() || !IsKindList(GetKind(v)) || v.Len() == 0 {
 		return true
 	}
 

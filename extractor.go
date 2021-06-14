@@ -8,18 +8,6 @@ import (
 	"github.com/reiver/go-cast"
 )
 
-func checkExtractValid(val reflect.Value, opt *Option) (err error) {
-	if !opt.hasCheckExtractValid {
-		defer opt.toggleOnCheckExtractValid()
-		err = getErrIsValid(val)
-		if err != nil {
-			return
-		}
-		err = getErrCanInterface(val)
-	}
-	return
-}
-
 func extractBool(val reflect.Value, option *Option) (result bool, err error) {
 	err = checkExtractValid(val, option)
 	if err != nil {
@@ -365,7 +353,7 @@ func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) 
 		valType := val.Type()
 		if valType == TypeTime || valType == TypeTimePtr {
 			result, err = extractTime(val, opt)
-			break
+			return
 		}
 
 		fallthrough

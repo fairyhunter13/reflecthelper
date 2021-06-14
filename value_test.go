@@ -67,7 +67,7 @@ func TestValue_IterateStruct(t *testing.T) {
 	})
 	t.Run("kind is not struct", func(t *testing.T) {
 		var hello int
-		val := Cast(reflect.ValueOf(hello))
+		val := Cast(reflect.ValueOf(hello), WithDecoderConfig(nil))
 		assert.Nil(t, val.IterateStruct().Error())
 	})
 	t.Run("iterate example function", func(t *testing.T) {
