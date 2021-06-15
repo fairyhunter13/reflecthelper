@@ -60,7 +60,7 @@ func IsZero(k interface{}) bool {
 		return IsTimeZero(val)
 	case Zeroable:
 		refVal := reflect.ValueOf(val)
-		if GetKind(refVal) == reflect.Ptr {
+		if IsKindValueNil(refVal) {
 			return refVal.IsNil() || val == nil || val.IsZero()
 		}
 		return val == nil || val.IsZero()

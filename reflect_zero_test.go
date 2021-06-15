@@ -55,7 +55,24 @@ func TestIsReflectZero(t *testing.T) {
 	}
 }
 
+type checkBool struct {
+	val bool
+}
+
+func (c *checkBool) Bool() (bool, error) {
+	return c.val, nil
+}
+
+type boolInt interface {
+	Bool() (bool, error)
+}
+
 func TestIsInterfaceReflectZero(t *testing.T) {
+	var (
+		boolerVal boolInt
+		checkVal  *checkBool
+	)
+	boolerVal = checkVal
 	type args struct {
 		val interface{}
 	}
@@ -89,6 +106,13 @@ func TestIsInterfaceReflectZero(t *testing.T) {
 			name: "Nil implementation of struct",
 			args: args{
 				val: (*structTest)(nil),
+			},
+			wantResult: true,
+		},
+		{
+			name: "nil ptr inside interface",
+			args: args{
+				val: boolerVal,
 			},
 			wantResult: true,
 		},

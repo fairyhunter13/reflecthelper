@@ -3,6 +3,7 @@ package reflecthelper
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -291,6 +292,40 @@ func TestTryGet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotResult := TryGet(tt.args.val, tt.args.fnOpts...); !reflect.DeepEqual(gotResult, tt.wantResult) {
 				t.Errorf("TryGet() = %v, want %v", gotResult, tt.wantResult)
+			}
+		})
+	}
+}
+
+func TestGetDuration(t *testing.T) {
+	type args struct {
+		val    reflect.Value
+		fnOpts []FuncOption
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult time.Duration
+	}{
+		{
+			name: "valid duration syntax",
+			args: args{
+				val: reflect.ValueOf("5s"),
+			},
+			wantResult: 5 * time.Second,
+		},
+		{
+			name: "invalid duration syntax",
+			args: args{
+				val: reflect.ValueOf("hello"),
+			},
+			wantResult: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotResult := GetDuration(tt.args.val, tt.args.fnOpts...); !reflect.DeepEqual(gotResult, tt.wantResult) {
+				t.Errorf("GetDuration() = %v, want %v", gotResult, tt.wantResult)
 			}
 		})
 	}

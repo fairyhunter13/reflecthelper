@@ -28,11 +28,17 @@ func TestExtractBool(t *testing.T) {
 	type test struct {
 		hello string
 	}
-	fieldVal := reflect.ValueOf(test{"hello"}).FieldByIndex([]int{0})
-	var nilBool *bool
-	valBool := true
-	valBooler := booler{true}
-	ptrValBooler := &valBooler
+
+	var (
+		fieldVal     = reflect.ValueOf(test{"hello"}).FieldByIndex([]int{0})
+		nilBool      *bool
+		valBool      = true
+		valBooler    = booler{true}
+		ptrValBooler = &valBooler
+		checkBool    *booler
+		boolInt      boolInt
+	)
+	boolInt = checkBool
 	type args struct {
 		val reflect.Value
 	}
@@ -42,6 +48,20 @@ func TestExtractBool(t *testing.T) {
 		wantResult bool
 		wantErr    bool
 	}{
+		{
+			name: "invalid nil ptr value",
+			args: args{
+				val: reflect.ValueOf(boolInt),
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid nil ptr ptr value",
+			args: args{
+				val: reflect.ValueOf(&boolInt),
+			},
+			wantErr: true,
+		},
 		{
 			name: "invalid interface value",
 			args: args{
@@ -60,6 +80,13 @@ func TestExtractBool(t *testing.T) {
 			name: "invalid bool string",
 			args: args{
 				val: reflect.ValueOf("hello"),
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid nil bool pointer",
+			args: args{
+				val: reflect.ValueOf(&nilBool),
 			},
 			wantErr: true,
 		},
@@ -147,8 +174,17 @@ type anon struct {
 	hello string
 }
 
+type int64Int interface {
+	Int64() (int64, error)
+}
+
 func TestExtractInt(t *testing.T) {
-	valInt := 10
+	var (
+		valInt   = 10
+		checkInt *int64er
+		int64Int int64Int
+	)
+	int64Int = checkInt
 	type args struct {
 		val reflect.Value
 	}
@@ -158,6 +194,20 @@ func TestExtractInt(t *testing.T) {
 		wantResult int64
 		wantErr    bool
 	}{
+		{
+			name: "invalid nil ptr value",
+			args: args{
+				val: reflect.ValueOf(int64Int),
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid nil ptr ptr value",
+			args: args{
+				val: reflect.ValueOf(&int64Int),
+			},
+			wantErr: true,
+		},
 		{
 			name: "invalid reflect value",
 			args: args{
@@ -273,8 +323,17 @@ func (u uinterVal) Uint() (uint, error) {
 	return u.val, nil
 }
 
+type uintInt interface {
+	Uint() (uint, error)
+}
+
 func TestExtractUint(t *testing.T) {
-	uintPtr := uint(15)
+	var (
+		uintPtr   = uint(15)
+		uintCheck *uinter
+		uintInt   uintInt
+	)
+	uintInt = uintCheck
 	type args struct {
 		val reflect.Value
 	}
@@ -284,6 +343,20 @@ func TestExtractUint(t *testing.T) {
 		wantResult uint64
 		wantErr    bool
 	}{
+		{
+			name: "invalid nil ptr value",
+			args: args{
+				val: reflect.ValueOf(uintInt),
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid nil ptr ptr value",
+			args: args{
+				val: reflect.ValueOf(&uintInt),
+			},
+			wantErr: true,
+		},
 		{
 			name: "invalid reflect value",
 			args: args{
@@ -406,8 +479,17 @@ func (f floaterVal) Float64() (float64, error) {
 	return f.val, nil
 }
 
+type float64Int interface {
+	Float64() (float64, error)
+}
+
 func TestExtractFloat(t *testing.T) {
-	floatPtr := 13.0
+	var (
+		floatPtr   = 13.0
+		floatInt   float64Int
+		checkFloat *floater
+	)
+	floatInt = checkFloat
 	type args struct {
 		val reflect.Value
 	}
@@ -417,6 +499,20 @@ func TestExtractFloat(t *testing.T) {
 		wantResult float64
 		wantErr    bool
 	}{
+		{
+			name: "invalid nil ptr value",
+			args: args{
+				val: reflect.ValueOf(floatInt),
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid nil ptr ptr value",
+			args: args{
+				val: reflect.ValueOf(&floatInt),
+			},
+			wantErr: true,
+		},
 		{
 			name: "invalid reflect value",
 			args: args{
@@ -532,8 +628,17 @@ func (c complex128Val) Complex128() (complex128, error) {
 	return c.val, nil
 }
 
+type complexInt interface {
+	Complex128() (complex128, error)
+}
+
 func TestExtractComplex(t *testing.T) {
-	testComplex := complex(15, 0)
+	var (
+		testComplex  = complex(15, 0)
+		complexInt   complexInt
+		checkComplex *complex128er
+	)
+	complexInt = checkComplex
 	type args struct {
 		val reflect.Value
 	}
@@ -543,6 +648,20 @@ func TestExtractComplex(t *testing.T) {
 		wantResult complex128
 		wantErr    bool
 	}{
+		{
+			name: "invalid nil ptr ptr interface value",
+			args: args{
+				val: reflect.ValueOf(&complexInt),
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid nil ptr interface value",
+			args: args{
+				val: reflect.ValueOf(complexInt),
+			},
+			wantErr: true,
+		},
 		{
 			name: "invalid reflect value",
 			args: args{
@@ -652,7 +771,11 @@ func (s stringVal) String() string {
 }
 
 func TestExtractString(t *testing.T) {
-	intVal := 5
+	var (
+		intVal      = 5
+		ptrString   *string
+		nilStringer *stringer
+	)
 	type args struct {
 		val reflect.Value
 	}
@@ -666,6 +789,20 @@ func TestExtractString(t *testing.T) {
 			name: "invalid reflect value for input",
 			args: args{
 				val: reflect.ValueOf(nil),
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid nil ptr ptr string",
+			args: args{
+				val: reflect.ValueOf(&ptrString),
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid nil ptr ptr stringer",
+			args: args{
+				val: reflect.ValueOf(&nilStringer),
 			},
 			wantErr: true,
 		},
@@ -798,6 +935,19 @@ func TestExtractTime(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "invalid nil ptr time Value",
+			args: args{
+				val: func() reflect.Value {
+					var test *time.Time
+					return reflect.ValueOf(&test)
+				},
+			},
+			wantRes: func() *time.Time {
+				return nil
+			},
+			wantErr: true,
+		},
+		{
 			name: "invalid string value",
 			args: args{
 				val: func() reflect.Value {
@@ -893,8 +1043,107 @@ func TestExtractTime(t *testing.T) {
 	}
 }
 
+func TestExtractDuration(t *testing.T) {
+	type args struct {
+		val    func() reflect.Value
+		fnOpts []FuncOption
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult time.Duration
+		wantErr    bool
+	}{
+		{
+			name: "valid string duration format",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf("5m")
+				},
+			},
+			wantResult: 5 * time.Minute,
+			wantErr:    false,
+		},
+		{
+			name: "invalid string duration format",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantResult: 0,
+			wantErr:    true,
+		},
+		{
+			name: "invalid ptr ptr ptr nil value",
+			args: args{
+				val: func() reflect.Value {
+					var test ******interface{}
+					return reflect.ValueOf(&test)
+				},
+			},
+			wantResult: 0,
+			wantErr:    true,
+		},
+		{
+			name: "nil value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf(nil)
+				},
+			},
+			wantResult: 0,
+			wantErr:    true,
+		},
+		{
+			name: "valid time.Duration value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf(5 * time.Millisecond)
+				},
+			},
+			wantResult: 5 * time.Millisecond,
+			wantErr:    false,
+		},
+		{
+			name: "valid int64 value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf(int64(5 * time.Millisecond))
+				},
+			},
+			wantResult: 5 * time.Millisecond,
+			wantErr:    false,
+		},
+		{
+			name: "invalid nil ptr time.Duration value",
+			args: args{
+				val: func() reflect.Value {
+					var dur *time.Duration
+					return reflect.ValueOf(&dur)
+				},
+			},
+			wantResult: 0,
+			wantErr:    true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResult, err := ExtractDuration(tt.args.val(), tt.args.fnOpts...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractDuration() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.EqualValues(t, tt.wantResult, gotResult)
+		})
+	}
+}
+
 func TestTryExtract(t *testing.T) {
-	now := time.Now()
+	var (
+		now = time.Now()
+		dur = 5 * time.Second
+	)
 	type args struct {
 		val reflect.Value
 	}
@@ -980,6 +1229,20 @@ func TestTryExtract(t *testing.T) {
 				val: reflect.ValueOf(&now),
 			},
 			wantResult: now,
+		},
+		{
+			name: "time.Duration value",
+			args: args{
+				val: reflect.ValueOf(5 * time.Microsecond),
+			},
+			wantResult: 5 * time.Microsecond,
+		},
+		{
+			name: "ptr time.Duration value",
+			args: args{
+				val: reflect.ValueOf(&dur),
+			},
+			wantResult: dur,
 		},
 	}
 	for _, tt := range tests {

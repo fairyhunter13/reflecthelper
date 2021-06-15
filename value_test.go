@@ -376,3 +376,64 @@ func TestValue_IterateChan(t *testing.T) {
 		assert.Equal(t, "error in the channel", val.Error().Error())
 	})
 }
+
+func TestIsNil(t *testing.T) {
+	var (
+		interfaceVal boolInt
+		checkVal     *checkBool
+		checkSlice   []int
+		checkFunc    func()
+	)
+	interfaceVal = checkVal
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "nil ptr inside interface",
+			args: args{
+				val: interfaceVal,
+			},
+			want: true,
+		},
+		{
+			name: "nil interface",
+			args: args{
+				val: nil,
+			},
+			want: true,
+		},
+		{
+			name: "nil slice",
+			args: args{
+				val: checkSlice,
+			},
+			want: true,
+		},
+		{
+			name: "nil func",
+			args: args{
+				val: checkFunc,
+			},
+			want: true,
+		},
+		{
+			name: "valid int",
+			args: args{
+				val: 5,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsNil(tt.args.val); got != tt.want {
+				t.Errorf("IsValueNil() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

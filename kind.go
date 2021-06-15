@@ -180,3 +180,17 @@ func IsKindMap(kind reflect.Kind) bool {
 func IsKindChan(kind reflect.Kind) bool {
 	return kind == reflect.Chan
 }
+
+// IsKindValueNil checks whether the input val of reflect.Value can call IsNil method.
+func IsKindValueNil(val reflect.Value) bool {
+	return IsKindNil(GetKind(val))
+}
+
+// IsKindNil checks whether the input kind can call IsNil method.
+func IsKindNil(kind reflect.Kind) bool {
+	switch kind {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+		return true
+	}
+	return false
+}

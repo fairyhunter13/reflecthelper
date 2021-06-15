@@ -96,6 +96,19 @@ func ExtractTime(val reflect.Value, fnOpts ...FuncOption) (result time.Time, err
 	return
 }
 
+// GetDuration is ExtractDuration without error.
+func GetDuration(val reflect.Value, fnOpts ...FuncOption) (result time.Duration) {
+	result, _ = ExtractDuration(val, fnOpts...)
+	return
+}
+
+// ExtractDuration extracts time.Duration from val of reflect.Value.
+func ExtractDuration(val reflect.Value, fnOpts ...FuncOption) (result time.Duration, err error) {
+	opt := NewOption().Assign(fnOpts...)
+	result, err = extractDuration(val, opt)
+	return
+}
+
 // TryGet is TryExtract without error.
 func TryGet(val reflect.Value, fnOpts ...FuncOption) (result interface{}) {
 	result, _ = TryExtract(val, fnOpts...)

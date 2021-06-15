@@ -132,3 +132,16 @@ func checkExtractValid(val reflect.Value, opt *Option) (err error) {
 	}
 	return
 }
+
+func getErrExtractNil(input interface{}) (err error) {
+	if IsNil(input) {
+		val := reflect.ValueOf(input)
+		err = fmt.Errorf(
+			"error can't extract value from nil, type: %s kind: %s val: %s",
+			GetType(val),
+			GetKind(val),
+			val,
+		)
+	}
+	return
+}

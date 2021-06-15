@@ -4,8 +4,6 @@ import (
 	"reflect"
 	"strconv"
 	"time"
-
-	"github.com/reiver/go-cast"
 )
 
 func extractBool(val reflect.Value, option *Option) (result bool, err error) {
@@ -17,7 +15,7 @@ func extractBool(val reflect.Value, option *Option) (result bool, err error) {
 	originKind := GetKind(val)
 	tempVal := GetElem(val)
 	for IsValueElemable(val) && tempVal != val {
-		result, err = cast.Bool(val.Interface())
+		result, err = castBool(val.Interface())
 		if err == nil {
 			return
 		}
@@ -31,12 +29,12 @@ func extractBool(val reflect.Value, option *Option) (result bool, err error) {
 		result = val.Bool()
 	default:
 		if val.CanAddr() && !IsKindPtr(originKind) {
-			result, err = cast.Bool(val.Addr().Interface())
+			result, err = castBool(val.Addr().Interface())
 			if err == nil {
 				return
 			}
 		}
-		result, err = cast.Bool(val.Interface())
+		result, err = castBool(val.Interface())
 		if err == nil {
 			return
 		}
@@ -55,7 +53,7 @@ func extractInt(val reflect.Value, option *Option) (result int64, err error) {
 	originKind := GetKind(val)
 	tempVal := GetElem(val)
 	for IsValueElemable(val) && tempVal != val {
-		result, err = cast.Int64(val.Interface())
+		result, err = castInt64(val.Interface())
 		if err == nil {
 			return
 		}
@@ -77,12 +75,12 @@ func extractInt(val reflect.Value, option *Option) (result int64, err error) {
 		result = int64(val.Uint())
 	default:
 		if val.CanAddr() && !IsKindPtr(originKind) {
-			result, err = cast.Int64(val.Addr().Interface())
+			result, err = castInt64(val.Addr().Interface())
 			if err == nil {
 				return
 			}
 		}
-		result, err = cast.Int64(val.Interface())
+		result, err = castInt64(val.Interface())
 		if err == nil {
 			return
 		}
@@ -105,7 +103,7 @@ func extractUint(val reflect.Value, option *Option) (result uint64, err error) {
 	originKind := GetKind(val)
 	tempVal := GetElem(val)
 	for IsValueElemable(val) && tempVal != val {
-		result, err = cast.Uint64(val.Interface())
+		result, err = castUint64(val.Interface())
 		if err == nil {
 			return
 		}
@@ -132,12 +130,12 @@ func extractUint(val reflect.Value, option *Option) (result uint64, err error) {
 		result = val.Uint()
 	default:
 		if val.CanAddr() && !IsKindPtr(originKind) {
-			result, err = cast.Uint64(val.Addr().Interface())
+			result, err = castUint64(val.Addr().Interface())
 			if err == nil {
 				return
 			}
 		}
-		result, err = cast.Uint64(val.Interface())
+		result, err = castUint64(val.Interface())
 		if err == nil {
 			return
 		}
@@ -160,7 +158,7 @@ func extractFloat(val reflect.Value, option *Option) (result float64, err error)
 	originKind := GetKind(val)
 	tempVal := GetElem(val)
 	for IsValueElemable(val) && tempVal != val {
-		result, err = cast.Float64(val.Interface())
+		result, err = castFloat64(val.Interface())
 		if err == nil {
 			return
 		}
@@ -184,12 +182,12 @@ func extractFloat(val reflect.Value, option *Option) (result float64, err error)
 		result = val.Float()
 	default:
 		if val.CanAddr() && !IsKindPtr(originKind) {
-			result, err = cast.Float64(val.Addr().Interface())
+			result, err = castFloat64(val.Addr().Interface())
 			if err == nil {
 				return
 			}
 		}
-		result, err = cast.Float64(val.Interface())
+		result, err = castFloat64(val.Interface())
 		if err == nil {
 			return
 		}
@@ -212,7 +210,7 @@ func extractComplex(val reflect.Value, option *Option) (result complex128, err e
 	originKind := GetKind(val)
 	tempVal := GetElem(val)
 	for IsValueElemable(val) && tempVal != val {
-		result, err = cast.Complex128(val.Interface())
+		result, err = castComplex128(val.Interface())
 		if err == nil {
 			return
 		}
@@ -232,12 +230,12 @@ func extractComplex(val reflect.Value, option *Option) (result complex128, err e
 		result = val.Complex()
 	default:
 		if val.CanAddr() && !IsKindPtr(originKind) {
-			result, err = cast.Complex128(val.Addr().Interface())
+			result, err = castComplex128(val.Addr().Interface())
 			if err == nil {
 				return
 			}
 		}
-		result, err = cast.Complex128(val.Interface())
+		result, err = castComplex128(val.Interface())
 		if err == nil {
 			return
 		}
@@ -260,7 +258,7 @@ func extractString(val reflect.Value, option *Option) (result string, err error)
 	originKind := GetKind(val)
 	tempVal := GetElem(val)
 	for IsValueElemable(val) && tempVal != val {
-		result, err = cast.String(val.Interface())
+		result, err = castString(val.Interface())
 		if err == nil {
 			return
 		}
@@ -285,29 +283,29 @@ func extractString(val reflect.Value, option *Option) (result string, err error)
 		result = val.String()
 	default:
 		if val.CanAddr() && !IsKindPtr(originKind) {
-			result, err = cast.String(val.Addr().Interface())
+			result, err = castString(val.Addr().Interface())
 			if err == nil {
 				return
 			}
 		}
-		result, err = cast.String(val.Interface())
+		result, err = castString(val.Interface())
 	}
 	return
 }
 
 func extractTime(val reflect.Value, option *Option) (result time.Time, err error) {
+	val = GetChildElem(val)
 	err = checkExtractValid(val, option)
 	if err != nil {
 		return
 	}
 
-	val = GetChildElem(val)
 	var timeStr string
 	switch GetKind(val) {
 	case reflect.String:
 		timeStr = val.String()
 	case reflect.Struct:
-		if val.Type() == TypeTime {
+		if GetType(val) == TypeTime {
 			timeVal := val.Interface().(time.Time)
 			result = timeVal
 			return
@@ -330,7 +328,36 @@ func extractTime(val reflect.Value, option *Option) (result time.Time, err error
 	return
 }
 
+func extractDuration(val reflect.Value, option *Option) (res time.Duration, err error) {
+	val = GetChildElem(val)
+	err = checkExtractValid(val, option)
+	if err != nil {
+		return
+	}
+
+	switch GetKind(val) {
+	case reflect.String:
+		res, err = time.ParseDuration(val.String())
+	default:
+		if GetType(val) == TypeDuration {
+			durVal := val.Interface().(time.Duration)
+			res = durVal
+			return
+		}
+
+		var resInt64 int64
+		resInt64, err = extractInt(val, option)
+		if err != nil {
+			return
+		}
+
+		res = time.Duration(resInt64)
+	}
+	return
+}
+
 func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) {
+	val = GetChildElem(val)
 	err = checkExtractValid(val, opt)
 	if err != nil {
 		return
@@ -340,6 +367,11 @@ func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) 
 	case reflect.Bool:
 		result, err = extractBool(val, opt)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if IsTypeValueDuration(val) {
+			result, err = extractDuration(val, opt)
+			return
+		}
+
 		result, err = extractInt(val, opt)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		result, err = extractUint(val, opt)
@@ -350,8 +382,7 @@ func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) 
 	case reflect.String:
 		result, err = extractString(val, opt)
 	case reflect.Struct, reflect.Ptr:
-		valType := val.Type()
-		if valType == TypeTime || valType == TypeTimePtr {
+		if IsTypeValueTime(val) {
 			result, err = extractTime(val, opt)
 			return
 		}

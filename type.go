@@ -7,10 +7,12 @@ import (
 
 // List of reflect.Type used in this package
 var (
-	TypeRuneSlice = reflect.TypeOf([]rune{})
-	TypeByteSlice = reflect.TypeOf([]byte{})
-	TypeTimePtr   = reflect.TypeOf(&time.Time{})
-	TypeTime      = reflect.TypeOf(time.Time{})
+	TypeRuneSlice   = reflect.TypeOf([]rune{})
+	TypeByteSlice   = reflect.TypeOf([]byte{})
+	TypeTimePtr     = reflect.TypeOf(&time.Time{})
+	TypeTime        = reflect.TypeOf(time.Time{})
+	TypeDurationPtr = reflect.TypeOf(new(time.Duration))
+	TypeDuration    = reflect.TypeOf(time.Duration(0))
 )
 
 // IsTypeValueElemable checks if the type of the reflect.Value can call Elem.
@@ -124,4 +126,16 @@ func GetChildElemPtrTypeOfType(input reflect.Type) (typ reflect.Type) {
 func GetChildElemValueType(val reflect.Value) (typ reflect.Type) {
 	typ = GetChildElemPtrType(UnwrapInterfaceValue(val))
 	return
+}
+
+// IsTypeValueDuration checks whether the type of val reflect.Value is time.Duration or *time.Duration.
+func IsTypeValueDuration(val reflect.Value) bool {
+	typeVal := GetType(val)
+	return typeVal == TypeDuration || typeVal == TypeDurationPtr
+}
+
+// IsTypeValueTime checks whether the type of val reflect.Value is time.Time or *time.Time.
+func IsTypeValueTime(val reflect.Value) bool {
+	typeVal := GetType(val)
+	return typeVal == TypeTime || typeVal == TypeTimePtr
 }

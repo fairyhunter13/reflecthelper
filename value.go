@@ -283,3 +283,20 @@ func Cast(val reflect.Value, fnOpts ...FuncOption) (res Value) {
 	}).Assign(fnOpts...)
 	return
 }
+
+// IsNil checks whether the input val is nil for any type.
+func IsNil(val interface{}) bool {
+	if val == nil {
+		return true
+	}
+
+	return IsValueNil(reflect.ValueOf(val))
+}
+
+// IsValueNil checks whether the input val of reflect.Value is nil for any type.
+func IsValueNil(val reflect.Value) bool {
+	if IsKindValueNil(val) {
+		return val.IsNil()
+	}
+	return false
+}
