@@ -290,7 +290,7 @@ func IsNil(val interface{}) bool {
 		return true
 	}
 
-	return IsValueNil(reflect.ValueOf(val))
+	return IsValueNil(getValFromInterface(val))
 }
 
 // IsValueNil checks whether the input val of reflect.Value is nil for any type.

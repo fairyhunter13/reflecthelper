@@ -57,3 +57,17 @@ func TestInitNew(t *testing.T) {
 		assert.Equal(t, reflect.Invalid, valInit.Kind())
 	})
 }
+
+func TestCloneInterface(t *testing.T) {
+	t.Run("Simple test", func(t *testing.T) {
+		s := &str{Field: "astr", field: "small field"}
+
+		valClone := CloneInterface(reflect.ValueOf(s))
+		b := valClone.(*str)
+
+		s.Field = "changed field"
+
+		assert.NotEqual(t, s.field, b.field)
+		fmt.Println(s, b)
+	})
+}

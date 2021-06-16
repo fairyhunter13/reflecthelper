@@ -23,7 +23,7 @@ func IsInterfaceReflectZero(val interface{}) (result bool) {
 		return
 	}
 
-	return IsReflectZero(reflect.ValueOf(val))
+	return IsReflectZero(getValFromInterface(val))
 }
 
 // SetReflectZero sets the val to the reflect.Zero of its type.

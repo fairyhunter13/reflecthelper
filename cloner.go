@@ -17,6 +17,15 @@ func Clone(val reflect.Value) (res reflect.Value) {
 	return
 }
 
+// CloneInterface is like Clone but it accepts input and returns output as interface{}.
+func CloneInterface(input interface{}) (res interface{}) {
+	val := Clone(getValFromInterface(input))
+	if val.IsValid() && val.CanInterface() {
+		res = val.Interface()
+	}
+	return
+}
+
 // InitNew initializes a new reflect.Value with reflect.Type of val.
 func InitNew(val reflect.Value) (res reflect.Value) {
 	if !val.IsValid() {
