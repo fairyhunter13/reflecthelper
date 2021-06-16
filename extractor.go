@@ -319,12 +319,7 @@ func extractTime(val reflect.Value, option *Option) (result time.Time, err error
 		return
 	}
 
-	timeVal, err := parseTime(timeStr, option)
-	if err != nil {
-		return
-	}
-
-	result = timeVal
+	result, err = parseTime(timeStr, option)
 	return
 }
 

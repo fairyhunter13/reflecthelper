@@ -42,7 +42,6 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 	defer recoverFnOpt(&err, opt)
 
 	assignerKind := GetKind(assigner)
-	valKind := GetKind(val)
 	switch assignerKind {
 	case reflect.Bool:
 		var result bool
@@ -52,16 +51,26 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetBool(result)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		var result int64
-		result, err = extractInt(val, opt)
-		if err != nil {
-			return
+		switch GetType(assigner) {
+		case TypeDuration:
+			var resultDur time.Duration
+			resultDur, err = extractDuration(val, opt)
+			if err != nil {
+				return
+			}
+			assigner.Set(reflect.ValueOf(resultDur))
+		default:
+			var result int64
+			result, err = extractInt(val, opt)
+			if err != nil {
+				return
+			}
+			if assigner.OverflowInt(result) {
+				err = getErrOverflow(assigner)
+				return
+			}
+			assigner.SetInt(result)
 		}
-		if assigner.OverflowInt(result) {
-			err = getErrOverflow(assigner)
-			return
-		}
-		assigner.SetInt(result)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		var result uint64
 		result, err = extractUint(val, opt)
@@ -97,6 +106,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		assigner.SetComplex(result)
 	case reflect.Array, reflect.Slice:
 		isSlice := assignerKind == reflect.Slice
+		valKind := GetKind(val)
 		switch valKind {
 		case reflect.Array, reflect.Slice:
 			err = getErrOverflowedLength(assigner, val, isSlice)
@@ -118,6 +128,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetString(result)
 	case reflect.Map:
+		valKind := GetKind(val)
 		switch valKind {
 		case reflect.Map:
 			if GetType(assigner) == GetType(val) {
@@ -133,7 +144,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			err = assignDefault(assigner, val)
 		}
 	case reflect.Struct:
-		switch assigner.Type() {
+		switch GetType(assigner) {
 		case TypeTime:
 			var timeRes time.Time
 			timeRes, err = extractTime(val, opt)
@@ -143,6 +154,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			assigner.Set(reflect.ValueOf(timeRes))
 			return
 		default:
+			valKind := GetKind(val)
 			if !IsKindMap(valKind) && !IsKindStruct(valKind) {
 				break
 			}
@@ -191,7 +203,7 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, o
 	tm := task.NewErrorManager(task.WithBufferSize(val.Len()))
 	var emptyList reflect.Value
 	if isSlice {
-		emptyList = reflect.MakeSlice(assigner.Type(), val.Len(), val.Len())
+		emptyList = reflect.MakeSlice(GetType(assigner), val.Len(), val.Len())
 	} else {
 		typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
 		emptyList = reflect.New(typeArr).Elem()

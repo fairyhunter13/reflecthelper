@@ -626,6 +626,23 @@ func TestAssignReflect(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "time assignment using ptr valid string format",
+			args: args{
+				assigner: func() reflect.Value {
+					var test *time.Time = &now
+					return reflect.ValueOf(&test)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("2019-08-22T11:43:21+07:00")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				past, _ := time.Parse(time.RFC3339, "2019-08-22T11:43:21+07:00")
+				return reflect.ValueOf(past)
+			},
+			wantErr: false,
+		},
+		{
 			name: "unimplemented unsafe pointer",
 			args: args{
 				assigner: func() reflect.Value {
@@ -735,6 +752,36 @@ func TestAssignReflect(t *testing.T) {
 			},
 			wantAssigner: nil,
 			wantErr:      true,
+		},
+		{
+			name: "assign time.Duration from string - error",
+			args: args{
+				assigner: func() reflect.Value {
+					var hello *time.Duration
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("hello")
+				},
+			},
+			wantAssigner: nil,
+			wantErr:      true,
+		},
+		{
+			name: "assign time.Duration from string - valid",
+			args: args{
+				assigner: func() reflect.Value {
+					var hello *time.Duration
+					return reflect.ValueOf(&hello)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("15m")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(15 * time.Minute)
+			},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
