@@ -5,9 +5,20 @@ import (
 	"time"
 )
 
+func getValFromInterface(input interface{}) (val reflect.Value) {
+	switch input := input.(type) {
+	case reflect.Value:
+		val = input
+	default:
+		val = reflect.ValueOf(input)
+	}
+	return
+}
+
+// GetBool accepts input as interface{}.
 // GetBool is ExtractBool without error.
-func GetBool(val reflect.Value, fnOpts ...FuncOption) (res bool) {
-	res, _ = ExtractBool(val, fnOpts...)
+func GetBool(input interface{}, fnOpts ...FuncOption) (res bool) {
+	res, _ = ExtractBool(getValFromInterface(input), fnOpts...)
 	return
 }
 
@@ -18,9 +29,10 @@ func ExtractBool(val reflect.Value, fnOpts ...FuncOption) (res bool, err error) 
 	return
 }
 
+// GetInt accepts input as interface{}.
 // GetInt is ExtractInt without error.
-func GetInt(val reflect.Value, fnOpts ...FuncOption) (result int64) {
-	result, _ = ExtractInt(val, fnOpts...)
+func GetInt(input interface{}, fnOpts ...FuncOption) (result int64) {
+	result, _ = ExtractInt(getValFromInterface(input), fnOpts...)
 	return
 }
 
@@ -31,9 +43,10 @@ func ExtractInt(val reflect.Value, fnOpts ...FuncOption) (result int64, err erro
 	return
 }
 
+// GetUint accepts input as interface{}.
 // GetUint is ExtractUint without error.
-func GetUint(val reflect.Value, fnOpts ...FuncOption) (result uint64) {
-	result, _ = ExtractUint(val, fnOpts...)
+func GetUint(input interface{}, fnOpts ...FuncOption) (result uint64) {
+	result, _ = ExtractUint(getValFromInterface(input), fnOpts...)
 	return
 }
 
@@ -44,9 +57,10 @@ func ExtractUint(val reflect.Value, fnOpts ...FuncOption) (result uint64, err er
 	return
 }
 
+// GetFloat accepts input as interface{}.
 // GetFloat is ExtractFloat without error.
-func GetFloat(val reflect.Value, fnOpts ...FuncOption) (result float64) {
-	result, _ = ExtractFloat(val, fnOpts...)
+func GetFloat(input interface{}, fnOpts ...FuncOption) (result float64) {
+	result, _ = ExtractFloat(getValFromInterface(input), fnOpts...)
 	return
 }
 
@@ -57,9 +71,10 @@ func ExtractFloat(val reflect.Value, fnOpts ...FuncOption) (result float64, err 
 	return
 }
 
+// GetComplex accepts input as interface{}.
 // GetComplex is ExtractComplex without error.
-func GetComplex(val reflect.Value, fnOpts ...FuncOption) (result complex128) {
-	result, _ = ExtractComplex(val, fnOpts...)
+func GetComplex(input interface{}, fnOpts ...FuncOption) (result complex128) {
+	result, _ = ExtractComplex(getValFromInterface(input), fnOpts...)
 	return
 }
 
@@ -70,9 +85,10 @@ func ExtractComplex(val reflect.Value, fnOpts ...FuncOption) (result complex128,
 	return
 }
 
+// GetString accepts input as interface{}.
 // GetString is ExtractString without error.
-func GetString(val reflect.Value, fnOpts ...FuncOption) (result string) {
-	result, _ = ExtractString(val, fnOpts...)
+func GetString(input interface{}, fnOpts ...FuncOption) (result string) {
+	result, _ = ExtractString(getValFromInterface(input), fnOpts...)
 	return
 }
 
@@ -83,9 +99,10 @@ func ExtractString(val reflect.Value, fnOpts ...FuncOption) (result string, err 
 	return
 }
 
+// GetTime accepts input as interface{}.
 // GetTime is ExtractTime without error.
-func GetTime(val reflect.Value, fnOpts ...FuncOption) (result time.Time) {
-	result, _ = ExtractTime(val, fnOpts...)
+func GetTime(input interface{}, fnOpts ...FuncOption) (result time.Time) {
+	result, _ = ExtractTime(getValFromInterface(input), fnOpts...)
 	return
 }
 
@@ -96,9 +113,10 @@ func ExtractTime(val reflect.Value, fnOpts ...FuncOption) (result time.Time, err
 	return
 }
 
+// GetDuration accepts input as interface{}.
 // GetDuration is ExtractDuration without error.
-func GetDuration(val reflect.Value, fnOpts ...FuncOption) (result time.Duration) {
-	result, _ = ExtractDuration(val, fnOpts...)
+func GetDuration(input interface{}, fnOpts ...FuncOption) (result time.Duration) {
+	result, _ = ExtractDuration(getValFromInterface(input), fnOpts...)
 	return
 }
 
@@ -109,9 +127,10 @@ func ExtractDuration(val reflect.Value, fnOpts ...FuncOption) (result time.Durat
 	return
 }
 
+// TryGet accepts input as interface{}.
 // TryGet is TryExtract without error.
-func TryGet(val reflect.Value, fnOpts ...FuncOption) (result interface{}) {
-	result, _ = TryExtract(val, fnOpts...)
+func TryGet(input interface{}, fnOpts ...FuncOption) (result interface{}) {
+	result, _ = TryExtract(getValFromInterface(input), fnOpts...)
 	return
 }
 

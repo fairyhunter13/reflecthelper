@@ -299,7 +299,7 @@ func TestTryGet(t *testing.T) {
 
 func TestGetDuration(t *testing.T) {
 	type args struct {
-		val    reflect.Value
+		val    interface{}
 		fnOpts []FuncOption
 	}
 	tests := []struct {
@@ -320,6 +320,13 @@ func TestGetDuration(t *testing.T) {
 				val: reflect.ValueOf("hello"),
 			},
 			wantResult: 0,
+		},
+		{
+			name: "valid duration 1 second",
+			args: args{
+				val: time.Second,
+			},
+			wantResult: time.Second,
 		},
 	}
 	for _, tt := range tests {
