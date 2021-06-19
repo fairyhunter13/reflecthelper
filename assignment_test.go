@@ -2,6 +2,7 @@ package reflecthelper
 
 import (
 	"math"
+	"net"
 	"net/url"
 	"reflect"
 	"testing"
@@ -816,6 +817,39 @@ func TestAssignReflect(t *testing.T) {
 				var test *url.URL
 				test, _ = url.Parse("http://www.test.com")
 				return reflect.ValueOf(*test)
+			},
+			wantErr: false,
+		},
+		{
+			name: "assign net.IP from ptr ptr stringer - invalid",
+			args: args{
+				assigner: func() reflect.Value {
+					var test net.IP
+					return reflect.ValueOf(&test)
+				},
+				val: func() reflect.Value {
+					var test *stringer
+					return reflect.ValueOf(&test)
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(net.IP(nil))
+			},
+			wantErr: true,
+		},
+		{
+			name: "assign net.IP from string - valid",
+			args: args{
+				assigner: func() reflect.Value {
+					var test net.IP
+					return reflect.ValueOf(&test)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("8.8.8.8")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf(net.ParseIP("8.8.8.8"))
 			},
 			wantErr: false,
 		},

@@ -156,16 +156,31 @@ func IsArrayZero(v reflect.Value) bool {
 		return true
 	}
 
-	for i := 0; i < v.Len(); i++ {
+	var (
+		len      = v.Len()
+		boolChan = make(chan bool, len)
+		tm       = task.NewManager()
+	)
+	for i := 0; i < len; i++ {
 		elem := v.Index(i)
-		if !elem.IsValid() {
-			continue
-		}
-		if elem.CanInterface() && !IsZero(elem.Interface()) {
-			return false
+		tm.Run(func() {
+			if !elem.IsValid() {
+				return
+			}
+			if elem.CanInterface() && !IsZero(elem.Interface()) {
+				boolChan <- false
+			}
+		})
+	}
+	ants.Submit(func() {
+		tm.Wait()
+		close(boolChan)
+	})
+	for boolVal := range boolChan {
+		if !boolVal {
+			return boolVal
 		}
 	}
-
 	return true
 }
 

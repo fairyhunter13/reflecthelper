@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net"
 	"net/url"
 	"reflect"
 	"time"
@@ -117,7 +118,12 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		inSwitch = true
 		switch GetType(assigner) {
 		case TypeIP:
-			// TODO: Add net.IP assignment in here
+			var ipVal net.IP
+			ipVal, err = extractIP(val, opt)
+			if err != nil {
+				return
+			}
+			assigner.Set(reflect.ValueOf(ipVal))
 		default:
 			isSlice := assignerKind == reflect.Slice
 			valKind := GetKind(val)
