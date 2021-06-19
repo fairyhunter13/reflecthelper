@@ -1140,6 +1140,14 @@ func TestExtractDuration(t *testing.T) {
 	}
 }
 
+type URL struct {
+	URL string
+}
+
+func (u *URL) String() string {
+	return "http://www.test.com"
+}
+
 func TestExtractURL(t *testing.T) {
 	type args struct {
 		val    func() reflect.Value
@@ -1165,7 +1173,93 @@ func TestExtractURL(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		// TODO: Add test cases
+		{
+			name: "invalid ptr url.URL val",
+			args: args{
+				val: func() reflect.Value {
+					var test *url.URL
+					res := reflect.ValueOf(&test)
+					return res
+				},
+			},
+			wantResult: func() *url.URL {
+				return nil
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid string val",
+			args: args{
+				val: func() reflect.Value {
+					res := reflect.ValueOf("this \nis a \nurl")
+					return res
+				},
+			},
+			wantResult: func() *url.URL {
+				res := (*url.URL)(nil)
+				return res
+			},
+			wantErr: true,
+		},
+		{
+			name: "valid struct URL val",
+			args: args{
+				val: func() reflect.Value {
+					var test = URL{"http://www.test.com"}
+					res := reflect.ValueOf(&test)
+					return res
+				},
+			},
+			wantResult: func() *url.URL {
+				res, _ := url.Parse("http://www.test.com")
+				return res
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid string val",
+			args: args{
+				val: func() reflect.Value {
+					res := reflect.ValueOf("http://www.test.com")
+					return res
+				},
+			},
+			wantResult: func() *url.URL {
+				res, _ := url.Parse("http://www.test.com")
+				return res
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid url.URL val",
+			args: args{
+				val: func() reflect.Value {
+					urlVal, _ := url.Parse("http://www.test.com")
+					res := reflect.ValueOf(*urlVal)
+					return res
+				},
+			},
+			wantResult: func() *url.URL {
+				urlVal, _ := url.Parse("http://www.test.com")
+				return urlVal
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid ptr ptr url.URL val",
+			args: args{
+				val: func() reflect.Value {
+					urlVal, _ := url.Parse("http://www.test.com")
+					res := reflect.ValueOf(&urlVal)
+					return res
+				},
+			},
+			wantResult: func() *url.URL {
+				urlVal, _ := url.Parse("http://www.test.com")
+				return urlVal
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1181,8 +1275,9 @@ func TestExtractURL(t *testing.T) {
 
 func TestTryExtract(t *testing.T) {
 	var (
-		now = time.Now()
-		dur = 5 * time.Second
+		now       = time.Now()
+		dur       = 5 * time.Second
+		urlVal, _ = url.Parse("http://www.test.com")
 	)
 	type args struct {
 		val reflect.Value
@@ -1284,7 +1379,20 @@ func TestTryExtract(t *testing.T) {
 			},
 			wantResult: dur,
 		},
-		// TODO: Add test cases
+		{
+			name: "url.URL value",
+			args: args{
+				val: reflect.ValueOf(*urlVal),
+			},
+			wantResult: urlVal,
+		},
+		{
+			name: "ptr url.URL value",
+			args: args{
+				val: reflect.ValueOf(&urlVal),
+			},
+			wantResult: urlVal,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

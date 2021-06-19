@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net/url"
 	"reflect"
 	"time"
 
@@ -152,6 +153,14 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 				return
 			}
 			assigner.Set(reflect.ValueOf(timeRes))
+			return
+		case TypeURL:
+			var urlRes *url.URL
+			urlRes, err = extractURL(val, opt)
+			if err != nil {
+				return
+			}
+			assigner.Set(GetElem(reflect.ValueOf(urlRes)))
 			return
 		default:
 			valKind := GetKind(val)

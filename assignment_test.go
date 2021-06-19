@@ -2,6 +2,7 @@ package reflecthelper
 
 import (
 	"math"
+	"net/url"
 	"reflect"
 	"testing"
 	"time"
@@ -780,6 +781,41 @@ func TestAssignReflect(t *testing.T) {
 			},
 			wantAssigner: func() reflect.Value {
 				return reflect.ValueOf(15 * time.Minute)
+			},
+			wantErr: false,
+		},
+		{
+			name: "assign url.URL from string - invalid",
+			args: args{
+				assigner: func() reflect.Value {
+					var test *url.URL
+					return reflect.ValueOf(&test)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("test \n&& hello")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				var test *url.URL
+				return reflect.ValueOf(test)
+			},
+			wantErr: true,
+		},
+		{
+			name: "assign url.URL from string - valid",
+			args: args{
+				assigner: func() reflect.Value {
+					var test *url.URL
+					return reflect.ValueOf(&test)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf("http://www.test.com")
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				var test *url.URL
+				test, _ = url.Parse("http://www.test.com")
+				return reflect.ValueOf(*test)
 			},
 			wantErr: false,
 		},
