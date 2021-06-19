@@ -129,22 +129,22 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetString(result)
 	case reflect.Map:
+		err = assignDefault(assigner, val)
+		if err == nil {
+			return
+		}
 		valKind := GetKind(val)
 		switch valKind {
-		case reflect.Map:
-			if GetType(assigner) == GetType(val) {
-				err = assignDefault(assigner, val)
-				if err == nil {
-					return
-				}
-			}
-			fallthrough
-		case reflect.Struct, reflect.Array, reflect.Slice:
+		case reflect.Map, reflect.Struct:
 			err = assignMap(assigner, val, opt)
 		default:
-			err = assignDefault(assigner, val)
+			err = getErrUnimplementedAssign(assigner, val)
 		}
 	case reflect.Struct:
+		err = assignDefault(assigner, val)
+		if err == nil {
+			return
+		}
 		switch GetType(assigner) {
 		case TypeTime:
 			var timeRes time.Time
@@ -164,16 +164,13 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			return
 		default:
 			valKind := GetKind(val)
-			if !IsKindMap(valKind) && !IsKindStruct(valKind) {
-				break
-			}
-
-			err = assignMap(assigner, val, opt)
-			if err == nil {
-				return
+			switch valKind {
+			case reflect.Map, reflect.Struct:
+				err = assignMap(assigner, val, opt)
+			default:
+				err = getErrUnimplementedAssign(assigner, val)
 			}
 		}
-		fallthrough
 	case reflect.Chan, reflect.Func, reflect.Interface:
 		err = assignDefault(assigner, val)
 	default:
