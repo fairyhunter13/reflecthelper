@@ -42,13 +42,13 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
 	defer recoverFnOpt(&err, opt)
 
-	err = assignDefault(assigner, val)
-	if err == nil {
-		return
-	}
-	assignerKind := GetKind(assigner)
+	var (
+		assignerKind = GetKind(assigner)
+		inSwitch     bool
+	)
 	switch assignerKind {
 	case reflect.Bool:
+		inSwitch = true
 		var result bool
 		result, err = extractBool(val, opt)
 		if err != nil {
@@ -56,6 +56,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetBool(result)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		inSwitch = true
 		switch GetType(assigner) {
 		case TypeDuration:
 			var resultDur time.Duration
@@ -77,6 +78,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			assigner.SetInt(result)
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		inSwitch = true
 		var result uint64
 		result, err = extractUint(val, opt)
 		if err != nil {
@@ -88,6 +90,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetUint(result)
 	case reflect.Float32, reflect.Float64:
+		inSwitch = true
 		var result float64
 		result, err = extractFloat(val, opt)
 		if err != nil {
@@ -99,6 +102,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetFloat(result)
 	case reflect.Complex64, reflect.Complex128:
+		inSwitch = true
 		var result complex128
 		result, err = extractComplex(val, opt)
 		if err != nil {
@@ -110,6 +114,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetComplex(result)
 	case reflect.Array, reflect.Slice:
+		inSwitch = true
 		switch GetType(assigner) {
 		case TypeIP:
 			// TODO: Add net.IP assignment in here
@@ -131,6 +136,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			}
 		}
 	case reflect.String:
+		inSwitch = true
 		var result string
 		result, err = extractString(val, opt)
 		if err != nil {
@@ -138,6 +144,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetString(result)
 	case reflect.Map:
+		inSwitch = true
 		valKind := GetKind(val)
 		switch valKind {
 		case reflect.Map, reflect.Struct:
@@ -146,6 +153,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			err = getErrUnimplementedAssign(assigner, val)
 		}
 	case reflect.Struct:
+		inSwitch = true
 		switch GetType(assigner) {
 		case TypeTime:
 			var timeRes time.Time
@@ -170,9 +178,11 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 				err = getErrUnimplementedAssign(assigner, val)
 			}
 		}
-	default:
-		err = getErrUnimplementedAssign(assigner, val)
 	}
+	if inSwitch {
+		return
+	}
+	err = assignDefault(assigner, val)
 	return
 }
 

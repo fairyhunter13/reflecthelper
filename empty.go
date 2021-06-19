@@ -4,6 +4,9 @@ import (
 	"math"
 	"reflect"
 	"time"
+
+	"github.com/fairyhunter13/task/v2"
+	"github.com/panjf2000/ants"
 )
 
 // Zeroable is a contract to specifies the Zero attribute of a custom type.
@@ -119,13 +122,29 @@ func IsStructZero(v reflect.Value) bool {
 		}
 	}
 
-	for i := 0; i < v.NumField(); i++ {
+	var (
+		numField = v.NumField()
+		boolChan = make(chan bool, numField)
+		tm       = task.NewManager()
+	)
+	for i := 0; i < numField; i++ {
 		field := v.Field(i)
-		if !field.IsValid() {
-			continue
-		}
-		if field.CanInterface() && !IsZero(field.Interface()) {
-			return false
+		tm.Run(func() {
+			if !field.IsValid() {
+				return
+			}
+			if field.CanInterface() && !IsZero(field.Interface()) {
+				boolChan <- false
+			}
+		})
+	}
+	ants.Submit(func() {
+		tm.Wait()
+		close(boolChan)
+	})
+	for boolVal := range boolChan {
+		if !boolVal {
+			return boolVal
 		}
 	}
 	return true
