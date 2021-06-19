@@ -42,6 +42,10 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
 	defer recoverFnOpt(&err, opt)
 
+	err = assignDefault(assigner, val)
+	if err == nil {
+		return
+	}
 	assignerKind := GetKind(assigner)
 	switch assignerKind {
 	case reflect.Bool:
@@ -106,20 +110,25 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetComplex(result)
 	case reflect.Array, reflect.Slice:
-		isSlice := assignerKind == reflect.Slice
-		valKind := GetKind(val)
-		switch valKind {
-		case reflect.Array, reflect.Slice:
-			err = getErrOverflowedLength(assigner, val, isSlice)
-			if err != nil {
-				return
-			}
-
-			err = iterateAndAssign(assigner, val, isSlice, opt)
-		case reflect.String:
-			err = iterateAndAssignString(assigner, val, isSlice, opt)
+		switch GetType(assigner) {
+		case TypeIP:
+			// TODO: Add net.IP assignment in here
 		default:
-			err = getErrUnimplementedAssign(assigner, val)
+			isSlice := assignerKind == reflect.Slice
+			valKind := GetKind(val)
+			switch valKind {
+			case reflect.Array, reflect.Slice:
+				err = getErrOverflowedLength(assigner, val, isSlice)
+				if err != nil {
+					return
+				}
+
+				err = iterateAndAssign(assigner, val, isSlice, opt)
+			case reflect.String:
+				err = iterateAndAssignString(assigner, val, isSlice, opt)
+			default:
+				err = getErrUnimplementedAssign(assigner, val)
+			}
 		}
 	case reflect.String:
 		var result string
@@ -129,10 +138,6 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 		assigner.SetString(result)
 	case reflect.Map:
-		err = assignDefault(assigner, val)
-		if err == nil {
-			return
-		}
 		valKind := GetKind(val)
 		switch valKind {
 		case reflect.Map, reflect.Struct:
@@ -141,10 +146,6 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			err = getErrUnimplementedAssign(assigner, val)
 		}
 	case reflect.Struct:
-		err = assignDefault(assigner, val)
-		if err == nil {
-			return
-		}
 		switch GetType(assigner) {
 		case TypeTime:
 			var timeRes time.Time
@@ -153,7 +154,6 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 				return
 			}
 			assigner.Set(reflect.ValueOf(timeRes))
-			return
 		case TypeURL:
 			var urlRes *url.URL
 			urlRes, err = extractURL(val, opt)
@@ -161,7 +161,6 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 				return
 			}
 			assigner.Set(GetElem(reflect.ValueOf(urlRes)))
-			return
 		default:
 			valKind := GetKind(val)
 			switch valKind {
@@ -171,8 +170,6 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 				err = getErrUnimplementedAssign(assigner, val)
 			}
 		}
-	case reflect.Chan, reflect.Func, reflect.Interface:
-		err = assignDefault(assigner, val)
 	default:
 		err = getErrUnimplementedAssign(assigner, val)
 	}
