@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net/url"
 	"reflect"
 	"time"
 )
@@ -124,6 +125,20 @@ func GetDuration(input interface{}, fnOpts ...FuncOption) (result time.Duration)
 func ExtractDuration(val reflect.Value, fnOpts ...FuncOption) (result time.Duration, err error) {
 	opt := NewOption().Assign(fnOpts...)
 	result, err = extractDuration(val, opt)
+	return
+}
+
+// GetURL accepts input as interface{}.
+// GetURL is ExtractURL without error.
+func GetURL(input interface{}, fnOpts ...FuncOption) (result *url.URL) {
+	result, _ = ExtractURL(getValFromInterface(input), fnOpts...)
+	return
+}
+
+// ExtractURL extracts *url.URL from val of reflect.Value.
+func ExtractURL(val reflect.Value, fnOpts ...FuncOption) (result *url.URL, err error) {
+	opt := NewOption().Assign(fnOpts...)
+	result, err = extractURL(val, opt)
 	return
 }
 

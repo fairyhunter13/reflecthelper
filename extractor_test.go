@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net/url"
 	"reflect"
 	"testing"
 	"time"
@@ -1139,6 +1140,45 @@ func TestExtractDuration(t *testing.T) {
 	}
 }
 
+func TestExtractURL(t *testing.T) {
+	type args struct {
+		val    func() reflect.Value
+		fnOpts []FuncOption
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult func() *url.URL
+		wantErr    bool
+	}{
+		{
+			name: "invalid val",
+			args: args{
+				val: func() reflect.Value {
+					res := reflect.ValueOf(nil)
+					return res
+				},
+			},
+			wantResult: func() *url.URL {
+				res := (*url.URL)(nil)
+				return res
+			},
+			wantErr: true,
+		},
+		// TODO: Add test cases
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResult, err := ExtractURL(tt.args.val(), tt.args.fnOpts...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractURL() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.EqualValues(t, tt.wantResult(), gotResult)
+		})
+	}
+}
+
 func TestTryExtract(t *testing.T) {
 	var (
 		now = time.Now()
@@ -1244,6 +1284,7 @@ func TestTryExtract(t *testing.T) {
 			},
 			wantResult: dur,
 		},
+		// TODO: Add test cases
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

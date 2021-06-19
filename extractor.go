@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net/url"
 	"reflect"
 	"strconv"
 	"time"
@@ -351,6 +352,34 @@ func extractDuration(val reflect.Value, option *Option) (res time.Duration, err 
 	return
 }
 
+func extractURL(val reflect.Value, option *Option) (res *url.URL, err error) {
+	val = GetChildElem(val)
+	err = checkExtractValid(val, option)
+	if err != nil {
+		return
+	}
+
+	switch GetKind(val) {
+	case reflect.String:
+		res, err = url.Parse(val.String())
+	default:
+		if GetType(val) == TypeURL {
+			urlVal := val.Interface().(url.URL)
+			res = &urlVal
+			return
+		}
+
+		var resURL string
+		resURL, err = extractString(val, option)
+		if err != nil {
+			return
+		}
+
+		res, err = url.Parse(resURL)
+	}
+	return
+}
+
 func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) {
 	val = GetChildElem(val)
 	err = checkExtractValid(val, opt)
@@ -377,8 +406,12 @@ func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) 
 	case reflect.String:
 		result, err = extractString(val, opt)
 	case reflect.Struct, reflect.Ptr:
-		if IsTypeValueTime(val) {
+		switch {
+		case IsTypeValueTime(val):
 			result, err = extractTime(val, opt)
+			return
+		case IsTypeValueURL(val):
+			result, err = extractURL(val, opt)
 			return
 		}
 

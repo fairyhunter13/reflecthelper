@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net/url"
 	"reflect"
 	"testing"
 	"time"
@@ -333,6 +334,47 @@ func TestGetDuration(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotResult := GetDuration(tt.args.val, tt.args.fnOpts...); !reflect.DeepEqual(gotResult, tt.wantResult) {
 				t.Errorf("GetDuration() = %v, want %v", gotResult, tt.wantResult)
+			}
+		})
+	}
+}
+
+func TestGetURL(t *testing.T) {
+	type args struct {
+		input  interface{}
+		fnOpts []FuncOption
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult func() *url.URL
+	}{
+		{
+			name: "valid URL",
+			args: args{
+				input: "http://test.com",
+			},
+			wantResult: func() *url.URL {
+				res, _ := url.Parse("http://test.com")
+				return res
+			},
+		},
+		{
+			name: "invalid URL",
+			args: args{
+				input: "http: // test. com",
+			},
+			wantResult: func() *url.URL {
+				res, _ := url.Parse("http: // test. com")
+				return res
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResult := GetURL(tt.args.input, tt.args.fnOpts...)
+			if tt.wantResult() != nil && gotResult != nil {
+				assert.EqualValues(t, tt.wantResult().String(), gotResult.String())
 			}
 		})
 	}

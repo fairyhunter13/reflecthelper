@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net/url"
 	"reflect"
 	"time"
 )
@@ -9,10 +10,12 @@ import (
 var (
 	TypeRuneSlice   = reflect.TypeOf([]rune{})
 	TypeByteSlice   = reflect.TypeOf([]byte{})
-	TypeTimePtr     = reflect.TypeOf(&time.Time{})
+	TypeTimePtr     = reflect.TypeOf(new(time.Time))
 	TypeTime        = reflect.TypeOf(time.Time{})
 	TypeDurationPtr = reflect.TypeOf(new(time.Duration))
 	TypeDuration    = reflect.TypeOf(time.Duration(0))
+	TypeURLPtr      = reflect.TypeOf(new(url.URL))
+	TypeURL         = reflect.TypeOf(url.URL{})
 )
 
 // IsTypeValueElemable checks if the type of the reflect.Value can call Elem.
@@ -138,4 +141,10 @@ func IsTypeValueDuration(val reflect.Value) bool {
 func IsTypeValueTime(val reflect.Value) bool {
 	typeVal := GetType(val)
 	return typeVal == TypeTime || typeVal == TypeTimePtr
+}
+
+// IsTypeValueURL checks whether the type of val reflect.Value is url.URL or *url.URL.
+func IsTypeValueURL(val reflect.Value) bool {
+	typeVal := GetType(val)
+	return typeVal == TypeURL || typeVal == TypeURLPtr
 }
