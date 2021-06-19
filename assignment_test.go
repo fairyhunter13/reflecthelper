@@ -853,6 +853,22 @@ func TestAssignReflect(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "assign array from array - valid",
+			args: args{
+				assigner: func() reflect.Value {
+					var test [3]int
+					return reflect.ValueOf(&test)
+				},
+				val: func() reflect.Value {
+					return reflect.ValueOf([3]int{1, 2, 3})
+				},
+			},
+			wantAssigner: func() reflect.Value {
+				return reflect.ValueOf([3]int{1, 2, 3})
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

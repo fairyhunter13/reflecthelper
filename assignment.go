@@ -114,8 +114,20 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 			return
 		}
 		assigner.SetComplex(result)
+	case reflect.String:
+		inSwitch = true
+		var result string
+		result, err = extractString(val, opt)
+		if err != nil {
+			return
+		}
+		assigner.SetString(result)
 	case reflect.Array, reflect.Slice:
 		inSwitch = true
+		err = assignDefault(assigner, val)
+		if err == nil {
+			break
+		}
 		switch GetType(assigner) {
 		case TypeIP:
 			var ipVal net.IP
@@ -141,16 +153,12 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 				err = getErrUnimplementedAssign(assigner, val)
 			}
 		}
-	case reflect.String:
-		inSwitch = true
-		var result string
-		result, err = extractString(val, opt)
-		if err != nil {
-			return
-		}
-		assigner.SetString(result)
 	case reflect.Map:
 		inSwitch = true
+		err = assignDefault(assigner, val)
+		if err == nil {
+			break
+		}
 		valKind := GetKind(val)
 		switch valKind {
 		case reflect.Map, reflect.Struct:
@@ -160,6 +168,10 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		}
 	case reflect.Struct:
 		inSwitch = true
+		err = assignDefault(assigner, val)
+		if err == nil {
+			break
+		}
 		switch GetType(assigner) {
 		case TypeTime:
 			var timeRes time.Time
