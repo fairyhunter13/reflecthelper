@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net"
 	"net/url"
 	"reflect"
 	"strconv"
@@ -380,6 +381,34 @@ func extractURL(val reflect.Value, option *Option) (res *url.URL, err error) {
 	return
 }
 
+func extractIP(val reflect.Value, option *Option) (res net.IP, err error) {
+	val = GetChildElem(val)
+	err = checkExtractValid(val, option)
+	if err != nil {
+		return
+	}
+
+	switch GetKind(val) {
+	case reflect.String:
+		res = net.ParseIP(val.String())
+	default:
+		if GetType(val) == TypeIP {
+			ipVal := val.Interface().(net.IP)
+			res = ipVal
+			return
+		}
+
+		var strIP string
+		strIP, err = extractString(val, option)
+		if err != nil {
+			return
+		}
+
+		res = net.ParseIP(strIP)
+	}
+	return
+}
+
 func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) {
 	val = GetChildElem(val)
 	err = checkExtractValid(val, opt)
@@ -393,7 +422,7 @@ func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if IsTypeValueDuration(val) {
 			result, err = extractDuration(val, opt)
-			return
+			break
 		}
 
 		result, err = extractInt(val, opt)
@@ -409,10 +438,15 @@ func tryExtract(val reflect.Value, opt *Option) (result interface{}, err error) 
 		switch {
 		case IsTypeValueTime(val):
 			result, err = extractTime(val, opt)
-			return
 		case IsTypeValueURL(val):
 			result, err = extractURL(val, opt)
-			return
+		default:
+			err = getErrUnimplementedExtract(val)
+		}
+	case reflect.Slice:
+		if IsTypeValueIP(val) {
+			result, err = extractIP(val, opt)
+			break
 		}
 
 		fallthrough

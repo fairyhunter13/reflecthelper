@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net"
 	"net/url"
 	"reflect"
 	"testing"
@@ -375,6 +376,27 @@ func TestGetURL(t *testing.T) {
 			gotResult := GetURL(tt.args.input, tt.args.fnOpts...)
 			if tt.wantResult() != nil && gotResult != nil {
 				assert.EqualValues(t, tt.wantResult().String(), gotResult.String())
+			}
+		})
+	}
+}
+
+func TestGetIP(t *testing.T) {
+	type args struct {
+		input  interface{}
+		fnOpts []FuncOption
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult net.IP
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotResult := GetIP(tt.args.input, tt.args.fnOpts...); !reflect.DeepEqual(gotResult, tt.wantResult) {
+				t.Errorf("GetIP() = %v, want %v", gotResult, tt.wantResult)
 			}
 		})
 	}

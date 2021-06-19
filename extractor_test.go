@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net"
 	"net/url"
 	"reflect"
 	"testing"
@@ -1402,6 +1403,33 @@ func TestTryExtract(t *testing.T) {
 				return
 			}
 			assert.Equal(t, tt.wantResult, gotResult)
+		})
+	}
+}
+
+func TestExtractIP(t *testing.T) {
+	type args struct {
+		val    reflect.Value
+		fnOpts []FuncOption
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult net.IP
+		wantErr    bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResult, err := ExtractIP(tt.args.val, tt.args.fnOpts...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractIP() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotResult, tt.wantResult) {
+				t.Errorf("ExtractIP() = %v, want %v", gotResult, tt.wantResult)
+			}
 		})
 	}
 }

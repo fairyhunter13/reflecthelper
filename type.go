@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"net"
 	"net/url"
 	"reflect"
 	"time"
@@ -16,6 +17,8 @@ var (
 	TypeDuration    = reflect.TypeOf(time.Duration(0))
 	TypeURLPtr      = reflect.TypeOf(new(url.URL))
 	TypeURL         = reflect.TypeOf(url.URL{})
+	TypeIPPtr       = reflect.TypeOf(new(net.IP))
+	TypeIP          = reflect.TypeOf(net.IP{})
 )
 
 // IsTypeValueElemable checks if the type of the reflect.Value can call Elem.
@@ -147,4 +150,10 @@ func IsTypeValueTime(val reflect.Value) bool {
 func IsTypeValueURL(val reflect.Value) bool {
 	typeVal := GetType(val)
 	return typeVal == TypeURL || typeVal == TypeURLPtr
+}
+
+// IsTypeValueIP checks whether the type of val reflect.Value is net.IP or *net.IP.
+func IsTypeValueIP(val reflect.Value) bool {
+	typeVal := GetType(val)
+	return typeVal == TypeIP || typeVal == TypeIPPtr
 }
