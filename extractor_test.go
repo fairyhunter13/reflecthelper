@@ -1274,11 +1274,111 @@ func TestExtractURL(t *testing.T) {
 	}
 }
 
+func TestExtractIP(t *testing.T) {
+	type args struct {
+		val    func() reflect.Value
+		fnOpts []FuncOption
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult func() net.IP
+		wantErr    bool
+	}{
+		{
+			name: "invalid nil value",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf(nil)
+				},
+			},
+			wantResult: func() net.IP {
+				return nil
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid nil ptr stringer ip address",
+			args: args{
+				val: func() reflect.Value {
+					var test *stringer
+					return reflect.ValueOf(&test)
+				},
+			},
+			wantResult: func() net.IP {
+				return nil
+			},
+			wantErr: true,
+		},
+		{
+			name: "valid string ip address",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf("1.1.1.1")
+				},
+			},
+			wantResult: func() net.IP {
+				return net.ParseIP("1.1.1.1")
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid net.IP address",
+			args: args{
+				val: func() reflect.Value {
+					return reflect.ValueOf(net.ParseIP("1.1.1.1"))
+				},
+			},
+			wantResult: func() net.IP {
+				return net.ParseIP("1.1.1.1")
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid ptr net.IP address",
+			args: args{
+				val: func() reflect.Value {
+					ipAddr := net.ParseIP("1.1.1.1")
+					return reflect.ValueOf(&ipAddr)
+				},
+			},
+			wantResult: func() net.IP {
+				return net.ParseIP("1.1.1.1")
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid stringer ip address",
+			args: args{
+				val: func() reflect.Value {
+					var test = stringer{"8.8.8.8"}
+					return reflect.ValueOf(&test)
+				},
+			},
+			wantResult: func() net.IP {
+				return net.ParseIP("8.8.8.8")
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResult, err := ExtractIP(tt.args.val(), tt.args.fnOpts...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractIP() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.EqualValues(t, tt.wantResult(), gotResult)
+		})
+	}
+}
+
 func TestTryExtract(t *testing.T) {
 	var (
 		now       = time.Now()
 		dur       = 5 * time.Second
 		urlVal, _ = url.Parse("http://www.test.com")
+		ipVal     = net.ParseIP("8.8.8.8")
 	)
 	type args struct {
 		val reflect.Value
@@ -1394,6 +1494,20 @@ func TestTryExtract(t *testing.T) {
 			},
 			wantResult: urlVal,
 		},
+		{
+			name: "net.IP value",
+			args: args{
+				val: reflect.ValueOf(ipVal),
+			},
+			wantResult: ipVal,
+		},
+		{
+			name: "ptr net.IP value",
+			args: args{
+				val: reflect.ValueOf(&ipVal),
+			},
+			wantResult: ipVal,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1403,33 +1517,6 @@ func TestTryExtract(t *testing.T) {
 				return
 			}
 			assert.Equal(t, tt.wantResult, gotResult)
-		})
-	}
-}
-
-func TestExtractIP(t *testing.T) {
-	type args struct {
-		val    reflect.Value
-		fnOpts []FuncOption
-	}
-	tests := []struct {
-		name       string
-		args       args
-		wantResult net.IP
-		wantErr    bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotResult, err := ExtractIP(tt.args.val, tt.args.fnOpts...)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ExtractIP() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotResult, tt.wantResult) {
-				t.Errorf("ExtractIP() = %v, want %v", gotResult, tt.wantResult)
-			}
 		})
 	}
 }

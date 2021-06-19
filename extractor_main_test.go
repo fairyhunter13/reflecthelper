@@ -389,15 +389,31 @@ func TestGetIP(t *testing.T) {
 	tests := []struct {
 		name       string
 		args       args
-		wantResult net.IP
+		wantResult func() net.IP
 	}{
-		// TODO: Add test cases.
+		{
+			name: "valid ip address",
+			args: args{
+				input: "1.1.1.1",
+			},
+			wantResult: func() net.IP {
+				return net.ParseIP("1.1.1.1")
+			},
+		},
+		{
+			name: "invalid ip address",
+			args: args{
+				input: "hello",
+			},
+			wantResult: func() net.IP {
+				return net.ParseIP("hello")
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotResult := GetIP(tt.args.input, tt.args.fnOpts...); !reflect.DeepEqual(gotResult, tt.wantResult) {
-				t.Errorf("GetIP() = %v, want %v", gotResult, tt.wantResult)
-			}
+			gotResult := GetIP(tt.args.input, tt.args.fnOpts...)
+			assert.EqualValues(t, tt.wantResult(), gotResult)
 		})
 	}
 }
