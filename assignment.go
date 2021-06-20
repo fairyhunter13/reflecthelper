@@ -128,6 +128,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		if err == nil {
 			break
 		}
+		err = nil
 		switch GetType(assigner) {
 		case TypeIP:
 			var ipVal net.IP
@@ -159,6 +160,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		if err == nil {
 			break
 		}
+		err = nil
 		valKind := GetKind(val)
 		switch valKind {
 		case reflect.Map, reflect.Struct:
@@ -172,6 +174,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		if err == nil {
 			break
 		}
+		err = nil
 		switch GetType(assigner) {
 		case TypeTime:
 			var timeRes time.Time
