@@ -146,6 +146,11 @@ func IsKindInt(kind reflect.Kind) bool {
 	return kind >= reflect.Int && kind <= reflect.Int64
 }
 
+// IsKindUint checks whether the kind is uint or not.
+func IsKindUint(kind reflect.Kind) bool {
+	return kind >= reflect.Uint && kind <= reflect.Uintptr
+}
+
 // IsKindUnsafePointer checks whether the kind is unsafe ptr or not.
 func IsKindUnsafePointer(kind reflect.Kind) bool {
 	return kind == reflect.UnsafePointer
@@ -156,14 +161,14 @@ func IsKindString(kind reflect.Kind) bool {
 	return kind == reflect.String
 }
 
-// IsKindUint checks whether the kind is uint or not.
-func IsKindUint(kind reflect.Kind) bool {
-	return kind >= reflect.Uint && kind <= reflect.Uintptr
-}
-
 // IsKindPtr checks whether the input kind is reflect.Ptr.
 func IsKindPtr(kind reflect.Kind) bool {
 	return kind == reflect.Ptr
+}
+
+// IsKindInterface checks whether the input kind is reflect.Interface.
+func IsKindInterface(kind reflect.Kind) bool {
+	return kind == reflect.Interface
 }
 
 // IsKindStruct checks whether the input kind is reflect.Struct.

@@ -721,3 +721,29 @@ func TestIsKindUint(t *testing.T) {
 		})
 	}
 }
+
+func TestIsKindInterface(t *testing.T) {
+	type args struct {
+		kind reflect.Kind
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "kind interface",
+			args: args{
+				kind: reflect.Interface,
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsKindInterface(tt.args.kind); got != tt.want {
+				t.Errorf("IsKindInterface() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
