@@ -2,7 +2,7 @@ version: 2.1
 executors:
   completedocker:
     docker:
-      - image: golang:1
+      - image: golang:1.16
     working_directory: /go/src/github.com/fairyhunter13/reflecthelper
 jobs:
   testandcoverage:
