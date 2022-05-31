@@ -43,6 +43,13 @@ func assignReflect(assigner reflect.Value, val reflect.Value, opt *Option) (err 
 func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err error) {
 	defer recoverFnOpt(&err, opt)
 
+	if opt.FnAssigner != nil {
+		err = opt.FnAssigner(assigner, val, opt)
+		if err == nil || !opt.ContinueAssignOnError {
+			return
+		}
+	}
+
 	var (
 		assignerKind = GetKind(assigner)
 		inSwitch     bool

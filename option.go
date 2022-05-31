@@ -1,6 +1,8 @@
 package reflecthelper
 
 import (
+	"reflect"
+
 	"github.com/Popog/deepcopy"
 	"github.com/mitchellh/mapstructure"
 )
@@ -22,7 +24,14 @@ type Option struct {
 	RecoverPanic          bool
 	BlockChannelIteration bool
 	ConcurrentMode        bool
+	FnAssigner            FuncAssigner
+	ContinueAssignOnError bool
 }
+
+// FuncAssigner is a custom function to assign from the val of reflect.Value to the assigner of reflect.Value.
+// This function will be passed with one more argument, that is option.
+// This function will return the error from inside the function.
+type FuncAssigner func(assigner reflect.Value, val reflect.Value, o *Option) (err error)
 
 // FuncOption is a function option to set the Option for function arguments.
 type FuncOption func(o *Option)
@@ -96,6 +105,18 @@ func WithConcurrency(input bool) FuncOption {
 func WithDecoderConfig(cfg *mapstructure.DecoderConfig) FuncOption {
 	return func(o *Option) {
 		o.DecoderConfig = cfg
+	}
+}
+
+// WithCustomAssigner sets the custom function of assigning value to the Option.
+// This function also accepts the continueAssignOnErr param to make sure that
+// the assignment inside this package still continues even the custom assigner
+// returns error.
+// The custom assigner is only needed if the assignment process is complex.
+func WithCustomAssigner(fn FuncAssigner, continueAssignOnErr bool) FuncOption {
+	return func(o *Option) {
+		o.ContinueAssignOnError = continueAssignOnErr
+		o.FnAssigner = fn
 	}
 }
 

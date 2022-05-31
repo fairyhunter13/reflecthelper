@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"errors"
 	"math"
 	"net"
 	"net/url"
@@ -11,6 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
+
+var ErrTesting = errors.New("error testing")
 
 func TestAssignReflect(t *testing.T) {
 	now := time.Now()
@@ -878,6 +881,66 @@ func TestAssignReflect(t *testing.T) {
 			}
 			if tt.wantAssigner != nil && tt.wantAssigner().IsValid() {
 				assert.EqualValues(t, tt.wantAssigner().Interface(), GetChildElem(assigner).Interface())
+			}
+		})
+	}
+}
+
+func TestAssignReflect_CustomFunction(t *testing.T) {
+	type args struct {
+		assigner reflect.Value
+		val      reflect.Value
+		funcOpts []FuncOption
+	}
+	tests := []struct {
+		name    string
+		args    func() args
+		wantErr bool
+	}{
+		{
+			name: "custom function returns error, continue",
+			args: func() args {
+				var test *string
+				assigner := reflect.ValueOf(&test)
+				val := reflect.ValueOf("")
+				return args{
+					funcOpts: []FuncOption{
+						WithCustomAssigner(func(assigner, val reflect.Value, o *Option) (err error) {
+							err = ErrTesting
+							return
+						}, true),
+					},
+					assigner: assigner,
+					val:      val,
+				}
+			},
+			wantErr: false,
+		},
+		{
+			name: "custom function returns error, don't continue",
+			args: func() args {
+				var test *string
+				assigner := reflect.ValueOf(&test)
+				val := reflect.ValueOf("")
+				return args{
+					funcOpts: []FuncOption{
+						WithCustomAssigner(func(assigner, val reflect.Value, o *Option) (err error) {
+							err = ErrTesting
+							return
+						}, false),
+					},
+					assigner: assigner,
+					val:      val,
+				}
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			args := tt.args()
+			if err := AssignReflect(args.assigner, args.val, args.funcOpts...); (err != nil) != tt.wantErr {
+				t.Errorf("AssignReflect() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

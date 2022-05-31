@@ -17,6 +17,7 @@ func TestOption(t *testing.T) {
 			WithBitSize(64, 128),
 			WithFloatConfiguration(-1, 't'),
 			WithTimeLayouts("hello"),
+			WithCustomAssigner(nil, true),
 		)
 		assert.Equal(t, byte('g'), opt.FloatFormat)
 		opt = NewOption().Assign(
@@ -24,6 +25,7 @@ func TestOption(t *testing.T) {
 			WithBitSize(64, 128),
 			WithFloatConfiguration(-1, 'f'),
 			WithTimeLayouts("hello"),
+			WithCustomAssigner(nil, true),
 		)
 		assert.Equal(t, byte('f'), opt.FloatFormat)
 	})
