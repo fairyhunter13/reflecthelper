@@ -48,6 +48,7 @@ func tryAssign(assigner reflect.Value, val reflect.Value, opt *Option) (err erro
 		if err == nil || !opt.ContinueAssignOnError {
 			return
 		}
+		err = nil
 	}
 
 	var (
