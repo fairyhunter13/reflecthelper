@@ -33,3 +33,13 @@ func IsNil(val interface{}) bool {
 func IsPtr(in interface{}) bool {
 	return IsKindPtr(GetKind(getValFromInterface(in)))
 }
+
+// GetTypeInterface is a wrapper for GetType by passing an interface instead of reflect.Value.
+func GetTypeInterface(in interface{}) reflect.Type {
+	return GetType(getValFromInterface(in))
+}
+
+// GetKindInterface is a wrapper for GetKind by passing an interface instead of reflect.Value.
+func GetKindInterface(in interface{}) reflect.Kind {
+	return GetKind(getValFromInterface(in))
+}

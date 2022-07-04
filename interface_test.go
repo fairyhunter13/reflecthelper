@@ -160,3 +160,17 @@ func TestIsPtr(t *testing.T) {
 		})
 	}
 }
+
+func TestGetTypeInterface(t *testing.T) {
+	var val int
+
+	assert.Equal(t, reflect.TypeOf(5), GetTypeInterface(val))
+	assert.Equal(t, reflect.TypeOf(10), GetTypeInterface(reflect.ValueOf(val)))
+}
+
+func TestGetKindInterface(t *testing.T) {
+	var val int
+
+	assert.Equal(t, reflect.TypeOf(5).Kind(), GetKindInterface(val))
+	assert.Equal(t, reflect.TypeOf(10).Kind(), GetKindInterface(reflect.ValueOf(val)))
+}
