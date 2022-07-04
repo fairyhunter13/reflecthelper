@@ -300,3 +300,9 @@ func IsValueNil(val reflect.Value) bool {
 	}
 	return false
 }
+
+// IsPtr checks whether the input interface{} is a reflect.Ptr or not.
+// The pointer in golang can be represented by reflect.Ptr.
+func IsPtr(in interface{}) bool {
+	return IsKindPtr(GetKind(reflect.ValueOf(in)))
+}

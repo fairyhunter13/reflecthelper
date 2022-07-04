@@ -437,3 +437,47 @@ func TestIsNil(t *testing.T) {
 		})
 	}
 }
+
+func TestIsPtr(t *testing.T) {
+	type args struct {
+		in interface{}
+	}
+	tests := []struct {
+		name string
+		args func() args
+		want bool
+	}{
+		{
+			name: "a pointer",
+			args: func() args {
+				var newVar int
+				return args{&newVar}
+			},
+			want: true,
+		},
+		{
+			name: "invalid null pointer",
+			args: func() args {
+				type test struct{}
+				var newVar *test
+				return args{&newVar}
+			},
+			want: true,
+		},
+
+		{
+			name: "valid value",
+			args: func() args {
+				var newVar string
+				return args{newVar}
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			args := tt.args()
+			assert.Equalf(t, tt.want, IsPtr(args.in), "IsPtr(%v)", args.in)
+		})
+	}
+}
