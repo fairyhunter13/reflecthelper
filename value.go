@@ -284,25 +284,10 @@ func Cast(val reflect.Value, fnOpts ...FuncOption) (res Value) {
 	return
 }
 
-// IsNil checks whether the input val is nil for any type.
-func IsNil(val interface{}) bool {
-	if val == nil {
-		return true
-	}
-
-	return IsValueNil(getValFromInterface(val))
-}
-
 // IsValueNil checks whether the input val of reflect.Value is nil for any type.
 func IsValueNil(val reflect.Value) bool {
 	if IsKindValueNil(val) {
 		return val.IsNil()
 	}
 	return false
-}
-
-// IsPtr checks whether the input interface{} is a reflect.Ptr or not.
-// The pointer in golang can be represented by reflect.Ptr.
-func IsPtr(in interface{}) bool {
-	return IsKindPtr(GetKind(reflect.ValueOf(in)))
 }

@@ -12,8 +12,8 @@ func GetKind(val reflect.Value) (res reflect.Kind) {
 	return
 }
 
-// GetElemKind gets the elem kind from the val of reflect.Value.
-func GetElemKind(val reflect.Value) (res reflect.Kind) {
+// GetKindElem gets the elem kind from the val of reflect.Value.
+func GetKindElem(val reflect.Value) (res reflect.Kind) {
 	if !val.IsValid() {
 		return
 	}
@@ -27,8 +27,8 @@ func GetElemKind(val reflect.Value) (res reflect.Kind) {
 	return
 }
 
-// GetChildElemTypeKind returns the child elems' (root child) kind of the type of val reflect.Value.
-func GetChildElemTypeKind(val reflect.Value) (res reflect.Kind) {
+// GetKindChildElemType returns the child elems' (root child) kind of the type of val reflect.Value.
+func GetKindChildElemType(val reflect.Value) (res reflect.Kind) {
 	if !val.IsValid() {
 		return
 	}
@@ -39,11 +39,11 @@ func GetChildElemTypeKind(val reflect.Value) (res reflect.Kind) {
 		return
 	}
 
-	res = getChildElemTypeKind(val)
+	res = getKindChildElemType(val)
 	return
 }
 
-func getChildElemTypeKind(val reflect.Value) (res reflect.Kind) {
+func getKindChildElemType(val reflect.Value) (res reflect.Kind) {
 	elemType := val.Type().Elem()
 	res = elemType.Kind()
 	for IsKindTypeElemable(res) {
@@ -53,8 +53,8 @@ func getChildElemTypeKind(val reflect.Value) (res reflect.Kind) {
 	return
 }
 
-// GetChildElemPtrKind gets the child elements' (root child) ptr kind of the val of reflect.Value.
-func GetChildElemPtrKind(val reflect.Value) (res reflect.Kind) {
+// GetKindChildElemPtr gets the child elements' (root child) ptr kind of the val of reflect.Value.
+func GetKindChildElemPtr(val reflect.Value) (res reflect.Kind) {
 	if !val.IsValid() {
 		return
 	}
@@ -68,9 +68,9 @@ func GetChildElemPtrKind(val reflect.Value) (res reflect.Kind) {
 	return
 }
 
-// GetChildElemValueKind gets the child elements' (root child) kind of the val reflect.Value and it only works on ptr kind.
-func GetChildElemValueKind(val reflect.Value) (res reflect.Kind) {
-	res = GetChildElemPtrKind(UnwrapInterfaceValue(val))
+// GetKindChildElemValue gets the child elements' (root child) kind of the val reflect.Value and it only works on ptr kind.
+func GetKindChildElemValue(val reflect.Value) (res reflect.Kind) {
+	res = GetKindChildElemPtr(UnwrapInterfaceValue(val))
 	return
 }
 
@@ -86,7 +86,7 @@ func IsValueElemable(val reflect.Value) bool {
 
 // IsValueElemableParentElem checks whether the res have elemable kind for parent and elem.
 func IsValueElemableParentElem(res reflect.Value) bool {
-	return IsKindValueElemable(GetKind(res)) && IsKindValueElemable(GetElemKind(res))
+	return IsKindValueElemable(GetKind(res)) && IsKindValueElemable(GetKindElem(res))
 }
 
 // IsKindTypeElemable checks the kind of reflect.Type that can call Elem method.
@@ -113,7 +113,7 @@ func IsKindValueBytesSlice(val reflect.Value) bool {
 		return false
 	}
 
-	return GetElemKind(val) == reflect.Uint8
+	return GetKindElem(val) == reflect.Uint8
 }
 
 // IsKindSlice checks whether the kind is slice or not.

@@ -18,3 +18,18 @@ func UnwrapInterfaceValue(val reflect.Value) (res reflect.Value) {
 	}
 	return
 }
+
+// IsNil checks whether the input val is nil for any type.
+func IsNil(val interface{}) bool {
+	if val == nil {
+		return true
+	}
+
+	return IsValueNil(getValFromInterface(val))
+}
+
+// IsPtr checks whether the input interface{} is a reflect.Ptr or not.
+// The pointer in golang can be represented by reflect.Ptr.
+func IsPtr(in interface{}) bool {
+	return IsKindPtr(GetKind(getValFromInterface(in)))
+}

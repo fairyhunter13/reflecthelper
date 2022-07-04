@@ -16,7 +16,7 @@ type Zeroable interface {
 
 var nilTime *time.Time
 
-// IsZero returns false if k is nil or has a zero value
+// IsZero returns false if k is nil or has a zero value.
 func IsZero(k interface{}) bool {
 	if k == nil {
 		return true
@@ -138,7 +138,7 @@ func IsStructZero(v reflect.Value) bool {
 			}
 		})
 	}
-	ants.Submit(func() {
+	_ = ants.Submit(func() {
 		tm.Wait()
 		close(boolChan)
 	})
@@ -157,11 +157,11 @@ func IsArrayZero(v reflect.Value) bool {
 	}
 
 	var (
-		len      = v.Len()
-		boolChan = make(chan bool, len)
+		length   = v.Len()
+		boolChan = make(chan bool, length)
 		tm       = task.NewManager()
 	)
-	for i := 0; i < len; i++ {
+	for i := 0; i < length; i++ {
 		elem := v.Index(i)
 		tm.Run(func() {
 			if !elem.IsValid() {
@@ -172,7 +172,7 @@ func IsArrayZero(v reflect.Value) bool {
 			}
 		})
 	}
-	ants.Submit(func() {
+	_ = ants.Submit(func() {
 		tm.Wait()
 		close(boolChan)
 	})

@@ -247,7 +247,7 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, o
 	if isSlice {
 		emptyList = reflect.MakeSlice(GetType(assigner), val.Len(), val.Len())
 	} else {
-		typeArr := reflect.ArrayOf(assigner.Len(), GetElemType(assigner))
+		typeArr := reflect.ArrayOf(assigner.Len(), GetTypeElem(assigner))
 		emptyList = reflect.New(typeArr).Elem()
 	}
 
@@ -270,7 +270,7 @@ func iterateAndAssign(assigner reflect.Value, val reflect.Value, isSlice bool, o
 
 func iterateAndAssignString(assigner reflect.Value, val reflect.Value, isSlice bool, opt *Option) (err error) {
 	var listVal reflect.Value
-	switch GetElemKind(assigner) {
+	switch GetKindElem(assigner) {
 	case reflect.Uint8:
 		listVal = reflect.ValueOf([]byte(val.String()))
 	case reflect.Int32:

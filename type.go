@@ -46,8 +46,8 @@ func GetType(val reflect.Value) (typ reflect.Type) {
 	return
 }
 
-// GetElemType returns the elem type of a val of reflect.Value.
-func GetElemType(val reflect.Value) (typ reflect.Type) {
+// GetTypeElem returns the elem type of a val of reflect.Value.
+func GetTypeElem(val reflect.Value) (typ reflect.Type) {
 	if !val.IsValid() {
 		return
 	}
@@ -59,8 +59,8 @@ func GetElemType(val reflect.Value) (typ reflect.Type) {
 	return
 }
 
-// GetElemTypeOfType returns the elem type of the input of reflect.Type.
-func GetElemTypeOfType(input reflect.Type) (typ reflect.Type) {
+// GetTypeElemType returns the elem type of the input of reflect.Type.
+func GetTypeElemType(input reflect.Type) (typ reflect.Type) {
 	typ = input
 	if typ == nil {
 		return
@@ -72,8 +72,8 @@ func GetElemTypeOfType(input reflect.Type) (typ reflect.Type) {
 	return
 }
 
-// GetChildElemType returns the child elems' (root child) type of the val of reflect.Value.
-func GetChildElemType(val reflect.Value) (typ reflect.Type) {
+// GetTypeChildElem returns the child elems' (root child) type of the val of reflect.Value.
+func GetTypeChildElem(val reflect.Value) (typ reflect.Type) {
 	if !val.IsValid() {
 		return
 	}
@@ -85,8 +85,8 @@ func GetChildElemType(val reflect.Value) (typ reflect.Type) {
 	return
 }
 
-// GetChildElemTypeOfType returns the child elems' (root child) type of the input of reflect.Type.
-func GetChildElemTypeOfType(input reflect.Type) (typ reflect.Type) {
+// GetTypeChildElemType returns the child elems' (root child) type of the input of reflect.Type.
+func GetTypeChildElemType(input reflect.Type) (typ reflect.Type) {
 	typ = input
 	if typ == nil {
 		return
@@ -98,8 +98,8 @@ func GetChildElemTypeOfType(input reflect.Type) (typ reflect.Type) {
 	return
 }
 
-// GetChildElemPtrType returns the child elems' (root child) ptr type of the val of reflect.Value.
-func GetChildElemPtrType(val reflect.Value) (typ reflect.Type) {
+// GetTypeChildElemPtr returns the child elems' (root child) ptr type of the val of reflect.Value.
+func GetTypeChildElemPtr(val reflect.Value) (typ reflect.Type) {
 	if !val.IsValid() {
 		return
 	}
@@ -113,8 +113,8 @@ func GetChildElemPtrType(val reflect.Value) (typ reflect.Type) {
 	return
 }
 
-// GetChildElemPtrTypeOfType returns the child elems' (root child) ptr type of the input of reflect.Type.
-func GetChildElemPtrTypeOfType(input reflect.Type) (typ reflect.Type) {
+// GetTypeChildElemPtrType returns the child elems' (root child) ptr type of the input of reflect.Type.
+func GetTypeChildElemPtrType(input reflect.Type) (typ reflect.Type) {
 	typ = input
 	if typ == nil {
 		return
@@ -128,9 +128,9 @@ func GetChildElemPtrTypeOfType(input reflect.Type) (typ reflect.Type) {
 	return
 }
 
-// GetChildElemValueType returns the child elem's (root child) type of the val reflect.Value and it only works on ptr kind.
-func GetChildElemValueType(val reflect.Value) (typ reflect.Type) {
-	typ = GetChildElemPtrType(UnwrapInterfaceValue(val))
+// GetTypeChildElemValue returns the child elem's (root child) type of the val reflect.Value and it only works on ptr kind.
+func GetTypeChildElemValue(val reflect.Value) (typ reflect.Type) {
+	typ = GetTypeChildElemPtr(UnwrapInterfaceValue(val))
 	return
 }
 

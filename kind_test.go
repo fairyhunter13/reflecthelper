@@ -144,8 +144,8 @@ func TestGetElemKind(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := GetElemKind(tt.args.val); !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("GetElemKind() = %v, want %v", gotRes, tt.wantRes)
+			if gotRes := GetKindElem(tt.args.val); !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("GetKindElem() = %v, want %v", gotRes, tt.wantRes)
 			}
 		})
 	}
@@ -221,8 +221,8 @@ func TestGetChildElemTypeKind(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := GetChildElemTypeKind(tt.args.val); !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("GetChildElemTypeKind() = %v, want %v", gotRes, tt.wantRes)
+			if gotRes := GetKindChildElemType(tt.args.val); !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("GetKindChildElemType() = %v, want %v", gotRes, tt.wantRes)
 			}
 		})
 	}
@@ -270,8 +270,8 @@ func TestGetChildElemPtrKind(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := GetChildElemPtrKind(tt.args.val); !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("GetChildElemPtrKind() = %v, want %v", gotRes, tt.wantRes)
+			if gotRes := GetKindChildElemPtr(tt.args.val); !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("GetKindChildElemPtr() = %v, want %v", gotRes, tt.wantRes)
 			}
 		})
 	}
@@ -319,8 +319,8 @@ func TestGetChildElemValueKind(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := GetChildElemValueKind(tt.args.val()); !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("GetChildElemValueKind() = %v, want %v", gotRes, tt.wantRes)
+			if gotRes := GetKindChildElemValue(tt.args.val()); !reflect.DeepEqual(gotRes, tt.wantRes) {
+				t.Errorf("GetKindChildElemValue() = %v, want %v", gotRes, tt.wantRes)
 			}
 		})
 	}
