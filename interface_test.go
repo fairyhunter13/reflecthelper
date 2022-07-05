@@ -111,7 +111,7 @@ func TestIsNil(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsNil(tt.args.val); got != tt.want {
-				t.Errorf("IsValueNil() = %v, want %v", got, tt.want)
+				t.Errorf("IsNil() = %v, want %v", got, tt.want)
 			}
 		})
 	}
