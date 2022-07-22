@@ -1,6 +1,7 @@
 package reflecthelper
 
 import (
+	"errors"
 	"net"
 	"net/url"
 	"reflect"
@@ -893,6 +894,14 @@ func TestExtractString(t *testing.T) {
 				val: reflect.ValueOf(stringVal{"hello"}),
 			},
 			wantResult: "hello",
+			wantErr:    false,
+		},
+		{
+			name: "error interface",
+			args: args{
+				val: reflect.ValueOf(errors.New("test this error")),
+			},
+			wantResult: "test this error",
 			wantErr:    false,
 		},
 	}

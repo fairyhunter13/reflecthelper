@@ -7,6 +7,12 @@ func castString(val interface{}) (result string, err error) {
 	if err != nil {
 		return
 	}
+
+	if errType, ok := val.(error); ok {
+		result = errType.Error()
+		return
+	}
+
 	result, err = cast.String(val)
 	return
 }
